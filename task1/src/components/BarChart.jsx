@@ -1,6 +1,5 @@
-//File: task1/src/components/BarChart.jsx
-import React from 'react';
-import { Bar } from 'react-chartjs-2';
+import React from "react";
+import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -8,7 +7,8 @@ import {
   BarElement,
   Tooltip,
   Legend,
-} from 'chart.js';
+} from "chart.js";
+import LegendBrush from "./LegendBrush.jsx"; // ✅ Import
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
@@ -18,19 +18,19 @@ export default function BarChart({ data }) {
     labels,
     datasets: [
       {
-        label: 'Total Value',
+        label: "Total Value",
         data: data.map((d) => d.totalValue),
-        backgroundColor: 'rgba(59, 130, 246, 0.7)', // blue
+        backgroundColor: "rgba(59, 130, 246, 0.7)", // blue
       },
       {
-        label: 'Total Sales',
+        label: "Total Sales",
         data: data.map((d) => d.totalSales),
-        backgroundColor: 'rgba(16, 185, 129, 0.7)', // green
+        backgroundColor: "rgba(16, 185, 129, 0.7)", // green
       },
       {
-        label: 'Difference',
+        label: "Difference",
         data: data.map((d) => d.totalValue - d.totalSales),
-        backgroundColor: 'rgba(234, 179, 8, 0.7)', // amber
+        backgroundColor: "rgba(234, 179, 8, 0.7)", // amber
       },
     ],
   };
@@ -38,13 +38,43 @@ export default function BarChart({ data }) {
   const options = {
     responsive: true,
     plugins: {
-      legend: { position: 'top' },
+      legend: { position: "top" },
       tooltip: { enabled: true },
     },
     scales: {
-      y: { beginAtZero: true },
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: "TotalSales",
+          font: {
+            size: 14,
+            weight: "bold",
+          },
+        },
+      },
+      x: {
+        title: {
+          display: true,
+          text: "Product",
+          font: {
+            size: 14,
+            weight: "bold",
+          },
+        },
+      },
+    },
+    animation: {
+      duration: 800,
+      easing: "easeOutCubic",
     },
   };
 
-  return <Bar data={chartData} options={options} />;
+  return (
+    <div className="flex items-start space-x-8">
+      <div className="flex-1">
+        <Bar data={chartData} options={options} />
+      </div>
+    </div>
+  );
 }

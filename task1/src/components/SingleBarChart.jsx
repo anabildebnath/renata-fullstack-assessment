@@ -1,5 +1,3 @@
-// src/components/SingleBarChart.jsx
-
 import React from 'react';
 import { Bar } from 'react-chartjs-2';
 import {
@@ -8,26 +6,57 @@ import {
   LinearScale,
   BarElement,
   Tooltip,
+  Title,
 } from 'chart.js';
+import LegendBrush from './LegendBrush';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Title);
 
-// Map totalValue → bar color (5-unit buckets)
-function getColor(value) {
-  if (value >= 36) return 'rgba(69, 10, 10, 0.9)';     // red-950
-  if (value >= 31) return 'rgba(154, 52, 18, 0.9)';    // orange-700
-  if (value >= 26) return 'rgba(234, 88, 12, 0.9)';    // orange-600
-  if (value >= 21) return 'rgba(251, 146, 60, 0.9)';   // orange-400
-  if (value >= 16) return 'rgba(253, 186, 116, 0.9)';  // orange-300
-  if (value >= 11) return 'rgba(254, 215, 170, 0.9)';  // orange-200
-  if (value >= 6)  return 'rgba(255, 237, 213, 0.9)';  // orange-100
-  return 'rgba(255, 247, 237, 0.9)';                   // orange-50
+// Fixed color palette (8 levels)
+const fixedColors = [
+  'rgba(69, 10, 10, 0.9)',     // red-950
+  'rgba(154, 52, 18, 0.9)',    // orange-700
+  'rgba(234, 88, 12, 0.9)',    // orange-600
+  'rgba(251, 146, 60, 0.9)',   // orange-400
+  'rgba(253, 186, 116, 0.9)',  // orange-300
+  'rgba(254, 215, 170, 0.9)',  // orange-200
+  'rgba(255, 237, 213, 0.9)',  // orange-100
+  'rgba(255, 247, 237, 0.9)',  // orange-50
+];
+
+// Generate dynamic ranges but fixed colors
+function generateColorRanges(max) {
+  const step = Math.ceil(max / 8);
+  const ranges = [];
+  for (let i = 0; i < 8; i++) {
+    const start = max - i * step;
+    const end = Math.max(0, start - step + 1);
+    ranges.push({
+      color: fixedColors[i],
+      label: `${start}–${end}`,
+      min: end,
+      max: start,
+    });
+  }
+  return ranges;
+}
+
+// Assign color based on range
+function getColor(value, ranges) {
+  for (const r of ranges) {
+    if (value >= r.min && value <= r.max) return r.color;
+  }
+  return 'rgba(255,255,255,1)';
 }
 
 export default function SingleBarChart({ data }) {
-  const labels   = data.map(d => d.product);
-  const values   = data.map(d => d.totalSales);
-  const bgColors = data.map(d => getColor(d.totalValue));
+  const maxVal = Math.max(...data.map(d => d.totalValue));
+  const maxSales = Math.max(...data.map(d => d.totalSales));
+  const colorRanges = generateColorRanges(maxVal);
+
+  const labels = data.map(d => d.product);
+  const values = data.map(d => d.totalSales);
+  const bgColors = data.map(d => getColor(d.totalValue, colorRanges));
 
   const chartData = {
     labels,
@@ -40,23 +69,35 @@ export default function SingleBarChart({ data }) {
 
   const options = {
     responsive: true,
+    animation: {
+      duration: 800,
+      easing: 'easeOutBounce',
+    },
     plugins: {
       tooltip: {
         callbacks: {
-          // Show the product as the title
           title: (items) => `Product: ${items[0].label}`,
-          // First line: TotalSales
           label: (item) => `TotalSales: ${item.formattedValue}`,
-          // Second line: TotalValue
           afterLabel: (item) => `TotalValue: ${data[item.dataIndex].totalValue}`
         }
-      }
+      },
     },
     scales: {
       y: {
         beginAtZero: true,
-        ticks: { stepSize: 2 },
-        max: 18,
+        max: Math.ceil(maxSales / 5) * 5 + 5,
+        title: {
+          display: true,
+          text: 'TotalSales',
+          font: { weight: 'bold', size: 14 },
+        },
+      },
+      x: {
+        title: {
+          display: true,
+          text: 'Product',
+          font: { weight: 'bold', size: 14 },
+        },
       },
     },
   };
@@ -66,9 +107,9 @@ export default function SingleBarChart({ data }) {
       <div className="flex-1">
         <Bar data={chartData} options={options} />
       </div>
-      <div className="w-32">
+      <div className="w-40">
         <h2 className="font-bold mb-2 text-center">Value Ranges</h2>
-        {/* LegendBrush or manual legend here */}
+        <LegendBrush ranges={colorRanges} />
       </div>
     </div>
   );

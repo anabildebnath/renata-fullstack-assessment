@@ -1,0 +1,77 @@
+[
+  {
+    "product": "isc",
+    "totalValue": 897,
+    "totalSales": 178
+  },
+  {
+    "product": "yax",
+    "totalValue": 646,
+    "totalSales": 96
+  },
+  {
+    "product": "soi",
+    "totalValue": 140,
+    "totalSales": 95
+  },
+  {
+    "product": "wmo",
+    "totalValue": 105,
+    "totalSales": 90
+  },
+  {
+    "product": "eyv",
+    "totalValue": 197,
+    "totalSales": 60
+  },
+  {
+    "product": "vhq",
+    "totalValue": 763,
+    "totalSales": 165
+  },
+  {
+    "product": "dbv",
+    "totalValue": 208,
+    "totalSales": 22
+  },
+  {
+    "product": "cje",
+    "totalValue": 35,
+    "totalSales": 49
+  },
+  {
+    "product": "hcl",
+    "totalValue": 130,
+    "totalSales": 161
+  },
+  {
+    "product": "vek",
+    "totalValue": 997,
+    "totalSales": 163
+  },
+  {
+    "product": "noa",
+    "totalValue": 247,
+    "totalSales": 185
+  },
+  {
+    "product": "ocs",
+    "totalValue": 698,
+    "totalSales": 100
+  },
+  {
+    "product": "cnm",
+    "totalValue": 837,
+    "totalSales": 151
+  },
+  {
+    "product": "iid",
+    "totalValue": 272,
+    "totalSales": 129
+  },
+  {
+    "product": "fxm",
+    "totalValue": 353,
+    "totalSales": 54
+  }
+]
