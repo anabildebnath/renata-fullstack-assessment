@@ -1,3 +1,5 @@
+// src/components/SingleBarChart.jsx
+
 import React from 'react';
 import { Bar } from 'react-chartjs-2';
 import {
@@ -10,12 +12,16 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
-// Map totalValue → bar color
+// Map totalValue → bar color (5-unit buckets)
 function getColor(value) {
-  if (value >= 35) return 'rgba(220, 38, 38, 0.8)';   // red
-  if (value >= 30) return 'rgba(249, 115, 22, 0.8)'; // orange
-  if (value >= 25) return 'rgba(234, 179, 8, 0.8)';  // yellow
-  return 'rgba(107, 114, 128, 0.5)';               // gray fallback
+  if (value >= 36) return 'rgba(69, 10, 10, 0.9)';     // red-950
+  if (value >= 31) return 'rgba(154, 52, 18, 0.9)';    // orange-700
+  if (value >= 26) return 'rgba(234, 88, 12, 0.9)';    // orange-600
+  if (value >= 21) return 'rgba(251, 146, 60, 0.9)';   // orange-400
+  if (value >= 16) return 'rgba(253, 186, 116, 0.9)';  // orange-300
+  if (value >= 11) return 'rgba(254, 215, 170, 0.9)';  // orange-200
+  if (value >= 6)  return 'rgba(255, 237, 213, 0.9)';  // orange-100
+  return 'rgba(255, 247, 237, 0.9)';                   // orange-50
 }
 
 export default function SingleBarChart({ data }) {
@@ -34,7 +40,18 @@ export default function SingleBarChart({ data }) {
 
   const options = {
     responsive: true,
-    plugins: { tooltip: { enabled: true } },
+    plugins: {
+      tooltip: {
+        callbacks: {
+          // Show the product as the title
+          title: (items) => `Product: ${items[0].label}`,
+          // First line: TotalSales
+          label: (item) => `TotalSales: ${item.formattedValue}`,
+          // Second line: TotalValue
+          afterLabel: (item) => `TotalValue: ${data[item.dataIndex].totalValue}`
+        }
+      }
+    },
     scales: {
       y: {
         beginAtZero: true,
@@ -51,14 +68,7 @@ export default function SingleBarChart({ data }) {
       </div>
       <div className="w-32">
         <h2 className="font-bold mb-2 text-center">Value Ranges</h2>
-        <div className="flex flex-col space-y-1">
-          <div className="h-6 bg-red-600" />
-          <span className="text-sm text-center">35 – 40</span>
-          <div className="h-6 bg-orange-500" />
-          <span className="text-sm text-center">30 – 35</span>
-          <div className="h-6 bg-yellow-400" />
-          <span className="text-sm text-center">25 – 30</span>
-        </div>
+        {/* LegendBrush or manual legend here */}
       </div>
     </div>
   );

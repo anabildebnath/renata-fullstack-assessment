@@ -1,10 +1,8 @@
-// Tailwind v4’s PostCSS plugin
-import postcss from '@tailwindcss/postcss';
+// postcss.config.js
+import tailwindcss from '@tailwindcss/postcss';
 import autoprefixer from 'autoprefixer';
 
+/** @type {import('postcss').Config} */
 export default {
-  plugins: [
-    postcss(),
-    autoprefixer(),
-  ],
+  plugins: [tailwindcss, autoprefixer],
 };
