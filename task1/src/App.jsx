@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import SingleBarChart from '@/components/SingleBarChart.jsx';
 import BarChart from '@/components/BarChart.jsx';
 import PieChart from '@/components/PieChart.jsx';
+import GaugeChart from '@/components/GaugeChart.jsx'; // Import the new GaugeChart component
 import { Button } from "@/components/ui/button";
 import './App.css';
 
@@ -9,16 +10,14 @@ export default function App() {
   const [data, setData] = useState([]);
 
   // Read the active version from localStorage on initial render
-  // Use a function inside useState to ensure localStorage is only accessed once
   const [activeVersion, setActiveVersion] = useState(() => {
     const savedVersion = localStorage.getItem('activeChartVersion');
-    // Return the saved version if it exists, otherwise default to 'v1'
     return savedVersion || 'v1';
   });
 
-  // Effect to fetch data on component mount (same as before)
+  // Effect to fetch data on component mount
   useEffect(() => {
-    console.log('Fetching data...'); // Added for debugging
+    console.log('Fetching data...');
     fetch('/data.json')
       .then(res => {
          if (!res.ok) {
@@ -28,16 +27,16 @@ export default function App() {
       })
       .then(data => {
         setData(data);
-        console.log('Data fetched successfully:', data); // Added for debugging
+        console.log('Data fetched successfully:', data);
       })
       .catch(err => console.error("Error loading data:", err));
-  }, []); // Empty dependency array means this runs only once on mount
+  }, []);
 
   // Effect to save the active version to localStorage whenever it changes
   useEffect(() => {
-    console.log('Saving active version to localStorage:', activeVersion); // Added for debugging
+    console.log('Saving active version to localStorage:', activeVersion);
     localStorage.setItem('activeChartVersion', activeVersion);
-  }, [activeVersion]); // This effect runs whenever activeVersion state changes
+  }, [activeVersion]);
 
   return (
     <div className="h-[90vh] px-20 py-10 bg-gray-50">
@@ -76,6 +75,17 @@ export default function App() {
           >
             Version 3
           </Button>
+           {/* Version 4 (Gauge Chart) Button */}
+           <Button
+            onClick={() => setActiveVersion('v4')}
+            className={`px-6 py-2 font-semibold rounded transition ${
+              activeVersion === 'v4'
+                ? 'bg-black text-white hover:bg-black'
+                : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+            }`}
+          >
+            Version 4
+          </Button>
         </div>
       </div>
 
@@ -86,7 +96,9 @@ export default function App() {
             ? 'Variation – Single Color Scale'
             : activeVersion === 'v2'
               ? 'Variation – Comparison View'
-              : 'Variation – Pie Chart View'
+              : activeVersion === 'v3'
+                ? 'Variation – Pie Chart View'
+                : 'Variation – Sales Gauge Chart' // Title for Version 4
           }
         </h2>
         {/* Conditional Rendering of the chart based on active version */}
@@ -97,9 +109,10 @@ export default function App() {
             <BarChart data={data} />
           ) : activeVersion === 'v3' ? (
             <PieChart data={data} />
+          ) : activeVersion === 'v4' ? (
+            <GaugeChart />
           ) : null // Fallback
         ) : (
-          // You could show a specific loading message or skeleton here if needed
           <p className="text-center text-gray-500">Loading data...</p>
         )}
       </section>
