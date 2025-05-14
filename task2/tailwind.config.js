@@ -1,16 +1,17 @@
 // tailwind.config.js
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: ["class"], // For shadcn/ui dark mode
+  darkMode: ["class"], // Essential for shadcn/ui dark mode
   content: [
-    './pages/**/*.{ts,tsx,js,jsx}',
-    './components/**/*.{ts,tsx,js,jsx}',
-    './app/**/*.{ts,tsx,js,jsx}',
-    './src/**/*.{ts,tsx,js,jsx}', // Include your src directory
+    './index.html',
+    './pages/**/*.{js,jsx,ts,tsx}',      // If you have a pages directory
+    './components/**/*.{js,jsx,ts,tsx}',// For your custom components
+    './app/**/*.{js,jsx,ts,tsx}',        // If you have an app directory
+    './src/**/*.{js,jsx,ts,tsx}',        // General catch-all for src
   ],
-  prefix: "", // If you're using a prefix for shadcn/ui
+  prefix: "", // From your components.json (if you intend to use a prefix, specify it here)
   theme: {
-    container: {
+    container: { // As per shadcn/ui docs
       center: true,
       padding: "2rem",
       screens: {
@@ -18,7 +19,7 @@ export default {
       },
     },
     extend: {
-      colors: { // Your shadcn/ui theme colors will go here or be imported
+      colors: { // From your components.json and typical shadcn/ui setup
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -52,21 +53,20 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // ... other colors from your theme inline block
       },
-      borderRadius: {
+      borderRadius: { // As per shadcn/ui docs
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
-      keyframes: {
+      keyframes: { // For shadcn/ui animations
         "accordion-down": {
-          from: { height: "0" },
+          from: { height: "0" }, /* Use "0" instead of 0px for keyframes */
           to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
+          to: { height: "0" }, /* Use "0" instead of 0px for keyframes */
         },
       },
       animation: {
@@ -75,5 +75,7 @@ export default {
       },
     },
   },
-  plugins: [import("tailwindcss-animate")], // For shadcn/ui animations
-}
+  plugins: [
+    import("tailwindcss-animate") // Essential for shadcn/ui animations
+  ],
+};
