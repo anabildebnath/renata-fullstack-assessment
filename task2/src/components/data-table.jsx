@@ -19,17 +19,6 @@ import {
 import { CSS } from "@dnd-kit/utilities"
 import {
   IconGripVertical,
-  IconCircleCheckFilled,
-  IconLoader,
-  IconLayoutColumns,
-  IconChevronDown,
-  IconChevronLeft,
-  IconChevronRight,
-  IconChevronsLeft,
-  IconChevronsRight,
-  IconPlus,
-  IconDotsVertical,
-  IconTrendingUp,
 } from "@tabler/icons-react"
 import {
   flexRender,
@@ -41,56 +30,15 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
+import { toast } from "sonner"
 import { z } from "zod"
 
-import { Badge } from "@/components/ui/badge"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { Button } from "@/components/ui/button"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Checkbox } from "@/components/ui/checkbox"
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Tabs, TabsContent } from "@/components/ui/tabs"
 
-// Optional Zod schema for your data validation
+// Zod schema (optional)
 export const schema = z.object({
   ID: z.string(),
   CustomerName: z.string(),
@@ -101,48 +49,38 @@ export const schema = z.object({
   Income: z.number(),
 })
 
-// Drag handle renders the little grip icon and wires up sorting listeners
-function DragHandle({ id }) {
-  const { attributes, listeners, setNodeRef, transition, transform } = useSortable({ id })
+// DraggableRow: wraps a single <TableRow> and injects sorting refs
+function DraggableRow({ row, children, onDragEnd, sensors }) {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: row.id })
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   }
+
   return (
-    <TableRow ref={setNodeRef} style={style} className="z-10">
-      <TableCell>
-        <Button
-          {...attributes}
-          {...listeners}
-          variant="ghost"
-          size="icon"
-          className="text-muted-foreground size-7 hover:bg-transparent"
-        >
-          <IconGripVertical className="text-muted-foreground size-3" />
-          <span className="sr-only">Drag to reorder</span>
-        </Button>
-      </TableCell>
+    <TableRow ref={setNodeRef} style={style} {...attributes} {...listeners} className="data-[dragging=true]:opacity-80">
+      {children}
     </TableRow>
   )
 }
 
-// Define your columns
+// Column definitions
 const columns = [
   {
     id: "drag",
     header: () => null,
-    cell: ({ row }) => <DragHandle id={row.id} />,
+    cell: () => <IconGripVertical className="size-4 cursor-grab text-muted-foreground" />,
   },
-  { accessorKey: "CustomerName", header: "Customer", cell: info => info.getValue() },
-  { accessorKey: "Division", header: "Division", cell: info => info.getValue() },
-  { accessorKey: "Gender", header: "Gender", cell: info => info.getValue() },
-  { accessorKey: "MaritalStatus", header: "Marital Status", cell: info => info.getValue() },
-  { accessorKey: "Age", header: "Age", cell: info => info.getValue() },
-  { accessorKey: "Income", header: "Income", cell: info => info.getValue() },
+  { accessorKey: "CustomerName", header: "Customer" },
+  { accessorKey: "Division", header: "Division" },
+  { accessorKey: "Gender", header: "Gender" },
+  { accessorKey: "MaritalStatus", header: "Marital Status" },
+  { accessorKey: "Age", header: "Age" },
+  { accessorKey: "Income", header: "Income" },
 ]
 
 export function DataTable({ data: initialData }) {
-  // Normalize incoming JSON rows so that each has an `id`
+  // normalize so each item has .id
   const normalized = React.useMemo(
     () => initialData.map(item => ({ ...item, id: item.ID })),
     [initialData]
@@ -182,7 +120,7 @@ export function DataTable({ data: initialData }) {
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
 
-  const handleDragEnd = event => {
+  function handleDragEnd(event) {
     const { active, over } = event
     if (active && over && active.id !== over.id) {
       setData(old => {
@@ -195,55 +133,49 @@ export function DataTable({ data: initialData }) {
 
   return (
     <Tabs defaultValue="outline" className="w-full flex-col gap-6">
-      {/* you can re-add your view selectors & other controls here */}
       <TabsContent value="outline" className="overflow-auto">
-        <div className="overflow-hidden rounded-lg border">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            modifiers={[restrictToVerticalAxis]}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext items={dataIds} strategy={verticalListSortingStrategy}>
-              <Table>
-                <TableHeader>
-                  {table.getHeaderGroups().map(hg => (
-                    <TableRow key={hg.id}>
-                      {hg.headers.map(header => (
-                        <TableHead key={header.id} colSpan={header.colSpan}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(header.column.columnDef.header, header.getContext())}
-                        </TableHead>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          modifiers={[restrictToVerticalAxis]}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={dataIds} strategy={verticalListSortingStrategy}>
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map(hg => (
+                  <TableRow key={hg.id}>
+                    {hg.headers.map(header => (
+                      <TableHead key={header.id} colSpan={header.colSpan}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+
+              <TableBody>
+                {table.getRowModel().rows.length ? (
+                  table.getRowModel().rows.map(row => (
+                    <DraggableRow key={row.id} row={row}>
+                      {row.getVisibleCells().map(cell => (
+                        <TableCell key={cell.id}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
                       ))}
-                    </TableRow>
-                  ))}
-                </TableHeader>
-                <TableBody>
-                  {table.getRowModel().rows.length > 0 ? (
-                    table.getRowModel().rows.map(row => (
-                      // render every other cell in a normal row, but include the drag handle row above
-                      <React.Fragment key={row.id}>
-                        <DragHandle id={row.id} />
-                        <TableRow>
-                          {row.getVisibleCells().map(cell => (
-                            <TableCell key={cell.id}>
-                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      </React.Fragment>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={columns.length}>No data</TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </SortableContext>
-          </DndContext>
-        </div>
+                    </DraggableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length}>No data</TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </SortableContext>
+        </DndContext>
       </TabsContent>
     </Tabs>
   )
