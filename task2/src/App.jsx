@@ -1,30 +1,30 @@
-import { AppSidebar } from "@/components/app-sidebar"
-import { ChartAreaInteractive } from "@/components/chart-area-interactive"
-import { DataTable } from "@/components/data-table"
-import { SectionCards } from "@/components/section-cards"
-import { SiteHeader } from "@/components/site-header"
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import React from 'react'
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
+import { AppSidebar } from '@/components/app-sidebar'
+import { SiteHeader } from '@/components/site-header'
+import { SectionCards } from '@/components/section-cards'
+import { ChartAreaInteractive } from '@/components/chart-area-interactive'
+import { DataTable } from '@/components/data-table'
+import rawData from './data.json'
 
-import data from "./app//dashboard/data.json";
-
-export default function Page() {
+export default function App() {
   return (
     <SidebarProvider>
-      <AppSidebar variant="inset" />
-      <SidebarInset>
-        <SiteHeader />
-        <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2">
-            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <SectionCards />
-              <div className="px-4 lg:px-6">
-                <ChartAreaInteractive />
-              </div>
-              <DataTable data={data} />
+      <div className="flex w-full min-h-screen bg-background text-foreground">
+        <AppSidebar variant="inset" />
+        <SidebarInset>
+          <SiteHeader />
+          <main className="flex flex-1 flex-col p-6">
+            <SectionCards data={rawData} />
+            <div className="mt-6">
+              <ChartAreaInteractive data={rawData} />
             </div>
-          </div>
-        </div>
-      </SidebarInset>
+            <div className="mt-6">
+              <DataTable data={rawData} />
+            </div>
+          </main>
+        </SidebarInset>
+      </div>
     </SidebarProvider>
   )
 }

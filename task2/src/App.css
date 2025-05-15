@@ -1,0 +1,56 @@
+/* src/App.css */
+
+/* Reset any container cap and make #root full‑width */
+#root {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Global page styles */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #000;   /* pure black */
+  color: #fff;              /* pure white text */
+  font-family: sans-serif;
+}
+
+/* Ensure your app wrapper flexes full height */
+#__vite_root, /* for Vite React entry */
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Card override to match black card backgrounds */
+.card {
+  background-color: #000 !important;
+  color: #fff !important;
+  padding: 1rem;
+}
+
+/* If you have any other shadcn-ui components using bg-white or text-black, override here */
+.bg-white { background-color: #000 !important; }
+.text-black { color: #fff !important; }
+
+/* Tweak header layout (example) */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #000;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #333;
+}
+
+/* Remove logo styles unless you still need them */
+.logo,
+.logo.react {
+  display: none;
+}

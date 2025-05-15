@@ -1,0 +1,452 @@
+[
+  {
+    "ID": "BU79786",
+    "CustomerName": "Andrew",
+    "Division": "Dhaka",
+    "Gender": "F",
+    "MaritalStatus": "Married",
+    "Age": 36,
+    "Income": 56274
+  },
+  {
+    "ID": "QZ44356",
+    "CustomerName": "Anne",
+    "Division": "Rajshahi",
+    "Gender": "F",
+    "MaritalStatus": "Single",
+    "Age": 45,
+    "Income": 0
+  },
+  {
+    "ID": "AI49188",
+    "CustomerName": "Anthony",
+    "Division": "Khulna",
+    "Gender": "F",
+    "MaritalStatus": "Married",
+    "Age": 27,
+    "Income": 48767
+  },
+  {
+    "ID": "WW63253",
+    "CustomerName": "Barbara",
+    "Division": "Barishal",
+    "Gender": "M",
+    "MaritalStatus": "Married",
+    "Age": 47,
+    "Income": 0
+  },
+  {
+    "ID": "HB64268",
+    "CustomerName": "Brian",
+    "Division": "Mymensingh",
+    "Gender": "M",
+    "MaritalStatus": "Single",
+    "Age": 50,
+    "Income": 43836
+  },
+  {
+    "ID": "OC83172",
+    "CustomerName": "Bruce",
+    "Division": "Sylhet",
+    "Gender": "F",
+    "MaritalStatus": "Married",
+    "Age": 49,
+    "Income": 62902
+  },
+  {
+    "ID": "XZ87318",
+    "CustomerName": "Carol",
+    "Division": "Khulna",
+    "Gender": "F",
+    "MaritalStatus": "Married",
+    "Age": 41,
+    "Income": 55350
+  },
+  {
+    "ID": "CF85061",
+    "CustomerName": "Christine",
+    "Division": "Barishal",
+    "Gender": "M",
+    "MaritalStatus": "Single",
+    "Age": 35,
+    "Income": 0
+  },
+  {
+    "ID": "DY87989",
+    "CustomerName": "Christopher",
+    "Division": "Mymensingh",
+    "Gender": "M",
+    "MaritalStatus": "Divorced",
+    "Age": 26,
+    "Income": 14072
+  },
+  {
+    "ID": "BQ94931",
+    "CustomerName": "Craig",
+    "Division": "Sylhet",
+    "Gender": "F",
+    "MaritalStatus": "Married",
+    "Age": 31,
+    "Income": 28812
+  },
+  {
+    "ID": "SX51350",
+    "CustomerName": "David",
+    "Division": "Rangpur",
+    "Gender": "M",
+    "MaritalStatus": "Single",
+    "Age": 25,
+    "Income": 0
+  },
+  {
+    "ID": "VQ65197",
+    "CustomerName": "Diane",
+    "Division": "Chattogram",
+    "Gender": "F",
+    "MaritalStatus": "Married",
+    "Age": 29,
+    "Income": 0
+  },
+  {
+    "ID": "DP39365",
+    "CustomerName": "Elizabeth",
+    "Division": "Dhaka",
+    "Gender": "M",
+    "MaritalStatus": "Married",
+    "Age": 40,
+    "Income": 77026
+  },
+  {
+    "ID": "SJ95423",
+    "CustomerName": "Grant",
+    "Division": "Rajshahi",
+    "Gender": "M",
+    "MaritalStatus": "Married",
+    "Age": 31,
+    "Income": 99845
+  },
+  {
+    "ID": "IL66569",
+    "CustomerName": "Gregory",
+    "Division": "Khulna",
+    "Gender": "M",
+    "MaritalStatus": "Single",
+    "Age": 34,
+    "Income": 83689
+  },
+  {
+    "ID": "BW63560",
+    "CustomerName": "Heather",
+    "Division": "Barishal",
+    "Gender": "F",
+    "MaritalStatus": "Married",
+    "Age": 31,
+    "Income": 24599
+  },
+  {
+    "ID": "FV94802",
+    "CustomerName": "Helen",
+    "Division": "Mymensingh",
+    "Gender": "M",
+    "MaritalStatus": "Married",
+    "Age": 28,
+    "Income": 25049
+  },
+  {
+    "ID": "OE15005",
+    "CustomerName": "Ian",
+    "Division": "Sylhet",
+    "Gender": "M",
+    "MaritalStatus": "Married",
+    "Age": 38,
+    "Income": 28855
+  },
+  {
+    "ID": "WC83389",
+    "CustomerName": "James",
+    "Division": "Rangpur",
+    "Gender": "M",
+    "MaritalStatus": "Married",
+    "Age": 40,
+    "Income": 51148
+  },
+  {
+    "ID": "FL50705",
+    "CustomerName": "Janet",
+    "Division": "Chattogram",
+    "Gender": "F",
+    "MaritalStatus": "Married",
+    "Age": 30,
+    "Income": 66140
+  },
+  {
+    "ID": "ZK25313",
+    "CustomerName": "Janice",
+    "Division": "Dhaka",
+    "Gender": "F",
+    "MaritalStatus": "Single",
+    "Age": 39,
+    "Income": 57749
+  },
+  {
+    "ID": "SV62436",
+    "CustomerName": "Jennifer",
+    "Division": "Rajshahi",
+    "Gender": "F",
+    "MaritalStatus": "Divorced",
+    "Age": 42,
+    "Income": 13789
+  },
+  {
+    "ID": "YH23384",
+    "CustomerName": "John",
+    "Division": "Mymensingh",
+    "Gender": "M",
+    "MaritalStatus": "Divorced",
+    "Age": 26,
+    "Income": 14072
+  },
+  {
+    "ID": "TZ98966",
+    "CustomerName": "Judith",
+    "Division": "Sylhet",
+    "Gender": "F",
+    "MaritalStatus": "Single",
+    "Age": 41,
+    "Income": 0
+  },
+  {
+    "ID": "HM55802",
+    "CustomerName": "Julie",
+    "Division": "Rangpur",
+    "Gender": "F",
+    "MaritalStatus": "Married",
+    "Age": 45,
+    "Income": 17870
+  },
+  {
+    "ID": "FS42516",
+    "CustomerName": "Karen",
+    "Division": "Chattogram",
+    "Gender": "M",
+    "MaritalStatus": "Married",
+    "Age": 45,
+    "Income": 97541
+  },
+  {
+    "ID": "US89481",
+    "CustomerName": "Kevin",
+    "Division": "Dhaka",
+    "Gender": "F",
+    "MaritalStatus": "Single",
+    "Age": 47,
+    "Income": 0
+  },
+  {
+    "ID": "HO30839",
+    "CustomerName": "Linda",
+    "Division": "Rajshahi",
+    "Gender": "F",
+    "MaritalStatus": "Married",
+    "Age": 31,
+    "Income": 10511
+  },
+  {
+    "ID": "GE62437",
+    "CustomerName": "Lorraine",
+    "Division": "Khulna",
+    "Gender": "F",
+    "MaritalStatus": "Single",
+    "Age": 25,
+    "Income": 86584
+  },
+  {
+    "ID": "EJ77678",
+    "CustomerName": "Lynette",
+    "Division": "Rangpur",
+    "Gender": "F",
+    "MaritalStatus": "Married",
+    "Age": 50,
+    "Income": 75690
+  },
+  {
+    "ID": "SV85652",
+    "CustomerName": "Margaret",
+    "Division": "Chattogram",
+    "Gender": "M",
+    "MaritalStatus": "Married",
+    "Age": 47,
+    "Income": 23158
+  },
+  {
+    "ID": "UL64533",
+    "CustomerName": "Mark",
+    "Division": "Dhaka",
+    "Gender": "M",
+    "MaritalStatus": "Married",
+    "Age": 34,
+    "Income": 65999
+  },
+  {
+    "ID": "PF41800",
+    "CustomerName": "Mary",
+    "Division": "Rajshahi",
+    "Gender": "M",
+    "MaritalStatus": "Married",
+    "Age": 32,
+    "Income": 0
+  },
+  {
+    "ID": "AO98601",
+    "CustomerName": "Michael",
+    "Division": "Khulna",
+    "Gender": "M",
+    "MaritalStatus": "Married",
+    "Age": 33,
+    "Income": 54500
+  },
+  {
+    "ID": "SK67821",
+    "CustomerName": "Pamela",
+    "Division": "Barishal",
+    "Gender": "F",
+    "MaritalStatus": "Married",
+    "Age": 37,
+    "Income": 37260
+  },
+  {
+    "ID": "YV55495",
+    "CustomerName": "Patricia",
+    "Division": "Mymensingh",
+    "Gender": "F",
+    "MaritalStatus": "Married",
+    "Age": 35,
+    "Income": 68987
+  },
+  {
+    "ID": "KY38074",
+    "CustomerName": "Paul",
+    "Division": "Sylhet",
+    "Gender": "M",
+    "MaritalStatus": "Married",
+    "Age": 38,
+    "Income": 42305
+  },
+  {
+    "ID": "DM79012",
+    "CustomerName": "Peter",
+    "Division": "Rangpur",
+    "Gender": "F",
+    "MaritalStatus": "Married",
+    "Age": 40,
+    "Income": 65706
+  },
+  {
+    "ID": "CM61827",
+    "CustomerName": "Philip",
+    "Division": "Chattogram",
+    "Gender": "M",
+    "MaritalStatus": "Single",
+    "Age": 40,
+    "Income": 0
+  },
+  {
+    "ID": "WC35801",
+    "CustomerName": "Richard",
+    "Division": "Khulna",
+    "Gender": "M",
+    "MaritalStatus": "Divorced",
+    "Age": 42,
+    "Income": 53243
+  },
+  {
+    "ID": "QG25316",
+    "CustomerName": "Robert",
+    "Division": "Rangpur",
+    "Gender": "F",
+    "MaritalStatus": "Married",
+    "Age": 40,
+    "Income": 0
+  },
+  {
+    "ID": "MB98372",
+    "CustomerName": "Robyn",
+    "Division": "Chattogram",
+    "Gender": "F",
+    "MaritalStatus": "Single",
+    "Age": 47,
+    "Income": 50071
+  },
+  {
+    "ID": "IL19217",
+    "CustomerName": "Sandra",
+    "Division": "Dhaka",
+    "Gender": "F",
+    "MaritalStatus": "Married",
+    "Age": 24,
+    "Income": 60021
+  },
+  {
+    "ID": "SR38658",
+    "CustomerName": "Stephen",
+    "Division": "Rajshahi",
+    "Gender": "M",
+    "MaritalStatus": "Married",
+    "Age": 43,
+    "Income": 43244
+  },
+  {
+    "ID": "DH41343",
+    "CustomerName": "Steven",
+    "Division": "Mymensingh",
+    "Gender": "M",
+    "MaritalStatus": "Married",
+    "Age": 29,
+    "Income": 92834
+  },
+  {
+    "ID": "HG65722",
+    "CustomerName": "Susan",
+    "Division": "Sylhet",
+    "Gender": "F",
+    "MaritalStatus": "Married",
+    "Age": 43,
+    "Income": 10105
+  },
+  {
+    "ID": "BU27331",
+    "CustomerName": "Suzanne",
+    "Division": "Rangpur",
+    "Gender": "F",
+    "MaritalStatus": "Single",
+    "Age": 28,
+    "Income": 0
+  },
+  {
+    "ID": "XM45289",
+    "CustomerName": "Wayne",
+    "Division": "Chattogram",
+    "Gender": "F",
+    "MaritalStatus": "Single",
+    "Age": 24,
+    "Income": 23218
+  },
+  {
+    "ID": "KP34198",
+    "CustomerName": "Wendy",
+    "Division": "Khulna",
+    "Gender": "F",
+    "MaritalStatus": "Married",
+    "Age": 36,
+    "Income": 0
+  },
+  {
+    "ID": "WE95729",
+    "CustomerName": "William",
+    "Division": "Sylhet",
+    "Gender": "F",
+    "MaritalStatus": "Married",
+    "Age": 39,
+    "Income": 0
+  }
+]
