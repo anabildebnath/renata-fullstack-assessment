@@ -1,4 +1,3 @@
-// src/components/data-table.jsx
 "use client";
 
 import * as React from "react";
@@ -11,13 +10,13 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
   SortableContext,
-  arrayMove,
   useSortable,
   verticalListSortingStrategy,
+  arrayMove,
 } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import {
   flexRender,
   getCoreRowModel,
@@ -104,6 +103,7 @@ import {
 // that you provided *should* be in a separate file, e.g., "@/components/ui/form.jsx".
 // Ensure that file exports { FormModal } and the helper components you use.
 import { FormModal } from "@/components/ui/form";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 
 // InputForm is no longer needed if using FormModal
 // import { InputForm } from "@/components/input-form";
@@ -122,18 +122,27 @@ export const schema = z.object({
 
 // Drag handle component - uses the correct ID prop
 function DragHandle({ id }) {
-  const { attributes, listeners } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+
   return (
-    <Button
-      {...attributes}
-      {...listeners}
-      variant="ghost"
-      size="icon"
-      className="size-7 text-muted-foreground hover:bg-transparent"
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+      }}
     >
-      <GripVerticalIcon className="size-3 text-muted-foreground" />
-      <span className="sr-only">Drag to reorder</span>
-    </Button>
+      <Button
+        {...attributes}
+        {...listeners}
+        variant="ghost"
+        size="icon"
+        className="size-7 text-muted-foreground hover:bg-transparent"
+      >
+        <GripVerticalIcon className="size-3 text-muted-foreground" />
+        <span className="sr-only">Drag to reorder</span>
+      </Button>
+    </div>
   );
 }
 
@@ -153,59 +162,74 @@ const columns = [
   { accessorKey: "Age", header: "Age" },
   { accessorKey: "Income", header: "Income" },
   // Add more columns here if your data.json has more fields you want to display
+  {
+    id: "actions",
+    header: () => null,
+    cell: ({ row }) => <RowActions row={row} onEdit={handleEdit} onDelete={handleDelete} onCopy={handleCopy} onFavorite={handleFavorite} />,
+  },
 ];
 
-export function DataTable({ data: initialData }) {
-  const [data, setData] = React.useState(() => initialData);
+// Row actions component
+function RowActions({ row, onEdit, onDelete, onCopy, onFavorite }) {
+  const record = row?.original; // Safely access row.original
+
+  if (!record) {
+    return null; // Return null if record is undefined
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="flex size-8 text-muted-foreground data-[state=open]:bg-muted"
+        >
+          <MoreVerticalIcon />
+          <span className="sr-only">Open menu</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-32">
+        <DropdownMenuItem onClick={() => onEdit(record)}>
+          Edit
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onCopy(record)}>
+          Make a Copy
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onFavorite(record)}>
+          Favorite
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => onDelete(record.ID)}>
+          Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord }) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState({});
-  const [columnFilters, setColumnFilters] = React.useState([]); // State for filtering
-  const [globalFilter, setGlobalFilter] = React.useState(""); // State for search box
+  const [columnFilters, setColumnFilters] = React.useState([]);
+  const [globalFilter, setGlobalFilter] = React.useState("");
   const [sorting, setSorting] = React.useState([]);
   const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
-  const [isFormOpen, setIsFormOpen] = React.useState(false); // State to control FormModal
+  const [isFormOpen, setIsFormOpen] = React.useState(false);
+  const [isEditOpen, setIsEditOpen] = React.useState(false);
+  const [editRecord, setEditRecord] = React.useState(null); // State for the record being edited
 
-  // Ensure unique sensors are created once
   const sensors = useSensors(
-    useSensor(MouseSensor, {
-      // Require the mouse button to be pressed for 500 milliseconds, or the movement of 5 pixels
-      activationConstraint: {
-        delay: 500,
-        tolerance: 5,
-      },
-    }),
-    useSensor(TouchSensor, {
-      // Press and hold for 250 milliseconds, with a tolerance of 5 pixels
-      activationConstraint: {
-        delay: 250,
-        tolerance: 5,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      // Use the keyboard to activate dnd events
-      coordinateGetter: ({ current }) => {
-        if (current) {
-          return {
-            x: current.clientX,
-            y: current.clientY,
-          };
-        }
-        return undefined;
-      },
-    })
+    useSensor(MouseSensor, { activationConstraint: { delay: 500, tolerance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
+    useSensor(KeyboardSensor)
   );
 
-
-  // Get data IDs for sorting - Use the correct property name 'ID'
-  const dataIds = React.useMemo(() => data.map(r => r.ID), [data]);
-
-
   const table = useReactTable({
-    data,
+    data, // Use the `data` prop directly
     columns,
     state: { sorting, columnVisibility, rowSelection, columnFilters, globalFilter, pagination },
-    // Use the correct property name 'ID' for getRowId
-    getRowId: row => row.ID.toString(),
+    getRowId: (row) => row.ID.toString(),
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
@@ -221,250 +245,233 @@ export function DataTable({ data: initialData }) {
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
-  const handleDragEnd = event => {
-    const { active, over } = event;
-    // Check if dragging and dropping on a different item
-    if (active && over && active.id !== over.id) {
-      setData(old => {
-        // Find the current index of the dragged item using its ID
-        const oldIndex = dataIds.indexOf(active.id);
-         // Find the new index based on where it was dropped using the target item's ID
-        const newIndex = dataIds.indexOf(over.id);
-
-        // If both items are found in the current data array
-        if (oldIndex !== -1 && newIndex !== -1) {
-             // Use arrayMove from @dnd-kit/sortable to reorder the data
-            return arrayMove(old, oldIndex, newIndex);
-        }
-        // If for some reason an item wasn't found, return the original data
-         return old;
-      });
-    }
-  };
-
-  // Function to handle data submission from the form modal
-  // You will need to implement logic here to generate a unique ID
-  // and add the new item to the 'data' state.
   const handleFormSubmit = (formData) => {
-    console.log("Form data submitted:", formData);
-    // Example: Generate a simple unique ID (replace with a better method)
     const newId = `ITEM${Date.now()}`;
     const newItem = {
       ID: newId,
-      ...formData, // Add other form fields
+      ...formData,
+      Age: Number(formData.Age), // Convert Age to a number
+      Income: Number(formData.Income), // Convert Income to a number
     };
 
-    // Basic validation against schema (optional, react-hook-form with zod does this)
     try {
       schema.parse(newItem);
-      setData((prevData) => [...prevData, newItem]); // Add new item to data state
-      toast.success("New item added!"); // Show a success toast
-      setIsFormOpen(false); // Close the modal on success
+      onAddRecord(newItem); // Use the onAddRecord prop
+      toast.success("New item added!");
+      setIsFormOpen(false);
     } catch (error) {
-      console.error("Validation Error or Failed to add item:", error);
-      toast.error("Failed to add item."); // Show an error toast
-      // Keep the modal open or provide feedback
+      console.error("Validation Error:", error);
+      toast.error("Failed to add item.");
     }
   };
 
+  const handleEditSubmit = (updatedData) => {
+    const updatedItem = {
+      ...editRecord,
+      ...updatedData,
+      Age: Number(updatedData.Age), // Convert Age to a number
+      Income: Number(updatedData.Income), // Convert Income to a number
+    };
+
+    try {
+      schema.parse(updatedItem);
+      onEditRecord(editRecord.ID, updatedItem); // Use the onEditRecord prop
+      toast.success("Item updated!");
+      setIsEditOpen(false);
+      setEditRecord(null);
+    } catch (error) {
+      console.error("Validation Error:", error);
+      toast.error("Failed to update item.");
+    }
+  };
+
+  const handleEdit = (record) => {
+    setEditRecord(record); // Set the record to be edited
+    setIsEditOpen(true); // Open the edit modal
+  };
+
+  const handleCopy = (record) => {
+    const copiedRecord = { ...record, ID: `COPY${Date.now()}` };
+    onAddRecord(copiedRecord); // Use the onAddRecord prop
+    toast.success("Record copied!");
+  };
+
+  const handleFavorite = (record) => {
+    toast.success(`${record.CustomerName} marked as favorite!`);
+  };
+
+  const handleDelete = (id) => {
+    onDeleteRecord(id); // Use the onDeleteRecord prop
+    toast.success("Item deleted!");
+  };
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (active && over && active.id !== over.id) {
+      const oldIndex = data.findIndex((item) => item.ID === active.id);
+      const newIndex = data.findIndex((item) => item.ID === over.id);
+      const reorderedData = arrayMove(data, oldIndex, newIndex);
+      reorderedData.forEach((item, index) => (item.Order = index)); // Optional: Update order field
+      onAddRecord(reorderedData); // Update parent state
+    }
+  };
 
   return (
-    // Use a Fragment <> to return multiple top-level elements (Tabs and FormModal)
     <>
       <Tabs defaultValue="outline" className="flex w-full flex-col gap-6">
-        {/* Top controls */}
         <div className="flex items-center justify-between px-4 lg:px-6">
-          {/* View Selector */}
           <Select defaultValue="outline">
             <SelectTrigger className="flex w-fit @4xl/main:hidden" id="view-selector">
               <SelectValue placeholder="Select view" />
             </SelectTrigger>
             <SelectContent>
-               {/* Update SelectItem values/labels if needed to match your tabs */}
               <SelectItem value="outline">Outline</SelectItem>
               <SelectItem value="past-performance">Past Performance</SelectItem>
               <SelectItem value="key-personnel">Key Personnel</SelectItem>
-              <SelectItem value="focus-documents">Focus Documents</SelectItem> {/* Fixed closing tag */}
+              <SelectItem value="focus-documents">Focus Documents</SelectItem>
             </SelectContent>
           </Select>
-          {/* Tabs List */}
           <TabsList className="hidden @4xl/main:flex">
-             {/* Update TabsTrigger values/labels if needed */}
             <TabsTrigger value="outline">Outline</TabsTrigger>
-            <TabsTrigger value="past-performance">Past Performance <Badge variant="secondary">3</Badge></TabsTrigger>
-            <TabsTrigger value="key-personnel">Key Personnel <Badge variant="secondary">2</Badge></TabsTrigger>
+            <TabsTrigger value="past-performance">
+              Past Performance <Badge variant="secondary">3</Badge>
+            </TabsTrigger>
+            <TabsTrigger value="key-personnel">
+              Key Personnel <Badge variant="secondary">2</Badge>
+            </TabsTrigger>
             <TabsTrigger value="focus-documents">Focus Documents</TabsTrigger>
           </TabsList>
           <div className="flex items-center gap-2">
-            {/* Search Box */}
             <Input
               placeholder="Search..."
               value={globalFilter}
               onChange={(e) => setGlobalFilter(e.target.value)}
               className="w-64"
             />
-            {/* Button to trigger the FormModal */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsFormOpen(true)} // Open the FormModal
-            >
+            <Button variant="outline" size="sm" onClick={() => setIsFormOpen(true)}>
               <PlusIcon className="size-4 mr-1" />
-              <span className="hidden lg:inline">Add Item</span> {/* Changed text */}
+              <span className="hidden lg:inline">Add Item</span>
             </Button>
           </div>
         </div>
-
-        {/* Table Content for "outline" tab */}
         <TabsContent value="outline" className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
           <div className="overflow-hidden rounded-lg border">
-             {/* DndContext for row dragging */}
-            <DndContext sensors={sensors} collisionDetection={closestCenter} modifiers={[restrictToVerticalAxis]} onDragEnd={handleDragEnd}>
-              <Table>
-                {/* Table Header */}
-                <TableHeader className="sticky top-0 z-10 bg-muted">
-                  {table.getHeaderGroups().map(hg => (
-                    <TableRow key={hg.id}>
-                      {hg.headers.map(header => (
-                        <TableHead key={header.id} colSpan={header.colSpan}>
-                          {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                        </TableHead>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableHeader>
-                {/* Table Body */}
-                <TableBody>
-                  {table.getRowModel().rows.length ? (
-                    <SortableContext items={dataIds} strategy={verticalListSortingStrategy}>
-                      {table.getRowModel().rows.map(row => (
-                        <TableRow
-                          key={row.id}
-                          data-state={row.getIsSelected() ? "selected" : undefined} // Fixed syntax
-                          className="relative z-0"
-                        >
-                          {row.getVisibleCells().map(cell => (
-                            <TableCell key={cell.id}>
-                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={data.map((item) => item.ID)} strategy={verticalListSortingStrategy}>
+                <Table>
+                  <TableHeader className="sticky top-0 z-10 bg-muted">
+                    {table.getHeaderGroups().map((hg) => (
+                      <TableRow key={hg.id}>
+                        {hg.headers.map((header) => (
+                          <TableHead key={header.id} colSpan={header.colSpan}>
+                            {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                          </TableHead>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableHeader>
+                  <TableBody>
+                    {data.length ? (
+                      data.map((row) => (
+                        <TableRow key={row.ID} data-state={rowSelection[row.ID] ? "selected" : undefined}>
+                          {columns.map((column) => (
+                            <TableCell key={column.accessorKey || column.id}>
+                              {column.accessorKey ? row[column.accessorKey] : null}
                             </TableCell>
                           ))}
+                          <TableCell>
+                            <RowActions
+                              row={{ original: row }} // Pass row.original explicitly
+                              onEdit={handleEdit}
+                              onDelete={handleDelete}
+                              onCopy={handleCopy}
+                              onFavorite={handleFavorite}
+                            />
+                          </TableCell>
                         </TableRow>
-                      ))}
-                    </SortableContext>
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={columns.length} className="h-24 text-center">
-                        No data
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={columns.length + 1} className="h-24 text-center">
+                          No data
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </SortableContext>
             </DndContext>
           </div>
-
-          {/* Pagination */}
-          <div className="flex items-center justify-end space-x-2 py-4 px-0"> {/* Removed px-4/lg:px-6 as TabsContent already has it */}
-            <div className="flex-1 text-sm text-muted-foreground">
-              {table.getFilteredSelectedRowModel().rows.length} of{" "}
-              {table.getFilteredRowModel().rows.length} row(s) selected.
-            </div>
-            <div className="flex items-center space-x-6 lg:space-x-8">
-              <div className="flex items-center space-x-2">
-                <p className="text-sm font-medium">Rows per page</p>
-                <Select
-                  value={`${table.getState().pagination.pageSize}`}
-                  onValueChange={(value) => {
-                    table.setPageSize(Number(value))
-                  }}
-                >
-                  <SelectTrigger className="h-8 w-[70px]">
-                    <SelectValue placeholder={table.getState().pagination.pageSize} />
+        </TabsContent>
+      </Tabs>
+      <FormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSubmit={handleFormSubmit} />
+      {isEditOpen && editRecord && (
+        <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Item</DialogTitle>
+              <DialogClose onClick={() => setIsEditOpen(false)} />
+            </DialogHeader>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const updatedData = Object.fromEntries(formData.entries());
+                handleEditSubmit(updatedData);
+              }}
+              className="space-y-4"
+            >
+              <div>
+                <Label>Customer Name</Label>
+                <Input name="CustomerName" defaultValue={editRecord.CustomerName} />
+              </div>
+              <div>
+                <Label>Division</Label>
+                <Input name="Division" defaultValue={editRecord.Division} />
+              </div>
+              <div>
+                <Label>Gender</Label>
+                <Select defaultValue={editRecord.Gender}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select gender" />
                   </SelectTrigger>
-                  <SelectContent side="top">
-                    {[10, 20, 30, 40, 50].map((pageSize) => (
-                      <SelectItem key={pageSize} value={`${pageSize}`}>
-                        {pageSize}
-                      </SelectItem>
-                    ))}
+                  <SelectContent>
+                    <SelectItem value="Male">Male</SelectItem>
+                    <SelectItem value="Female">Female</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-                Page {table.getState().pagination.pageIndex + 1} of{" "}
-                {table.getPageCount()}
+              <div>
+                <Label>Marital Status</Label>
+                <Select defaultValue={editRecord.MaritalStatus}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select marital status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Single">Single</SelectItem>
+                    <SelectItem value="Married">Married</SelectItem>
+                    <SelectItem value="Divorced">Divorced</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  className="h-8 w-8 p-0"
-                  onClick={() => table.setPageIndex(0)}
-                  disabled={!table.getCanPreviousPage()}
-                >
-                  <span className="sr-only">Go to first page</span>
-                  <ChevronsLeftIcon className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  className="h-8 w-8 p-0"
-                  onClick={() => table.previousPage()}
-                  disabled={!table.getCanPreviousPage()}
-                >
-                  <span className="sr-only">Go to previous page</span>
-                  <ChevronLeftIcon className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  className="h-8 w-8 p-0"
-                  onClick={() => table.nextPage()}
-                  disabled={!table.getCanNextPage()}
-                >
-                  <span className="sr-only">Go to next page</span>
-                  <ChevronRightIcon className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  className="h-8 w-8 p-0"
-                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                  disabled={!table.getCanNextPage()}
-                >
-                  <span className="sr-only">Go to last page</span>
-                  <ChevronsRightIcon className="h-4 w-4" />
+              <div>
+                <Label>Age</Label>
+                <Input name="Age" type="number" defaultValue={editRecord.Age} />
+              </div>
+              <div>
+                <Label>Income</Label>
+                <Input name="Income" type="number" defaultValue={editRecord.Income} />
+              </div>
+              <div className="flex justify-end">
+                <Button type="submit" variant="primary">
+                  Save
                 </Button>
               </div>
-            </div>
-          </div>
-        </TabsContent>
-
-         {/* Other tabs - Fixed syntax */}
-        <TabsContent value="past-performance">
-          {/* Content for Past Performance */}
-          <div className="h-40 w-full flex items-center justify-center border rounded-lg">
-             <p>Past Performance content goes here (likely needs data structure updates too)</p>
-          </div>
-        </TabsContent>
-         <TabsContent value="key-personnel">
-           {/* Content for Key Personnel */}
-           <div className="h-40 w-full flex items-center justify-center border rounded-lg">
-             <p>Key Personnel content goes here (likely needs data structure updates too)</p>
-          </div>
-        </TabsContent>
-         <TabsContent value="focus-documents">
-           {/* Content for Focus Documents - Fixed syntax */}
-           <div className="h-40 w-full flex items-center justify-center border rounded-lg">
-             <p>Focus Documents content goes here (likely needs data structure updates too)</p>
-           </div> {/* Correct closing div */}
-         </TabsContent> {/* Correct closing TabsContent */}
-
-      </Tabs> {/* Correct closing Tabs tag */}
-
-      {/* Render the FormModal outside the Tabs, as a sibling */}
-      {/* Pass the state and the submit handler */}
-      <FormModal
-        isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
-        onSubmit={handleFormSubmit} // Pass the handler to the modal
-      />
-    </> 
+            </form>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 }

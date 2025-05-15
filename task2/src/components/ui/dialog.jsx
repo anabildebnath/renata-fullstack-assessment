@@ -8,7 +8,7 @@ export function Dialog({ open, onOpenChange, children }) {
     >
       <div
         className="bg-white rounded-lg shadow-lg p-6 max-w-lg w-full"
-        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
+        onClick={(e) => e.stopPropagation()}
       >
         {children}
       </div>

@@ -1,13 +1,36 @@
-import React from 'react'
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
-import { AppSidebar } from '@/components/app-sidebar'
-import { SiteHeader } from '@/components/site-header'
-import { SectionCards } from '@/components/section-cards'
-import { ChartAreaInteractive } from '@/components/chart-area-interactive'
-import { DataTable } from '@/components/data-table'
-import rawData from './data.json'
+import React, { useState, useEffect } from "react";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+import { SiteHeader } from "@/components/site-header";
+import { SectionCards } from "@/components/section-cards";
+import { ChartAreaInteractive } from "@/components/chart-area-interactive";
+import { DataTable } from "@/components/data-table";
+import rawData from "./data.json";
 
 export default function App() {
+  const [data, setData] = useState(() => {
+    const savedData = localStorage.getItem("data");
+    return savedData ? JSON.parse(savedData) : rawData;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("data", JSON.stringify(data));
+  }, [data]);
+
+  const handleAddRecord = (newRecord) => {
+    setData((prevData) => [...prevData, newRecord]);
+  };
+
+  const handleDeleteRecord = (id) => {
+    setData((prevData) => prevData.filter((record) => record.ID !== id));
+  };
+
+  const handleEditRecord = (id, updatedRecord) => {
+    setData((prevData) =>
+      prevData.map((record) => (record.ID === id ? { ...record, ...updatedRecord } : record))
+    );
+  };
+
   return (
     <SidebarProvider>
       <div className="flex w-full min-h-screen bg-background text-foreground">
@@ -15,16 +38,21 @@ export default function App() {
         <SidebarInset>
           <SiteHeader />
           <main className="flex flex-1 flex-col p-6">
-            <SectionCards data={rawData} />
+            <SectionCards data={data} />
             <div className="mt-6">
-              <ChartAreaInteractive data={rawData} />
+              <ChartAreaInteractive data={data} />
             </div>
             <div className="mt-6">
-              <DataTable data={rawData} />
+              <DataTable
+                data={data}
+                onAddRecord={handleAddRecord}
+                onDeleteRecord={handleDeleteRecord}
+                onEditRecord={handleEditRecord}
+              />
             </div>
           </main>
         </SidebarInset>
       </div>
     </SidebarProvider>
-  )
+  );
 }
