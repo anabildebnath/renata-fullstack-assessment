@@ -1,22 +1,23 @@
-//File: src/components/app-sidebar.jsx
+"use client"
+
 import * as React from "react"
 import {
-  IconCamera,
-  IconChartBar,
-  IconDashboard,
-  IconDatabase,
-  IconFileAi,
-  IconFileDescription,
-  IconFileWord,
-  IconFolder,
-  IconHelp,
-  IconInnerShadowTop,
-  IconListDetails,
-  IconReport,
-  IconSearch,
-  IconSettings,
-  IconUsers,
-} from "@tabler/icons-react"
+  ArrowUpCircleIcon,
+  BarChartIcon,
+  CameraIcon,
+  ClipboardListIcon,
+  DatabaseIcon,
+  FileCodeIcon,
+  FileIcon,
+  FileTextIcon,
+  FolderIcon,
+  HelpCircleIcon,
+  LayoutDashboardIcon,
+  ListIcon,
+  SearchIcon,
+  SettingsIcon,
+  UsersIcon,
+} from "lucide-react"
 
 import { NavDocuments } from "@/components/nav-documents"
 import { NavMain } from "@/components/nav-main"
@@ -42,33 +43,33 @@ const data = {
     {
       title: "Dashboard",
       url: "#",
-      icon: IconDashboard,
+      icon: LayoutDashboardIcon,
     },
     {
       title: "Lifecycle",
       url: "#",
-      icon: IconListDetails,
+      icon: ListIcon,
     },
     {
       title: "Analytics",
       url: "#",
-      icon: IconChartBar,
+      icon: BarChartIcon,
     },
     {
       title: "Projects",
       url: "#",
-      icon: IconFolder,
+      icon: FolderIcon,
     },
     {
       title: "Team",
       url: "#",
-      icon: IconUsers,
+      icon: UsersIcon,
     },
   ],
   navClouds: [
     {
       title: "Capture",
-      icon: IconCamera,
+      icon: CameraIcon,
       isActive: true,
       url: "#",
       items: [
@@ -84,7 +85,7 @@ const data = {
     },
     {
       title: "Proposal",
-      icon: IconFileDescription,
+      icon: FileTextIcon,
       url: "#",
       items: [
         {
@@ -99,7 +100,7 @@ const data = {
     },
     {
       title: "Prompts",
-      icon: IconFileAi,
+      icon: FileCodeIcon,
       url: "#",
       items: [
         {
@@ -117,43 +118,45 @@ const data = {
     {
       title: "Settings",
       url: "#",
-      icon: IconSettings,
+      icon: SettingsIcon,
     },
     {
       title: "Get Help",
       url: "#",
-      icon: IconHelp,
+      icon: HelpCircleIcon,
     },
     {
       title: "Search",
       url: "#",
-      icon: IconSearch,
+      icon: SearchIcon,
     },
   ],
   documents: [
     {
       name: "Data Library",
       url: "#",
-      icon: IconDatabase,
+      icon: DatabaseIcon,
     },
     {
       name: "Reports",
       url: "#",
-      icon: IconReport,
+      icon: ClipboardListIcon,
     },
     {
       name: "Word Assistant",
       url: "#",
-      icon: IconFileWord,
+      icon: FileIcon,
     },
   ],
 }
 
-export function AppSidebar({
-  ...props
-}) {
+export function AppSidebar({ ...props }) {
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar
+      collapsible="offcanvas"
+      {...props}
+      className="bg-[oklch(240%_5.3%_26.1%)] text-[oklch(var(--sidebar-foreground))]" // Updated background color
+    >
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -162,7 +165,7 @@ export function AppSidebar({
               className="data-[slot=sidebar-menu-button]:!p-1.5 text-[oklch(var(--sidebar-foreground))] hover:bg-[oklch(var(--sidebar-accent))] hover:text-[oklch(var(--sidebar-accent-foreground))] rounded-[var(--radius)]"
             >
               <a href="#">
-                <IconInnerShadowTop className="!size-5" />
+                <ArrowUpCircleIcon className="h-5 w-5" />
                 <span className="text-base font-semibold">Acme Inc.</span>
               </a>
             </SidebarMenuButton>
@@ -172,11 +175,14 @@ export function AppSidebar({
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavDocuments items={data.documents} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <NavSecondary
+          items={data.navSecondary}
+          className="mt-auto text-[oklch(var(--sidebar-foreground))] hover:bg-[oklch(var(--sidebar-accent))] hover:text-[oklch(var(--sidebar-accent-foreground))]"
+        />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
       </SidebarFooter>
     </Sidebar>
-  );
+  )
 }

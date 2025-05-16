@@ -39,7 +39,7 @@ const chartConfig = {
 
 export function Component() {
   return (
-    <Card>
+    <Card className="rounded-[var(--radius)] border border-[oklch(0%_0%_98%)]">
       <CardHeader>
         <CardTitle>Area Chart - Gradient</CardTitle>
         <CardDescription>

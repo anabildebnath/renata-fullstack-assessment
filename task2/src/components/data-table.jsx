@@ -312,7 +312,7 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord }) {
             </TabsTrigger>
             <TabsTrigger value="focus-documents">Focus Documents</TabsTrigger>
           </TabsList>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ">
             <Input
               placeholder="Search..."
               value={globalFilter}
@@ -331,7 +331,7 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord }) {
           </div>
         </div>
         <TabsContent value="outline" className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
-          <div className="overflow-hidden rounded-lg border">
+          <div className="overflow-hidden rounded-[0.75rem] border">
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={data.map((item) => item.ID)} strategy={verticalListSortingStrategy}>
                 <Table>
@@ -348,24 +348,18 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord }) {
                   </TableHeader>
                   <TableBody>
                     {data.length ? (
-                      data.map((row) => (
-                        <TableRow key={row.ID} data-state={rowSelection[row.ID] ? "selected" : undefined}>
-                          {columns.map((column) => (
-                            <TableCell key={column.accessorKey || column.id}>
-                              {column.accessorKey ? row[column.accessorKey] : null}
-                            </TableCell>
-                          ))}
-                          <TableCell>
-                            <RowActions
-                              row={{ original: row }}
-                              onEdit={handleEdit}
-                              onDelete={handleDelete}
-                              onCopy={handleCopy}
-                              onFavorite={handleFavorite}
-                            />
-                          </TableCell>
-                        </TableRow>
-                      ))
+                      <SortableContext items={data.map((item) => item.ID)} strategy={verticalListSortingStrategy}>
+                        {data.map((row) => (
+                          <DraggableRow
+                            key={row.ID}
+                            row={row}
+                            onEdit={handleEdit} // Pass handleEdit as a prop
+                            onDelete={handleDelete} // Pass handleDelete as a prop
+                            onCopy={handleCopy} // Pass handleCopy as a prop
+                            onFavorite={handleFavorite} // Pass handleFavorite as a prop
+                          />
+                        ))}
+                      </SortableContext>
                     ) : (
                       <TableRow>
                         <TableCell colSpan={columns.length + 1} className="h-24 text-center">
@@ -453,5 +447,37 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord }) {
         </Dialog>
       )}
     </>
+  );
+}
+
+function DraggableRow({ row, onEdit, onDelete, onCopy, onFavorite }) {
+  const { setNodeRef, transform, transition, isDragging } = useSortable({
+    id: row.ID,
+  });
+
+  return (
+    <TableRow
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+      }}
+      className={`relative z-0 ${isDragging ? "opacity-50" : ""}`}
+    >
+      {columns.map((column) => (
+        <TableCell key={column.accessorKey || column.id}>
+          {column.accessorKey ? row[column.accessorKey] : null}
+        </TableCell>
+      ))}
+      <TableCell>
+        <RowActions
+          row={{ original: row }}
+          onEdit={onEdit} // Use the passed prop
+          onDelete={onDelete} // Use the passed prop
+          onCopy={onCopy} // Use the passed prop
+          onFavorite={onFavorite} // Use the passed prop
+        />
+      </TableCell>
+    </TableRow>
   );
 }

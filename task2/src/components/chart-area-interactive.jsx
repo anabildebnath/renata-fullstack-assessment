@@ -36,7 +36,7 @@ export function ChartAreaInteractive({ data }) {
   }
 
   return (
-    <Card className="@container/card mx-6">
+    <Card className="@container/card mx-6 rounded-[var(--radius)] border border-[oklch(0%_0%_98%)]">
       <CardHeader className="relative">
         <CardTitle>Total Users by Division</CardTitle>
         <CardDescription>
