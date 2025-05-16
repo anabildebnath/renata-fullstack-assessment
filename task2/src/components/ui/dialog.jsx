@@ -3,11 +3,11 @@ import * as React from "react";
 export function Dialog({ open, onOpenChange, children }) {
   return open ? (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[oklch(var(--background))]/50"
       onClick={() => onOpenChange(false)}
     >
       <div
-        className="bg-white rounded-lg shadow-lg p-6 max-w-lg w-full"
+        className="bg-[oklch(var(--card))] text-[oklch(var(--card-foreground))] rounded-[var(--radius)] shadow-lg p-6 max-w-lg w-full"
         onClick={(e) => e.stopPropagation()}
       >
         {children}
@@ -31,7 +31,7 @@ export function DialogTitle({ children }) {
 export function DialogClose({ onClick }) {
   return (
     <button
-      className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+      className="absolute top-2 right-2 text-[oklch(var(--muted-foreground))] hover:bg-[oklch(var(--muted))] hover:text-[oklch(var(--foreground))]"
       onClick={onClick}
     >
       Close

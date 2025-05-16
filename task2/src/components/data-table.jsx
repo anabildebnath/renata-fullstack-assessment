@@ -42,13 +42,10 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
-
-// Assuming these components/hooks exist and are correctly implemented
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  // ChartConfig is not exported by your chart.jsx
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
@@ -72,17 +69,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-// Sheet components are no longer used if using FormModal instead
-// import {
-//   Sheet,
-//   SheetClose,
-//   SheetContent,
-//   SheetDescription,
-//   SheetFooter,
-//   SheetHeader,
-//   SheetTitle,
-//   SheetTrigger,
-// } from "@/components/ui/sheet";
 import {
   Table,
   TableBody,
@@ -97,21 +83,11 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-
-// Import the FormModal component (adjust path if necessary)
-// NOTE: The definition of FormModal and the helper form components (Form, FormField, etc.)
-// that you provided *should* be in a separate file, e.g., "@/components/ui/form.jsx".
-// Ensure that file exports { FormModal } and the helper components you use.
 import { FormModal } from "@/components/ui/form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 
-// InputForm is no longer needed if using FormModal
-// import { InputForm } from "@/components/input-form";
-
-
-// Updated schema to match your data.json structure
 export const schema = z.object({
-  ID: z.string(), // ID is a string in your data
+  ID: z.string(),
   CustomerName: z.string(),
   Division: z.string(),
   Gender: z.string(),
@@ -120,7 +96,6 @@ export const schema = z.object({
   Income: z.number(),
 });
 
-// Drag handle component - uses the correct ID prop
 function DragHandle({ id }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
 
@@ -146,14 +121,12 @@ function DragHandle({ id }) {
   );
 }
 
-// Column definitions - Updated to match data.json keys
 const columns = [
-  // Drag handle column - uses the correct ID from row.original
   {
-    id: "drag", // This id is for the column itself, not the row data
+    id: "drag",
     header: () => null,
-    cell: ({ row }) => <DragHandle id={row.original.ID} />, // Use row.original.ID
-    size: 30, // Optional: give drag handle column a fixed size
+    cell: ({ row }) => <DragHandle id={row.original.ID} />,
+    size: 30,
   },
   { accessorKey: "CustomerName", header: "Customer Name" },
   { accessorKey: "Division", header: "Division" },
@@ -161,7 +134,6 @@ const columns = [
   { accessorKey: "MaritalStatus", header: "Marital Status" },
   { accessorKey: "Age", header: "Age" },
   { accessorKey: "Income", header: "Income" },
-  // Add more columns here if your data.json has more fields you want to display
   {
     id: "actions",
     header: () => null,
@@ -169,12 +141,11 @@ const columns = [
   },
 ];
 
-// Row actions component
 function RowActions({ row, onEdit, onDelete, onCopy, onFavorite }) {
-  const record = row?.original; // Safely access row.original
+  const record = row?.original;
 
   if (!record) {
-    return null; // Return null if record is undefined
+    return null;
   }
 
   return (
@@ -183,7 +154,7 @@ function RowActions({ row, onEdit, onDelete, onCopy, onFavorite }) {
         <Button
           variant="ghost"
           size="icon"
-          className="flex size-8 text-muted-foreground data-[state=open]:bg-muted"
+          className="flex size-8 text-[oklch(var(--muted-foreground))] hover:bg-[oklch(var(--muted))] hover:text-[oklch(var(--foreground))]"
         >
           <MoreVerticalIcon />
           <span className="sr-only">Open menu</span>
@@ -217,7 +188,7 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord }) {
   const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [isEditOpen, setIsEditOpen] = React.useState(false);
-  const [editRecord, setEditRecord] = React.useState(null); // State for the record being edited
+  const [editRecord, setEditRecord] = React.useState(null);
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { delay: 500, tolerance: 5 } }),
@@ -226,7 +197,7 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord }) {
   );
 
   const table = useReactTable({
-    data, // Use the `data` prop directly
+    data,
     columns,
     state: { sorting, columnVisibility, rowSelection, columnFilters, globalFilter, pagination },
     getRowId: (row) => row.ID.toString(),
@@ -250,13 +221,13 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord }) {
     const newItem = {
       ID: newId,
       ...formData,
-      Age: Number(formData.Age), // Convert Age to a number
-      Income: Number(formData.Income), // Convert Income to a number
+      Age: Number(formData.Age),
+      Income: Number(formData.Income),
     };
 
     try {
       schema.parse(newItem);
-      onAddRecord(newItem); // Use the onAddRecord prop
+      onAddRecord(newItem);
       toast.success("New item added!");
       setIsFormOpen(false);
     } catch (error) {
@@ -269,13 +240,13 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord }) {
     const updatedItem = {
       ...editRecord,
       ...updatedData,
-      Age: Number(updatedData.Age), // Convert Age to a number
-      Income: Number(updatedData.Income), // Convert Income to a number
+      Age: Number(updatedData.Age),
+      Income: Number(updatedData.Income),
     };
 
     try {
       schema.parse(updatedItem);
-      onEditRecord(editRecord.ID, updatedItem); // Use the onEditRecord prop
+      onEditRecord(editRecord.ID, updatedItem);
       toast.success("Item updated!");
       setIsEditOpen(false);
       setEditRecord(null);
@@ -286,13 +257,13 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord }) {
   };
 
   const handleEdit = (record) => {
-    setEditRecord(record); // Set the record to be edited
-    setIsEditOpen(true); // Open the edit modal
+    setEditRecord(record);
+    setIsEditOpen(true);
   };
 
   const handleCopy = (record) => {
     const copiedRecord = { ...record, ID: `COPY${Date.now()}` };
-    onAddRecord(copiedRecord); // Use the onAddRecord prop
+    onAddRecord(copiedRecord);
     toast.success("Record copied!");
   };
 
@@ -301,7 +272,7 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord }) {
   };
 
   const handleDelete = (id) => {
-    onDeleteRecord(id); // Use the onDeleteRecord prop
+    onDeleteRecord(id);
     toast.success("Item deleted!");
   };
 
@@ -311,8 +282,8 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord }) {
       const oldIndex = data.findIndex((item) => item.ID === active.id);
       const newIndex = data.findIndex((item) => item.ID === over.id);
       const reorderedData = arrayMove(data, oldIndex, newIndex);
-      reorderedData.forEach((item, index) => (item.Order = index)); // Optional: Update order field
-      onAddRecord(reorderedData); // Update parent state
+      reorderedData.forEach((item, index) => (item.Order = index));
+      onAddRecord(reorderedData);
     }
   };
 
@@ -348,7 +319,12 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord }) {
               onChange={(e) => setGlobalFilter(e.target.value)}
               className="w-64"
             />
-            <Button variant="outline" size="sm" onClick={() => setIsFormOpen(true)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsFormOpen(true)}
+              className="bg-transparent border-[oklch(var(--border))] text-[oklch(var(--foreground))] hover:bg-[oklch(var(--muted))] hover:text-[oklch(var(--foreground))]"
+            >
               <PlusIcon className="size-4 mr-1" />
               <span className="hidden lg:inline">Add Item</span>
             </Button>
@@ -381,7 +357,7 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord }) {
                           ))}
                           <TableCell>
                             <RowActions
-                              row={{ original: row }} // Pass row.original explicitly
+                              row={{ original: row }}
                               onEdit={handleEdit}
                               onDelete={handleDelete}
                               onCopy={handleCopy}
@@ -464,7 +440,11 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord }) {
                 <Input name="Income" type="number" defaultValue={editRecord.Income} />
               </div>
               <div className="flex justify-end">
-                <Button type="submit" variant="primary">
+                <Button
+                  type="submit"
+                  variant="primary"
+                  className="bg-[oklch(var(--primary))] text-[oklch(var(--primary-foreground))] hover:bg-[oklch(var(--primary))]/90"
+                >
                   Save
                 </Button>
               </div>

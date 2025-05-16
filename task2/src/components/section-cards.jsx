@@ -39,11 +39,14 @@ export function SectionCards({ data }) {
               {c.desc}
             </CardTitle>
             <div className="absolute right-4 top-4">
-              <Badge variant="outline" className="flex gap-1 rounded-lg text-xs">
+              <Badge
+                variant="outline"
+                className="flex gap-1 rounded-[var(--radius)] text-xs bg-[oklch(var(--muted))] text-[oklch(var(--muted-foreground))]"
+              >
                 {c.title === 'New Customers Today' || c.title === 'Most Frequent Division' ? (
-                  <TrendingDownIcon className="size-3" />
+                  <TrendingDownIcon className="size-3 text-[oklch(var(--destructive))]" />
                 ) : (
-                  <TrendingUpIcon className="size-3" />
+                  <TrendingUpIcon className="size-3 text-[oklch(var(--chart-1))]" />
                 )}
                 {c.title === 'Total Customers'
                   ? '+' + ((total / data.length) * 100).toFixed(1) + '%'
