@@ -13,6 +13,8 @@ export default function App() {
     return savedData ? JSON.parse(savedData) : rawData;
   });
 
+  const [isFormOpen, setIsFormOpen] = useState(false); // Popup state
+
   useEffect(() => {
     localStorage.setItem("data", JSON.stringify(data));
   }, [data]);
@@ -34,7 +36,7 @@ export default function App() {
   return (
     <SidebarProvider>
       <div className="flex w-full min-h-screen bg-background text-foreground">
-        <AppSidebar variant="inset" />
+        <AppSidebar setIsFormOpen={setIsFormOpen} variant="inset" /> {/* Pass setIsFormOpen */}
         <SidebarInset>
           <SiteHeader />
           <main className="flex flex-1 flex-col p-6">
@@ -48,6 +50,8 @@ export default function App() {
                 onAddRecord={handleAddRecord}
                 onDeleteRecord={handleDeleteRecord}
                 onEditRecord={handleEditRecord}
+                isFormOpen={isFormOpen} // Pass isFormOpen
+                setIsFormOpen={setIsFormOpen} // Pass setIsFormOpen
               />
             </div>
           </main>

@@ -96,6 +96,9 @@ export const schema = z.object({
   Income: z.number(),
 });
 
+// Create a context for managing the form popup state
+export const FormContext = React.createContext();
+
 function DragHandle({ id }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
 
@@ -179,14 +182,13 @@ function RowActions({ row, onEdit, onDelete, onCopy, onFavorite }) {
   );
 }
 
-export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord }) {
+export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isFormOpen, setIsFormOpen }) { // Accept isFormOpen and setIsFormOpen as props
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [sorting, setSorting] = React.useState([]);
   const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
-  const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [isEditOpen, setIsEditOpen] = React.useState(false);
   const [editRecord, setEditRecord] = React.useState(null);
 
@@ -373,79 +375,79 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord }) {
             </DndContext>
           </div>
         </TabsContent>
+        <FormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSubmit={handleFormSubmit} />
+        {isEditOpen && editRecord && (
+          <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Edit Item</DialogTitle>
+                <DialogClose onClick={() => setIsEditOpen(false)} />
+              </DialogHeader>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.target);
+                  const updatedData = Object.fromEntries(formData.entries());
+                  handleEditSubmit(updatedData);
+                }}
+                className="space-y-4"
+              >
+                <div>
+                  <Label>Customer Name</Label>
+                  <Input name="CustomerName" defaultValue={editRecord.CustomerName} />
+                </div>
+                <div>
+                  <Label>Division</Label>
+                  <Input name="Division" defaultValue={editRecord.Division} />
+                </div>
+                <div>
+                  <Label>Gender</Label>
+                  <Select defaultValue={editRecord.Gender}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Male">Male</SelectItem>
+                      <SelectItem value="Female">Female</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Marital Status</Label>
+                  <Select defaultValue={editRecord.MaritalStatus}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select marital status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Single">Single</SelectItem>
+                      <SelectItem value="Married">Married</SelectItem>
+                      <SelectItem value="Divorced">Divorced</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Age</Label>
+                  <Input name="Age" type="number" defaultValue={editRecord.Age} />
+                </div>
+                <div>
+                  <Label>Income</Label>
+                  <Input name="Income" type="number" defaultValue={editRecord.Income} />
+                </div>
+                <div className="flex justify-end">
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    className="bg-[oklch(var(--primary))] text-[oklch(var(--primary-foreground))] hover:bg-[oklch(var(--primary))]/90"
+                  >
+                    Save
+                  </Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+        )}
       </Tabs>
-      <FormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSubmit={handleFormSubmit} />
-      {isEditOpen && editRecord && (
-        <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit Item</DialogTitle>
-              <DialogClose onClick={() => setIsEditOpen(false)} />
-            </DialogHeader>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                const updatedData = Object.fromEntries(formData.entries());
-                handleEditSubmit(updatedData);
-              }}
-              className="space-y-4"
-            >
-              <div>
-                <Label>Customer Name</Label>
-                <Input name="CustomerName" defaultValue={editRecord.CustomerName} />
-              </div>
-              <div>
-                <Label>Division</Label>
-                <Input name="Division" defaultValue={editRecord.Division} />
-              </div>
-              <div>
-                <Label>Gender</Label>
-                <Select defaultValue={editRecord.Gender}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select gender" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Male">Male</SelectItem>
-                    <SelectItem value="Female">Female</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Marital Status</Label>
-                <Select defaultValue={editRecord.MaritalStatus}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select marital status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Single">Single</SelectItem>
-                    <SelectItem value="Married">Married</SelectItem>
-                    <SelectItem value="Divorced">Divorced</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Age</Label>
-                <Input name="Age" type="number" defaultValue={editRecord.Age} />
-              </div>
-              <div>
-                <Label>Income</Label>
-                <Input name="Income" type="number" defaultValue={editRecord.Income} />
-              </div>
-              <div className="flex justify-end">
-                <Button
-                  type="submit"
-                  variant="primary"
-                  className="bg-[oklch(var(--primary))] text-[oklch(var(--primary-foreground))] hover:bg-[oklch(var(--primary))]/90"
-                >
-                  Save
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
-      )}
     </>
   );
 }

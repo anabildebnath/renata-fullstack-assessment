@@ -24,13 +24,29 @@ export function NavDocuments({
 }) {
   const { isMobile } = useSidebar()
 
+  const handleWordAssistantRedirect = () => {
+    // Redirect to Gemini
+    window.location.href = "https://gemini.example.com";
+  };
+
+  const handleMorePopup = () => {
+    // Show a popup for "More"
+    alert("More: Added later based on new requirements.");
+  };
+
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Documents</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton
+              asChild
+              onClick={() => {
+                if (item.name === "Word Assistant") handleWordAssistantRedirect();
+                else alert(`${item.name}: Placeholder.`);
+              }}
+            >
               <a href={item.url}>
                 <item.icon />
                 <span>{item.name}</span>
@@ -65,7 +81,10 @@ export function NavDocuments({
           </SidebarMenuItem>
         ))}
         <SidebarMenuItem>
-          <SidebarMenuButton className="text-sidebar-foreground/70">
+          <SidebarMenuButton
+            onClick={handleMorePopup}
+            className="text-sidebar-foreground/70"
+          >
             <IconDots className="text-sidebar-foreground/70" />
             <span>More</span>
           </SidebarMenuButton>

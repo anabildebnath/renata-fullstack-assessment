@@ -32,6 +32,16 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
 
+  const handleLogout = () => {
+    // Logic for logout
+    alert("Logged out successfully.")
+  }
+
+  const handleAccountRedirect = () => {
+    // Redirect to settings
+    alert("Account: Redirecting to settings.")
+  }
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -74,21 +84,21 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleAccountRedirect}>
                 <IconUserCircle />
                 Account
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <IconCreditCard />
-                Billing
+                Billing (Placeholder)
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <IconNotification />
-                Notifications
+                Notifications (Placeholder)
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <IconLogout />
               Log out
             </DropdownMenuItem>

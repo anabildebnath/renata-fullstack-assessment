@@ -1,5 +1,6 @@
 "use client"
 
+import { FormContext } from "@/components/data-table"; // Import FormContext
 import * as React from "react"
 import {
   ArrowUpCircleIcon,
@@ -150,12 +151,12 @@ const data = {
   ],
 }
 
-export function AppSidebar({ ...props }) {
+export function AppSidebar({ setIsFormOpen, ...props }) { // Accept setIsFormOpen as a prop
   return (
     <Sidebar
       collapsible="offcanvas"
       {...props}
-      className="bg-[oklch(240%_5.3%_26.1%)] text-[oklch(var(--sidebar-foreground))]" // Updated background color
+      className="bg-[oklch(240%_5.3%_26.1%)] text-[oklch(var(--sidebar-foreground))]"
     >
       <SidebarHeader>
         <SidebarMenu>
@@ -173,7 +174,7 @@ export function AppSidebar({ ...props }) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={data.navMain} setIsFormOpen={setIsFormOpen} /> {/* Pass setIsFormOpen */}
         <NavDocuments items={data.documents} />
         <NavSecondary
           items={data.navSecondary}
@@ -184,5 +185,5 @@ export function AppSidebar({ ...props }) {
         <NavUser user={data.user} />
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

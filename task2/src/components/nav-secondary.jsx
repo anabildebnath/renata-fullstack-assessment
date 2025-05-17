@@ -13,13 +13,29 @@ export function NavSecondary({
   items,
   ...props
 }) {
+  const handleSettingsPopup = () => {
+    // Show a popup for editing profile details
+    alert("Settings: Edit profile details.");
+  };
+
+  const handleGetHelpPopup = () => {
+    // Show a popup with contact mediums
+    alert("Get Help: Contact mediums displayed.");
+  };
+
   return (
     <SidebarGroup {...props}>
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild>
+              <SidebarMenuButton
+                asChild
+                onClick={() => {
+                  if (item.title === "Settings") handleSettingsPopup();
+                  else if (item.title === "Get Help") handleGetHelpPopup();
+                }}
+              >
                 <a href={item.url}>
                   <item.icon />
                   <span>{item.title}</span>
