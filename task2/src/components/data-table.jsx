@@ -347,7 +347,7 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
               className="bg-transparent border-[oklch(var(--border))] text-[oklch(var(--foreground))] hover:bg-[oklch(var(--muted))] hover:text-[oklch(var(--foreground))]"
             >
               <PlusIcon className="size-4 mr-1" />
-              <span className="hidden lg:inline">Add Item</span>
+              <span className="hidden lg:inline">Add Customer</span>
             </Button>
           </div>
         </div>
@@ -392,10 +392,51 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
             </DndContext>
           </div>
         </TabsContent>
-        <FormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSubmit={handleFormSubmit} />
+        <FormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSubmit={handleFormSubmit}>
+          <div>
+            <Label>Customer Name</Label>
+            <Input name="CustomerName" required />
+          </div>
+          <div>
+            <Label>Division</Label>
+            <Select name="Division" required>
+              <SelectTrigger>
+                <SelectValue placeholder="Select division" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Dhaka">Dhaka</SelectItem>
+                <SelectItem value="Chattogram">Chattogram</SelectItem>
+                <SelectItem value="Rajshahi">Rajshahi</SelectItem>
+                <SelectItem value="Khulna">Khulna</SelectItem>
+                <SelectItem value="Barishal">Barishal</SelectItem>
+                <SelectItem value="Sylhet">Sylhet</SelectItem>
+                <SelectItem value="Rangpur">Rangpur</SelectItem>
+                <SelectItem value="Mymensingh">Mymensingh</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Gender</Label>
+            <Input name="Gender" required />
+          </div>
+          <div>
+            <Label>Marital Status</Label>
+            <Input name="MaritalStatus" required />
+          </div>
+          <div>
+            <Label>Age</Label>
+            <Input name="Age" type="number" min="0" max="200" required />
+          </div>
+          <div>
+            <Label>Income</Label>
+            <Input name="Income" type="number" min="0" required />
+          </div>
+        </FormModal>
         {isEditOpen && editRecord && (
           <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-            <DialogContent>
+            <DialogContent
+              style={{ backgroundColor: "oklch(224% 71.4% 4.1%)" }} // Updated background color
+            >
               <DialogHeader>
                 <DialogTitle>Edit Item</DialogTitle>
                 <DialogClose onClick={() => setIsEditOpen(false)} />
@@ -415,33 +456,29 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
                 </div>
                 <div>
                   <Label>Division</Label>
-                  <Input name="Division" defaultValue={editRecord.Division} />
+                  <Select defaultValue={editRecord.Division}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select division" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Dhaka">Dhaka</SelectItem>
+                      <SelectItem value="Chattogram">Chattogram</SelectItem>
+                      <SelectItem value="Rajshahi">Rajshahi</SelectItem>
+                      <SelectItem value="Khulna">Khulna</SelectItem>
+                      <SelectItem value="Barishal">Barishal</SelectItem>
+                      <SelectItem value="Sylhet">Sylhet</SelectItem>
+                      <SelectItem value="Rangpur">Rangpur</SelectItem>
+                      <SelectItem value="Mymensingh">Mymensingh</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label>Gender</Label>
-                  <Select defaultValue={editRecord.Gender}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select gender" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Male">Male</SelectItem>
-                      <SelectItem value="Female">Female</SelectItem>
-                      <SelectItem value="Other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Input name="Gender" defaultValue={editRecord.Gender} />
                 </div>
                 <div>
                   <Label>Marital Status</Label>
-                  <Select defaultValue={editRecord.MaritalStatus}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select marital status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Single">Single</SelectItem>
-                      <SelectItem value="Married">Married</SelectItem>
-                      <SelectItem value="Divorced">Divorced</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Input name="MaritalStatus" defaultValue={editRecord.MaritalStatus} />
                 </div>
                 <div>
                   <Label>Age</Label>

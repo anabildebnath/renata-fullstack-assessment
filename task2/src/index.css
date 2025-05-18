@@ -171,6 +171,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+  backdrop-filter: blur(1px); /* Apply blur effect */
+  z-index: 9999; /* Ensure it appears above other elements */
 }
 
 .dialog-content {
@@ -248,4 +253,15 @@ button:hover, .btn:hover, .btn-primary:hover {
   border-radius: 0.5rem;
   padding: 0.25rem 0.75rem;
   font-size: 0.85rem;
+}
+
+.popup-form {
+  background-color: #0a0a0a; /* Solid pitch-dark background color */
+  color: #ffffff; /* Ensure text is visible on the dark background */
+  border-radius: 8px; /* Optional: Add rounded corners */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8); /* Optional: Add a shadow for better visibility */
+  padding: 1.5rem; /* Add padding for better spacing */
+  opacity: 1; /* Ensure no transparency */
+  max-width: 600px; /* Restore original width */
+  width: 100%; /* Ensure it takes full width up to the maxWidth */
 }

@@ -152,7 +152,7 @@ const data = {
   ],
 }
 
-export function AppSidebar({ setIsFormOpen, onSearchClick, ...props }) { // Accept onSearchClick as a prop
+export function AppSidebar({ setIsFormOpen, onSearchClick, ...props }) {
   return (
     <Sidebar
       collapsible="offcanvas"

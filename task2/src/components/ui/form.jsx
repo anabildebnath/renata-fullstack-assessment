@@ -133,103 +133,159 @@ function FormMessage({
 }
 
 function FormModal({ isOpen, onClose, onSubmit }) {
-  const formMethods = useForm(); // Initialize react-hook-form
+  const formMethods = useForm({
+    defaultValues: {
+      CustomerName: "",
+      Division: "",
+      Gender: "",
+      MaritalStatus: "",
+      Age: "",
+      Income: "",
+    },
+    mode: "onBlur",
+  });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg mx-auto">
-        <DialogHeader>
-          <DialogTitle>Add New Item</DialogTitle>
-          <DialogClose onClick={onClose} /> {/* Ensure this closes the modal */}
-        </DialogHeader>
-        <FormProvider {...formMethods}>
-          <form
-            onSubmit={formMethods.handleSubmit((data) => {
-              onSubmit(data);
-              onClose(); // Close the modal after submission
-            })}
-            className="space-y-4"
+      <div
+        className="dialog-backdrop"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            onClose(); // Close the form only when clicking outside the modal content
+          }
+        }}
+      >
+        <DialogContent
+          className="popup-form relative"
+          style={{
+            backgroundColor: "#000000",
+            color: "#ffffff",
+            borderRadius: "8px",
+            boxShadow: "0 4px 10px rgba(0, 0, 0, 0.8)",
+            maxWidth: "600px",
+            width: "100%",
+          }}
+          onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the form
+        >
+          <DialogHeader>
+            <DialogTitle>Add Customer</DialogTitle>
+          </DialogHeader>
+          <button
+            className="absolute top-2 right-2 text-white bg-red-500 rounded-full p-1 hover:bg-red-600"
+            onClick={onClose} // Close the form when clicking the close button
           >
-            <FormItem>
-              <FormLabel>Customer Name</FormLabel>
-              <FormControl>
-                <input
-                  type="text"
-                  {...formMethods.register("CustomerName")}
-                  placeholder="Enter customer name"
-                  className="input"
-                />
-              </FormControl>
-            </FormItem>
-            <FormItem>
-              <FormLabel>Division</FormLabel>
-              <FormControl>
-                <input
-                  type="text"
-                  {...formMethods.register("Division")}
-                  placeholder="Enter division"
-                  className="input"
-                />
-              </FormControl>
-            </FormItem>
-            <FormItem>
-              <FormLabel>Gender</FormLabel>
-              <FormControl>
-                <select
-                  {...formMethods.register("Gender")}
-                  className="select"
-                >
-                  <option value="">Select gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </select>
-              </FormControl>
-            </FormItem>
-            <FormItem>
-              <FormLabel>Marital Status</FormLabel>
-              <FormControl>
-                <select
-                  {...formMethods.register("MaritalStatus")}
-                  className="select"
-                >
-                  <option value="">Select marital status</option>
-                  <option value="Single">Single</option>
-                  <option value="Married">Married</option>
-                  <option value="Divorced">Divorced</option>
-                </select>
-              </FormControl>
-            </FormItem>
-            <FormItem>
-              <FormLabel>Age</FormLabel>
-              <FormControl>
-                <input
-                  type="number"
-                  {...formMethods.register("Age")}
-                  placeholder="Enter age"
-                  className="input"
-                />
-              </FormControl>
-            </FormItem>
-            <FormItem>
-              <FormLabel>Income</FormLabel>
-              <FormControl>
-                <input
-                  type="number"
-                  {...formMethods.register("Income")}
-                  placeholder="Enter income"
-                  className="input"
-                />
-              </FormControl>
-            </FormItem>
-            <div className="flex justify-end mt-4">
-              <button type="submit" className="btn btn-primary">
-                Submit
-              </button>
-            </div>
-          </form>
-        </FormProvider>
-      </DialogContent>
+            ✕
+          </button>
+          <FormProvider {...formMethods}>
+            <form
+              onSubmit={formMethods.handleSubmit((data) => {
+                onSubmit(data);
+                onClose();
+              })}
+              className="space-y-4"
+            >
+              <FormItem>
+                <FormLabel>Customer Name</FormLabel>
+                <FormControl>
+                  <input
+                    type="text"
+                    {...formMethods.register("CustomerName", { required: "Customer Name is required" })}
+                    placeholder="Enter customer name"
+                    className="input"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+              <FormItem>
+                <FormLabel>Division</FormLabel>
+                <FormControl>
+                  <select
+                    {...formMethods.register("Division", { required: "Division is required" })}
+                    className="select"
+                  >
+                    <option value="">Select division</option>
+                    <option value="Dhaka">Dhaka</option>
+                    <option value="Chattogram">Chattogram</option>
+                    <option value="Rajshahi">Rajshahi</option>
+                    <option value="Khulna">Khulna</option>
+                    <option value="Barishal">Barishal</option>
+                    <option value="Sylhet">Sylhet</option>
+                    <option value="Rangpur">Rangpur</option>
+                    <option value="Mymensingh">Mymensingh</option>
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+              <FormItem>
+                <FormLabel>Gender</FormLabel>
+                <FormControl>
+                  <select
+                    {...formMethods.register("Gender", { required: "Gender is required" })}
+                    className="select"
+                  >
+                    <option value="">Select gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+              <FormItem>
+                <FormLabel>Marital Status</FormLabel>
+                <FormControl>
+                  <select
+                    {...formMethods.register("MaritalStatus", { required: "Marital Status is required" })}
+                    className="select"
+                  >
+                    <option value="">Select marital status</option>
+                    <option value="Single">Single</option>
+                    <option value="Married">Married</option>
+                    <option value="Divorced">Divorced</option>
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+              <FormItem>
+                <FormLabel>Age</FormLabel>
+                <FormControl>
+                  <input
+                    type="number"
+                    {...formMethods.register("Age", {
+                      required: "Age is required",
+                      min: { value: 0, message: "Age must be at least 0" },
+                      max: { value: 200, message: "Age must be at most 200" },
+                    })}
+                    placeholder="Enter age"
+                    className="input"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+              <FormItem>
+                <FormLabel>Income</FormLabel>
+                <FormControl>
+                  <input
+                    type="number"
+                    {...formMethods.register("Income", {
+                      required: "Income is required",
+                      min: { value: 0, message: "Income cannot be negative" },
+                    })}
+                    placeholder="Enter income"
+                    className="input"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+              <div className="flex justify-end mt-4">
+                <button type="submit" className="btn btn-primary">
+                  Submit
+                </button>
+              </div>
+            </form>
+          </FormProvider>
+        </DialogContent>
+      </div>
     </Dialog>
   );
 }
