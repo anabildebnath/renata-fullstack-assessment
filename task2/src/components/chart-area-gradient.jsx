@@ -29,11 +29,11 @@ const chartData = [
 const chartConfig = {
   desktop: {
     label: "Desktop",
-    color: "hsl(var(--chart-1))",
+    color: "hsl(var(--chart-1))", // Use --chart-1 for desktop
   },
   mobile: {
     label: "Mobile",
-    color: "hsl(var(--chart-2))",
+    color: "hsl(var(--chart-2))", // Use --chart-2 for mobile
   },
 } 
 
@@ -69,24 +69,24 @@ export function Component() {
               <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-desktop)"
+                  stopColor="hsl(var(--chart-1))"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-desktop)"
+                  stopColor="hsl(var(--chart-1))"
                   stopOpacity={0.1}
                 />
               </linearGradient>
               <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-mobile)"
+                  stopColor="hsl(var(--chart-2))"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-mobile)"
+                  stopColor="hsl(var(--chart-2))"
                   stopOpacity={0.1}
                 />
               </linearGradient>
@@ -96,7 +96,7 @@ export function Component() {
               type="natural"
               fill="url(#fillMobile)"
               fillOpacity={0.4}
-              stroke="var(--color-mobile)"
+              stroke="hsl(var(--chart-2))"
               stackId="a"
             />
             <Area
@@ -104,7 +104,7 @@ export function Component() {
               type="natural"
               fill="url(#fillDesktop)"
               fillOpacity={0.4}
-              stroke="var(--color-desktop)"
+              stroke="hsl(var(--chart-1))"
               stackId="a"
             />
           </AreaChart>

@@ -25,11 +25,11 @@
     --input: #232329;
     --ring: #818cf8;
     /* Keep these HSL chart colors */
-    --chart-1: 162.9 93.5% 24.3%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --chart-1: 143.8 61.2% 20.2%;
+    --chart-2: 202 80.3% 23.9%;
+    --chart-3: 142.4 71.8% 29.2%;
+    --chart-4: 244.5 57.9% 50.6%;
+    --chart-5: 345.3 82.7% 40.8%;
     /* Add other chart variables if needed */
     --chart-6: 60 70% 50%; /* Example HSL */
     --chart-7: 280 50% 60%; /* Example HSL */

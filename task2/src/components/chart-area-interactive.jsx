@@ -60,15 +60,15 @@ export function ChartAreaInteractive({ data }) {
   const chartConfig = {
     count: {
       label: "Users",
-      color: "hsl(var(--chart-1))", // Green
+      color: "hsl(var(--chart-3))", // Use --chart-3 for count
     },
     normalizedMedianAge: {
       label: "Median Age",
-      color: "hsl(var(--chart-2))", // Blue
+      color: "hsl(var(--chart-4))", // Use --chart-4 for median age
     },
     normalizedMedianSalary: {
       label: "Median Salary",
-      color: "hsl(var(--chart-3))", // Red
+      color: "hsl(var(--chart-5))", // Use --chart-5 for median salary
     },
   }
 
@@ -95,36 +95,36 @@ export function ChartAreaInteractive({ data }) {
               <linearGradient id="fillCount" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="hsl(var(--chart-1))"
-                  stopOpacity={0.8}
+                  stopColor="hsl(var(--chart-3))"
+                  stopOpacity={0.7}
                 />
                 <stop
                   offset="95%"
-                  stopColor="hsl(var(--chart-1))"
-                  stopOpacity={0.1}
+                  stopColor="hsl(var(--chart-3))"
+                  stopOpacity={0.3}
                 />
               </linearGradient>
               <linearGradient id="fillMedianAge" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="hsl(var(--chart-2))"
-                  stopOpacity={0.8}
+                  stopColor="hsl(var(--chart-4))"
+                  stopOpacity={0.3}
                 />
                 <stop
                   offset="95%"
-                  stopColor="hsl(var(--chart-2))"
-                  stopOpacity={0.1}
+                  stopColor="hsl(var(--chart-4))"
+                  stopOpacity={0.8}
                 />
               </linearGradient>
               <linearGradient id="fillMedianSalary" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="hsl(var(--chart-3))"
-                  stopOpacity={0.8}
+                  stopColor="hsl(var(--chart-5))"
+                  stopOpacity={0.5}
                 />
                 <stop
                   offset="95%"
-                  stopColor="hsl(var(--chart-3))"
+                  stopColor="hsl(var(--chart-5))"
                   stopOpacity={0.1}
                 />
               </linearGradient>
@@ -164,21 +164,21 @@ export function ChartAreaInteractive({ data }) {
               dataKey="count"
               type="natural"
               fill="url(#fillCount)"
-              stroke="hsl(var(--chart-1))"
+              stroke="hsl(var(--chart-3))"
               stackId="a"
             />
             <Area
               dataKey="normalizedMedianAge"
               type="natural"
               fill="url(#fillMedianAge)"
-              stroke="hsl(var(--chart-2))"
+              stroke="hsl(var(--chart-4))"
               stackId="a"
             />
             <Area
               dataKey="normalizedMedianSalary"
               type="natural"
               fill="url(#fillMedianSalary)"
-              stroke="hsl(var(--chart-3))"
+              stroke="hsl(var(--chart-5))"
               stackId="a"
             />
           </AreaChart>
