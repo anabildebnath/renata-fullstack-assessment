@@ -148,6 +148,8 @@
   padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 0.25rem;
+  background-color: var(--background); /* Match form background */
+  color: var(--foreground); /* Ensure text is visible */
 }
 
 .btn {
@@ -264,4 +266,39 @@ button:hover, .btn:hover, .btn-primary:hover {
   opacity: 1; /* Ensure no transparency */
   max-width: 600px; /* Restore original width */
   width: 100%; /* Ensure it takes full width up to the maxWidth */
+}
+
+.sidebar-menu-button {
+  background-color: transparent;
+  color: var(--sidebar-foreground);
+  border-radius: var(--radius);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar-menu-button:hover,
+.sidebar-menu-item:hover > .sidebar-menu-button {
+  background-color: oklch(220% 8.9% 46.1%) !important; /* Apply gray hover color */
+  color: var(--sidebar-accent-foreground) !important;
+}
+
+.sidebar-menu-item > .sidebar-menu-button:hover {
+  background-color: oklch(220% 8.9% 46.1%) !important; /* Ensure specificity */
+  color: var(--sidebar-accent-foreground) !important;
+}
+
+.sidebar-menu-item:hover > .sidebar-menu-button {
+  background-color: oklch(220% 8.9% 46.1%) !important; /* Ensure parent hover applies */
+  color: var(--sidebar-accent-foreground) !important;
+}
+
+.sidebar-menu-button.quick-create {
+  background-color: white !important;
+  width: 70%;
+  color: black !important;
+  border-radius: 8px;
+}
+
+.sidebar-menu-button.quick-create:hover {
+  background-color: oklch(220% 8.9% 46.1%) !important; /* Apply gray hover color */
+  color: black !important; /* Ensure black text on hover */
 }

@@ -36,7 +36,7 @@ export function NavMain({ items = [], setIsFormOpen, onSearchClick }) { // Accep
           <SidebarMenuItem className="flex items-center gap-2">
             <SidebarMenuButton
               onClick={handleQuickCreate} // Trigger popup
-              className="text-[oklch(var(--sidebar-foreground))] hover:bg-[oklch(var(--sidebar-accent))] hover:text-[oklch(var(--sidebar-accent-foreground))] rounded-[var(--radius)]"
+              className="sidebar-menu-button quick-create"
             >
               <IconCirclePlusFilled />
               <span>Quick Create</span>
@@ -54,7 +54,7 @@ export function NavMain({ items = [], setIsFormOpen, onSearchClick }) { // Accep
                   else if (item.title === "Analytics") navigate("/analytics");
                   else if (item.title === "Projects" || item.title === "Team") alert(`${item.title}: Placeholder.`);
                 }}
-                className="text-[oklch(var(--sidebar-foreground))] hover:bg-[oklch(var(--sidebar-accent))] hover:text-[oklch(var(--sidebar-accent-foreground))] rounded-[var(--radius)]"
+                className="sidebar-menu-button"
               >
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>
@@ -66,7 +66,7 @@ export function NavMain({ items = [], setIsFormOpen, onSearchClick }) { // Accep
             <SidebarMenuButton
               tooltip="Search"
               onClick={handleSearchClick} // Trigger onSearchClick prop
-              className="text-[oklch(var(--sidebar-foreground))] hover:bg-[oklch(var(--sidebar-accent))] hover:text-[oklch(var(--sidebar-accent-foreground))] rounded-[var(--radius)]"
+              className="sidebar-menu-button" // Ensure this class is applied
             >
               <IconSearch />
               <span>Search</span>
