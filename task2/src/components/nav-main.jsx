@@ -62,7 +62,7 @@ export function NavMain({ items = [], setIsFormOpen, onSearchClick }) { // Accep
                   else if (item.title === "Analytics") navigate("/analytics");
                   else if (item.title === "Projects" || item.title === "Team") alert(`${item.title}: Placeholder.`);
                 }}
-                className="min-w-8 bg-transparent text-sidebar-foreground duration-200 ease-linear hover:bg-gray-200 hover:text-black active:bg-gray-300 active:text-black"
+                className="nav-main-button min-w-8 bg-transparent text-sidebar-foreground duration-200 ease-linear hover:bg-gray-900"
               >
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>

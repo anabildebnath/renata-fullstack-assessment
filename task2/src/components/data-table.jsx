@@ -327,7 +327,7 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
                 ref={searchInputRef}
                 placeholder="Search..."
                 value={globalFilter}
-                onChange={(e) => setGlobalFilter(e.target.value)} // Update global filter state
+                onChange={(e) => setGlobalFilter(e.target.value)}
                 onFocus={() => setIsSearchFocused(true)}
                 onBlur={() => setIsSearchFocused(false)}
                 className={`transition-all duration-[2000ms] ease-out ${
@@ -337,6 +337,8 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
                   position: "absolute",
                   right: 0,
                   borderRadius: "10px",
+                  backgroundColor: "transparent", // Set background color to black
+                  color: "white", // Ensure text is visible on black background
                 }}
               />
             </div>
@@ -344,7 +346,7 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
               variant="outline"
               size="sm"
               onClick={() => setIsFormOpen(true)}
-              className="bg-transparent border-[oklch(var(--border))] text-[oklch(var(--foreground))] hover:bg-[oklch(var(--muted))] hover:text-[oklch(var(--foreground))]"
+              className="bg-transparent text-[oklch(var(--foreground))] hover:bg-gray-300 hover:text-[oklch(var(--foreground))]" 
             >
               <PlusIcon className="size-4 mr-1" />
               <span className="hidden lg:inline">Add Customer</span>
