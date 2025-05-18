@@ -35,12 +35,20 @@ export function NavMain({ items = [], setIsFormOpen, onSearchClick }) { // Accep
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-2">
             <SidebarMenuButton
+              tooltip="Quick Create"
               onClick={handleQuickCreate} // Trigger popup
-              className="sidebar-menu-button quick-create"
+              className="min-w-8 bg-white text-black duration-200 ease-linear hover:bg-gray-100 hover:text-black active:bg-gray-200 active:text-black"
             >
               <IconCirclePlusFilled />
               <span>Quick Create</span>
             </SidebarMenuButton>
+            <button
+              size="icon"
+              className="h-9 w-9 shrink-0 group-data-[collapsible=icon]:opacity-0 border border-gray-300 rounded-md hover:bg-gray-100"
+            >
+              <IconMail />
+              <span className="sr-only">Inbox</span>
+            </button>
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
@@ -54,7 +62,7 @@ export function NavMain({ items = [], setIsFormOpen, onSearchClick }) { // Accep
                   else if (item.title === "Analytics") navigate("/analytics");
                   else if (item.title === "Projects" || item.title === "Team") alert(`${item.title}: Placeholder.`);
                 }}
-                className="sidebar-menu-button"
+                className="min-w-8 bg-transparent text-sidebar-foreground duration-200 ease-linear hover:bg-gray-200 hover:text-black active:bg-gray-300 active:text-black"
               >
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>
@@ -66,14 +74,13 @@ export function NavMain({ items = [], setIsFormOpen, onSearchClick }) { // Accep
             <SidebarMenuButton
               tooltip="Search"
               onClick={handleSearchClick} // Trigger onSearchClick prop
-              className="sidebar-menu-button" // Ensure this class is applied
+              className="min-w-8 bg-transparent text-sidebar-foreground duration-200 ease-linear hover:bg-gray-200 hover:text-black active:bg-gray-300 active:text-black"
             >
               <IconSearch />
               <span>Search</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        {/* End of Search button */}
       </SidebarGroupContent>
     </SidebarGroup>
   );

@@ -275,30 +275,19 @@ button:hover, .btn:hover, .btn-primary:hover {
   transition: background-color 0.3s, color 0.3s;
 }
 
-.sidebar-menu-button:hover,
-.sidebar-menu-item:hover > .sidebar-menu-button {
+.sidebar-menu-button:hover {
   background-color: oklch(220% 8.9% 46.1%) !important; /* Apply gray hover color */
-  color: var(--sidebar-accent-foreground) !important;
-}
-
-.sidebar-menu-item > .sidebar-menu-button:hover {
-  background-color: oklch(220% 8.9% 46.1%) !important; /* Ensure specificity */
-  color: var(--sidebar-accent-foreground) !important;
-}
-
-.sidebar-menu-item:hover > .sidebar-menu-button {
-  background-color: oklch(220% 8.9% 46.1%) !important; /* Ensure parent hover applies */
   color: var(--sidebar-accent-foreground) !important;
 }
 
 .sidebar-menu-button.quick-create {
-  background-color: white !important;
-  width: 70%;
-  color: black !important;
-  border-radius: 8px;
+  background-color: white !important; /* Ensure white background */
+  color: black !important; /* Ensure black text */
+  border-radius: var(--radius);
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .sidebar-menu-button.quick-create:hover {
-  background-color: oklch(220% 8.9% 46.1%) !important; /* Apply gray hover color */
+  background-color: gray !important; /* Apply light gray hover color */
   color: black !important; /* Ensure black text on hover */
 }
