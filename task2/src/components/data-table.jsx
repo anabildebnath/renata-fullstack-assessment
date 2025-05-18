@@ -183,15 +183,15 @@ function RowActions({ row, onEdit, onDelete, onCopy, onFavorite }) {
   );
 }
 
-export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isFormOpen, setIsFormOpen, searchInputRef }) { // Accept searchInputRef
+export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isFormOpen, setIsFormOpen, searchInputRef }) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState({});
-  const [columnFilters, setColumnFilters] = React.useState([]);
-  const [globalFilter, setGlobalFilter] = React.useState("");
+  const [globalFilter, setGlobalFilter] = React.useState(""); // Global filter state
   const [sorting, setSorting] = React.useState([]);
   const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
   const [isEditOpen, setIsEditOpen] = React.useState(false);
   const [editRecord, setEditRecord] = React.useState(null);
+  const [isSearchFocused, setIsSearchFocused] = React.useState(false); // Track focus state of the search box
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { delay: 500, tolerance: 5 } }),
@@ -199,24 +199,30 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
     useSensor(KeyboardSensor)
   );
 
+  // Filter data directly in the render logic instead of modifying the table's data
+  const filteredData = React.useMemo(() => {
+    if (!globalFilter) return data; // If no filter value, return all rows
+    const lowerFilterValue = globalFilter.toLowerCase();
+    return data.filter((row) =>
+      Object.values(row).some((value) =>
+        value?.toString().toLowerCase().includes(lowerFilterValue)
+      )
+    );
+  }, [data, globalFilter]);
+
   const table = useReactTable({
-    data,
+    data, // Use the original data
     columns,
-    state: { sorting, columnVisibility, rowSelection, columnFilters, globalFilter, pagination },
+    state: { sorting, columnVisibility, rowSelection, pagination },
     getRowId: (row) => row.ID.toString(),
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
     onPaginationChange: setPagination,
     enableRowSelection: true,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
   const handleFormSubmit = (formData) => {
@@ -315,14 +321,25 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
             </TabsTrigger>
             <TabsTrigger value="focus-documents">Focus Documents</TabsTrigger>
           </TabsList>
-          <div className="flex items-center gap-2 ">
-            <Input
-              ref={searchInputRef} // Attach the ref to the search input
-              placeholder="Search..."
-              value={globalFilter}
-              onChange={(e) => setGlobalFilter(e.target.value)}
-              className="w-64"
-            />
+          <div className="flex items-center gap-2">
+            <div className="relative flex items-center">
+              <Input
+                ref={searchInputRef}
+                placeholder="Search..."
+                value={globalFilter}
+                onChange={(e) => setGlobalFilter(e.target.value)} // Update global filter state
+                onFocus={() => setIsSearchFocused(true)}
+                onBlur={() => setIsSearchFocused(false)}
+                className={`transition-all duration-[2000ms] ease-out ${
+                  isSearchFocused ? "w-[240px]" : "w-[160px]"
+                }`}
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  borderRadius: "10px",
+                }}
+              />
+            </div>
             <Button
               variant="outline"
               size="sm"
@@ -337,7 +354,7 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
         <TabsContent value="outline" className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
           <div className="overflow-hidden rounded-[0.75rem] border">
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={data.map((item) => item.ID)} strategy={verticalListSortingStrategy}>
+              <SortableContext items={filteredData.map((item) => item.ID)} strategy={verticalListSortingStrategy}>
                 <Table>
                   <TableHeader className="sticky top-0 z-10 bg-muted">
                     {table.getHeaderGroups().map((hg) => (
@@ -351,19 +368,17 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
                     ))}
                   </TableHeader>
                   <TableBody>
-                    {data.length ? (
-                      <SortableContext items={data.map((item) => item.ID)} strategy={verticalListSortingStrategy}>
-                        {data.map((row) => (
-                          <DraggableRow
-                            key={row.ID}
-                            row={row}
-                            onEdit={handleEdit} // Pass handleEdit as a prop
-                            onDelete={handleDelete} // Pass handleDelete as a prop
-                            onCopy={handleCopy} // Pass handleCopy as a prop
-                            onFavorite={handleFavorite} // Pass handleFavorite as a prop
-                          />
-                        ))}
-                      </SortableContext>
+                    {filteredData.length ? (
+                      filteredData.map((row) => (
+                        <DraggableRow
+                          key={row.ID}
+                          row={row}
+                          onEdit={handleEdit}
+                          onDelete={handleDelete}
+                          onCopy={handleCopy}
+                          onFavorite={handleFavorite}
+                        />
+                      ))
                     ) : (
                       <TableRow>
                         <TableCell colSpan={columns.length + 1} className="h-24 text-center">
