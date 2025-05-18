@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/app-sidebar"; // Restore AppSidebar
 import { SiteHeader } from "@/components/site-header";
 import { SectionCards } from "@/components/section-cards";
 import { ChartAreaInteractive } from "@/components/chart-area-interactive";
@@ -14,6 +14,7 @@ export default function App() {
   });
 
   const [isFormOpen, setIsFormOpen] = useState(false); // Popup state
+  const searchInputRef = React.useRef(null); // Create a ref for the search input
 
   useEffect(() => {
     localStorage.setItem("data", JSON.stringify(data));
@@ -33,10 +34,16 @@ export default function App() {
     );
   };
 
+  const setSearchFocus = () => {
+    if (searchInputRef.current) {
+      searchInputRef.current.focus(); // Focus on the search input
+    }
+  };
+
   return (
     <SidebarProvider>
       <div className="flex w-full min-h-screen bg-background text-foreground">
-        <AppSidebar setIsFormOpen={setIsFormOpen} variant="inset" /> {/* Pass setIsFormOpen */}
+        <AppSidebar setIsFormOpen={setIsFormOpen} onSearchClick={setSearchFocus} /> {/* Pass setSearchFocus */}
         <SidebarInset>
           <SiteHeader />
           <main className="flex flex-1 flex-col p-6">
@@ -52,6 +59,7 @@ export default function App() {
                 onEditRecord={handleEditRecord}
                 isFormOpen={isFormOpen} // Pass isFormOpen
                 setIsFormOpen={setIsFormOpen} // Pass setIsFormOpen
+                searchInputRef={searchInputRef} // Pass searchInputRef
               />
             </div>
           </main>

@@ -85,6 +85,7 @@ import {
 } from "@/components/ui/tabs";
 import { FormModal } from "@/components/ui/form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
+import { AppSidebar } from "@/components/app-sidebar"; // Import AppSidebar
 
 export const schema = z.object({
   ID: z.string(),
@@ -182,7 +183,7 @@ function RowActions({ row, onEdit, onDelete, onCopy, onFavorite }) {
   );
 }
 
-export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isFormOpen, setIsFormOpen }) { // Accept isFormOpen and setIsFormOpen as props
+export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isFormOpen, setIsFormOpen, searchInputRef }) { // Accept searchInputRef
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState([]);
@@ -316,6 +317,7 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
           </TabsList>
           <div className="flex items-center gap-2 ">
             <Input
+              ref={searchInputRef} // Attach the ref to the search input
               placeholder="Search..."
               value={globalFilter}
               onChange={(e) => setGlobalFilter(e.target.value)}

@@ -11,6 +11,7 @@ import {
   FileCodeIcon,
   FileIcon,
   FileTextIcon,
+  FilterIcon,
   FolderIcon,
   HelpCircleIcon,
   LayoutDashboardIcon,
@@ -47,9 +48,9 @@ const data = {
       icon: LayoutDashboardIcon,
     },
     {
-      title: "Lifecycle",
+      title: "Filter",
       url: "#",
-      icon: ListIcon,
+      icon: FilterIcon,
     },
     {
       title: "Analytics",
@@ -57,7 +58,7 @@ const data = {
       icon: BarChartIcon,
     },
     {
-      title: "Projects",
+      title: "Data Files",
       url: "#",
       icon: FolderIcon,
     },
@@ -151,7 +152,7 @@ const data = {
   ],
 }
 
-export function AppSidebar({ setIsFormOpen, ...props }) { // Accept setIsFormOpen as a prop
+export function AppSidebar({ setIsFormOpen, onSearchClick, ...props }) { // Accept onSearchClick as a prop
   return (
     <Sidebar
       collapsible="offcanvas"
@@ -165,16 +166,24 @@ export function AppSidebar({ setIsFormOpen, ...props }) { // Accept setIsFormOpe
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5 text-[oklch(var(--sidebar-foreground))] hover:bg-[oklch(var(--sidebar-accent))] hover:text-[oklch(var(--sidebar-accent-foreground))] rounded-[var(--radius)]"
             >
-              <a href="#">
-                <ArrowUpCircleIcon className="h-5 w-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
+              <a href="#" className="flex items-center gap-2">
+                <img
+                  src="/assets/renata-logo2.png" // Ensure the image is in the public/assets folder
+                  alt="Renata Logo"
+                  className="h-5 w-5" // Adjust size to be proportionate
+                />
+                <span className="text-base font-semibold">Renata PLC</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} setIsFormOpen={setIsFormOpen} /> {/* Pass setIsFormOpen */}
+        <NavMain
+          items={data.navMain}
+          setIsFormOpen={setIsFormOpen}
+          onSearchClick={onSearchClick}
+        />
         <NavDocuments items={data.documents} />
         <NavSecondary
           items={data.navSecondary}

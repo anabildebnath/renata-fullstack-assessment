@@ -1,4 +1,4 @@
-import { IconCirclePlusFilled, IconMail } from "@tabler/icons-react";
+import { IconCirclePlusFilled, IconMail, IconSearch } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react"; // Import useContext
 import { FormContext } from "@/components/data-table"; // Import FormContext
@@ -10,7 +10,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-export function NavMain({ items = [], setIsFormOpen }) { // Ensure setIsFormOpen is passed
+export function NavMain({ items = [], setIsFormOpen, onSearchClick }) { // Accept onSearchClick as a prop
   const navigate = useNavigate();
 
   const handleQuickCreate = () => {
@@ -18,6 +18,14 @@ export function NavMain({ items = [], setIsFormOpen }) { // Ensure setIsFormOpen
       setIsFormOpen(true); // Open the popup
     } else {
       console.error("setIsFormOpen is not a function");
+    }
+  };
+
+  const handleSearchClick = () => {
+    if (typeof onSearchClick === "function") {
+      onSearchClick(); // Trigger focus on search box
+    } else {
+      console.error("onSearchClick is not a function");
     }
   };
 
@@ -41,9 +49,9 @@ export function NavMain({ items = [], setIsFormOpen }) { // Ensure setIsFormOpen
               <SidebarMenuButton
                 tooltip={item.title}
                 onClick={() => {
-                  if (item.title === "Dashboard") navigate("/dashboard"); // Updated to use navigate
+                  if (item.title === "Dashboard") navigate("/dashboard");
                   else if (item.title === "Filter Search") alert("Filter Search: Page opened.");
-                  else if (item.title === "Analytics") navigate("/analytics"); // Updated to use navigate
+                  else if (item.title === "Analytics") navigate("/analytics");
                   else if (item.title === "Projects" || item.title === "Team") alert(`${item.title}: Placeholder.`);
                 }}
                 className="text-[oklch(var(--sidebar-foreground))] hover:bg-[oklch(var(--sidebar-accent))] hover:text-[oklch(var(--sidebar-accent-foreground))] rounded-[var(--radius)]"
@@ -53,7 +61,19 @@ export function NavMain({ items = [], setIsFormOpen }) { // Ensure setIsFormOpen
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
+          {/* Add Search button */}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              tooltip="Search"
+              onClick={handleSearchClick} // Trigger onSearchClick prop
+              className="text-[oklch(var(--sidebar-foreground))] hover:bg-[oklch(var(--sidebar-accent))] hover:text-[oklch(var(--sidebar-accent-foreground))] rounded-[var(--radius)]"
+            >
+              <IconSearch />
+              <span>Search</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         </SidebarMenu>
+        {/* End of Search button */}
       </SidebarGroupContent>
     </SidebarGroup>
   );
