@@ -18,32 +18,87 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-];
+export function LineChartLabel({ data = [] }) {
+  // Validate the data prop
+  if (!Array.isArray(data) || data.length === 0) {
+    console.warn("Invalid or empty data provided to LineChartLabel:", data);
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Median Salary by Division</CardTitle>
+          <CardDescription>No data available</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-center text-muted-foreground">
+            No valid data to display.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "hsl(var(--chart-2))",
-  },
-};
+  // Filter out records with invalid or undefined Division values
+  const validData = data.filter(
+    (record) => record.Division && record.Division.trim() !== ""
+  );
 
-export function LineChartLabel() {
+  if (validData.length === 0) {
+    console.warn("No valid Division data available for LineChartLabel.");
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Median Salary by Division</CardTitle>
+          <CardDescription>No valid division data available</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-center text-muted-foreground">
+            No valid division data to display.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Group data by division and calculate median salary
+  const groupedData = validData.reduce((acc, record) => {
+    const division = record.Division.trim();
+    if (!acc[division]) {
+      acc[division] = [];
+    }
+    acc[division].push(record.Income || 0);
+    return acc;
+  }, {});
+
+  // Helper function to calculate median
+  const calculateMedian = (arr) => {
+    if (!arr.length) return 0;
+    const sorted = [...arr].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 !== 0
+      ? sorted[mid]
+      : (sorted[mid - 1] + sorted[mid]) / 2;
+  };
+
+  // Prepare chart data
+  const chartData = Object.entries(groupedData).map(([division, incomes]) => ({
+    division,
+    medianSalary: calculateMedian(incomes),
+  }));
+
+  const chartConfig = {
+    medianSalary: {
+      label: "Median Salary",
+      color: "hsl(var(--chart-1))",
+    },
+  };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Line Chart - Label</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>Median Salary by Division</CardTitle>
+        <CardDescription>
+          Showcasing the median salary of each division
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -58,23 +113,22 @@ export function LineChartLabel() {
           >
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="month"
+              dataKey="division"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
             />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="line" />}
             />
             <Line
-              dataKey="desktop"
+              dataKey="medianSalary"
               type="natural"
-              stroke="var(--color-desktop)"
+              stroke="var(--color-medianSalary)"
               strokeWidth={2}
               dot={{
-                fill: "var(--color-desktop)",
+                fill: "var(--color-medianSalary)",
               }}
               activeDot={{
                 r: 6,
@@ -95,7 +149,7 @@ export function LineChartLabel() {
           Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
+          Based on division-wise median salary data
         </div>
       </CardFooter>
     </Card>

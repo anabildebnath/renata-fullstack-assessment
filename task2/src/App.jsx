@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router-dom"; // Add Navigate for redirection
+import { Routes, Route, Navigate } from "react-router-dom";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
@@ -7,7 +7,7 @@ import { SectionCards } from "@/components/section-cards";
 import { ChartAreaInteractive } from "@/components/chart-area-interactive";
 import { DataTable } from "@/components/data-table";
 import { FilterPopup } from "@/components/filter-popup";
-import AnalyticsPage from "@/pages/analytics"; // Import the Analytics page
+import AnalyticsPage from "@/pages/analytics";
 import rawData from "./data.json";
 
 export default function App() {
@@ -17,13 +17,13 @@ export default function App() {
       return savedData ? JSON.parse(savedData) : rawData;
     } catch (error) {
       console.error("Failed to load data from localStorage:", error);
-      return rawData; // Fallback to rawData if localStorage fails
+      return rawData;
     }
   });
 
-  const [filteredData, setFilteredData] = useState(data); // Filtered data state
-  const [isFilterOpen, setIsFilterOpen] = useState(false); // Filter popup state
-  const [isFormOpen, setIsFormOpen] = useState(false); // Form popup state
+  const [filteredData, setFilteredData] = useState(data);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -39,11 +39,9 @@ export default function App() {
   }, [data]);
 
   const handleApplyFilter = (filters) => {
-    console.log("Applying filters:", filters); // Debugging: Log the filters
-
     const filtered = data.filter((record) => {
-      // Normalize Gender field for comparison
-      const normalizedGender = record.Gender === "M" ? "Male" : record.Gender === "F" ? "Female" : record.Gender;
+      const normalizedGender =
+        record.Gender === "M" ? "Male" : record.Gender === "F" ? "Female" : record.Gender;
 
       return (
         (!filters.CustomerName || record.CustomerName.toLowerCase().includes(filters.CustomerName.toLowerCase().trim())) &&
@@ -55,21 +53,20 @@ export default function App() {
       );
     });
 
-    console.log("Filtered data:", filtered); // Debugging: Log the filtered data
     setFilteredData(filtered);
-    setIsFilterOpen(false); // Close the filter popup after applying filters
+    setIsFilterOpen(false);
   };
 
   const handleResetFilter = () => {
-    setFilteredData(data); // Reset to the original data
-    setIsFilterOpen(false); // Close the filter popup
+    setFilteredData(data);
+    setIsFilterOpen(false);
   };
 
   const handleAddRecord = (newRecord) => {
-    const timestampedRecord = { ...newRecord, addedAt: new Date().toISOString() }; // Add timestamp
+    const timestampedRecord = { ...newRecord, addedAt: new Date().toISOString() };
     setData((prevData) => {
       const updatedData = [...prevData, timestampedRecord];
-      setFilteredData(updatedData); // Update filteredData immediately
+      setFilteredData(updatedData);
       return updatedData;
     });
   };
@@ -82,9 +79,7 @@ export default function App() {
           <SiteHeader />
           <main className="flex flex-1 flex-col p-6">
             <Routes>
-              {/* Redirect "/" to "/dashboard" */}
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              {/* Dashboard route */}
               <Route
                 path="/dashboard"
                 element={
@@ -110,7 +105,6 @@ export default function App() {
                   </>
                 }
               />
-              {/* Analytics route */}
               <Route path="/analytics" element={<AnalyticsPage data={filteredData} />} />
             </Routes>
           </main>

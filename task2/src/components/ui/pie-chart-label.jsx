@@ -1,80 +1,114 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
-import { Pie, PieChart } from "recharts";
+import * as React from "react";
+import { Pie, PieChart, Cell, Tooltip } from "recharts";
 
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-const chartData = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  { browser: "firefox", visitors: 187, fill: "var(--color-firefox)" },
-  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-  { browser: "other", visitors: 90, fill: "var(--color-other)" },
-];
+export function PieChartLabel({ data = [] }) {
+  // Validate the data prop
+  if (!Array.isArray(data) || data.length === 0) {
+    console.warn("Invalid or empty data provided to PieChartLabel:", data);
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Highest Salary by Division</CardTitle>
+          <CardDescription>No data available</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-center text-muted-foreground">
+            No valid data to display.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
-const chartConfig = {
-  chrome: {
-    label: "Chrome",
-    color: "hsl(var(--chart-1))",
-  },
-  safari: {
-    label: "Safari",
-    color: "hsl(var(--chart-2))",
-  },
-  firefox: {
-    label: "Firefox",
-    color: "hsl(var(--chart-3))",
-  },
-  edge: {
-    label: "Edge",
-    color: "hsl(var(--chart-4))",
-  },
-  other: {
-    label: "Other",
-    color: "hsl(var(--chart-5))",
-  },
-};
+  // Group data by division and find the highest salary and its holder
+  const groupedData = data.reduce((acc, record) => {
+    const division = record.Division || "Unknown";
+    if (!acc[division]) {
+      acc[division] = { highestSalary: 0, highestSalaryHolder: "" };
+    }
+    if (record.Income > acc[division].highestSalary) {
+      acc[division].highestSalary = record.Income;
+      acc[division].highestSalaryHolder = record.CustomerName || "Unknown";
+    }
+    return acc;
+  }, {});
 
-export function PieChartLabel() {
+  // Prepare chart data
+  const chartData = Object.entries(groupedData).map(([division, details]) => ({
+    division,
+    highestSalary: details.highestSalary,
+    highestSalaryHolder: details.highestSalaryHolder,
+  }));
+
+  const colors = [
+    "#8884d8",
+    "#82ca9d",
+    "#ffc658",
+    "#ff8042",
+    "#8dd1e1",
+    "#a4de6c",
+    "#d0ed57",
+    "#ffc0cb",
+  ];
+
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="items-center pb-0">
-        <CardTitle>Pie Chart - Label</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+    <Card>
+      <CardHeader>
+        <CardTitle>Highest Salary by Division</CardTitle>
+        <CardDescription>
+          Showing the highest salary and division details
+        </CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
-        >
+      <CardContent>
+        <ChartContainer className="aspect-auto h-[300px] w-full">
           <PieChart>
-            <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-            <Pie data={chartData} dataKey="visitors" label nameKey="browser" />
+            <Pie
+              data={chartData}
+              dataKey="highestSalary"
+              nameKey="division"
+              cx="50%"
+              cy="50%"
+              outerRadius={100}
+              label={({ name, highestSalary }) =>
+                `${highestSalary.toLocaleString()}`
+              }
+              isAnimationActive={false}
+            >
+              {chartData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={colors[index % colors.length]}
+                />
+              ))}
+            </Pie>
+            <Tooltip
+              content={
+                <ChartTooltipContent
+                  formatter={(value, name, props) => [
+                    `Highest Salary Holder: ${props.payload.highestSalaryHolder}`,
+                    props.payload.division,
+                  ]}
+                />
+              }
+            />
           </PieChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
-        </div>
-      </CardFooter>
     </Card>
   );
 }

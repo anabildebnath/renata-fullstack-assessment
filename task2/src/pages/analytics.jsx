@@ -25,43 +25,43 @@ export default function AnalyticsPage({ data }) {
         {/* Chart 1: Division Metrics */}
         <ChartAreaInteractive data={data} />
         {/* Chart 2: Gradient Area Chart */}
-        <GradientChart />
+        <GradientChart data={data} />
         {/* Chart 3: Bar Chart */}
-        <BarChartComponent />
+        <BarChartComponent data={data} />
         {/* Chart 4: Stacked Bar Chart */}
-        <StackedBarChart />
+        <StackedBarChart data={data} />
       </div>
       {/* Interactive Bar Chart */}
       <div className="mt-6">
-        <InteractiveBarChart />
+        <InteractiveBarChart data={data} />
       </div>
       {/* Radial Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <RadialChartText />
-        <RadialChartShape />
+        <RadialChartText data={data} />
+        <RadialChartShape data={data} />
       </div>
       {/* Next Row of Radial Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <RadialChartStacked />
-        <RadialChartLabel />
+        <RadialChartStacked data={data} />
+        <RadialChartLabel data={data} />
       </div>
       {/* Radar Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <RadarChartLines />
-        <RadarChartGrid />
+        <RadarChartLines data={data} />
+        <RadarChartGrid data={data} />
       </div>
       {/* Pie Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <PieChartInteractive />
-        <PieChartLabel />
+        <PieChartInteractive data={data} />
+        <PieChartLabel data={data} />
       </div>
       {/* Line Chart */}
       <div className="mt-6">
-        <LineChartInteractive />
+        <LineChartInteractive data={data} />
       </div>
       {/* Line Chart with Labels and Bar Chart with Custom Labels */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <LineChartLabel />
+        <LineChartLabel data={data} />
         <BarChartCustomLabel data={data} />
       </div>
     </div>
