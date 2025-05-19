@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { Routes, Route, Navigate } from "react-router-dom"; // Add Navigate for redirection
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SectionCards } from "@/components/section-cards";
 import { ChartAreaInteractive } from "@/components/chart-area-interactive";
 import { DataTable } from "@/components/data-table";
-import { FilterPopup } from "@/components/filter-popup"; // Import the filter popup
+import { FilterPopup } from "@/components/filter-popup";
+import AnalyticsPage from "@/pages/analytics"; // Import the Analytics page
 import rawData from "./data.json";
 
 export default function App() {
@@ -79,24 +81,38 @@ export default function App() {
         <SidebarInset>
           <SiteHeader />
           <main className="flex flex-1 flex-col p-6">
-            <SectionCards data={filteredData} />
-            <div className="mt-6">
-              <ChartAreaInteractive data={filteredData} />
-            </div>
-            <div className="mt-6">
-              <DataTable
-                data={filteredData}
-                onAddRecord={handleAddRecord} // Use the updated handleAddRecord
-                onDeleteRecord={(id) => setData((prev) => prev.filter((record) => record.ID !== id))}
-                onEditRecord={(id, updatedRecord) =>
-                  setData((prev) =>
-                    prev.map((record) => (record.ID === id ? { ...record, ...updatedRecord } : record))
-                  )
+            <Routes>
+              {/* Redirect "/" to "/dashboard" */}
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              {/* Dashboard route */}
+              <Route
+                path="/dashboard"
+                element={
+                  <>
+                    <SectionCards data={filteredData} />
+                    <div className="mt-6">
+                      <ChartAreaInteractive data={filteredData} />
+                    </div>
+                    <div className="mt-6">
+                      <DataTable
+                        data={filteredData}
+                        onAddRecord={handleAddRecord}
+                        onDeleteRecord={(id) => setData((prev) => prev.filter((record) => record.ID !== id))}
+                        onEditRecord={(id, updatedRecord) =>
+                          setData((prev) =>
+                            prev.map((record) => (record.ID === id ? { ...record, ...updatedRecord } : record))
+                          )
+                        }
+                        isFormOpen={isFormOpen}
+                        setIsFormOpen={setIsFormOpen}
+                      />
+                    </div>
+                  </>
                 }
-                isFormOpen={isFormOpen} // Pass isFormOpen
-                setIsFormOpen={setIsFormOpen} // Pass setIsFormOpen
               />
-            </div>
+              {/* Analytics route */}
+              <Route path="/analytics" element={<AnalyticsPage data={filteredData} />} />
+            </Routes>
           </main>
         </SidebarInset>
       </div>

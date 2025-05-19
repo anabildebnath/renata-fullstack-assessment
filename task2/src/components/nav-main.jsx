@@ -67,7 +67,7 @@ export function NavMain({ items = [], setIsFormOpen, setIsFilterOpen, onSearchCl
                 onClick={() => {
                   if (item.title === "Filter") handleFilterClick(); // Trigger filter popup
                   else if (item.title === "Dashboard") navigate("/dashboard");
-                  else if (item.title === "Analytics") navigate("/analytics");
+                  else if (item.title === "Analytics") navigate("/analytics"); // Redirect to Analytics page
                   else if (item.title === "Projects" || item.title === "Team") alert(`${item.title}: Placeholder.`);
                 }}
                 className="nav-main-button min-w-8 bg-transparent text-sidebar-foreground duration-200 ease-linear hover:bg-gray-900"
