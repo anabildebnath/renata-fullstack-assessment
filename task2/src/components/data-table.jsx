@@ -122,6 +122,16 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
     useSensor(KeyboardSensor)
   );
 
+  const filteredData = React.useMemo(() => {
+    if (!globalFilter) return data;
+    const lowerCaseFilter = globalFilter.toLowerCase();
+    return data.filter((row) =>
+      Object.values(row).some((value) =>
+        String(value).toLowerCase().includes(lowerCaseFilter)
+      )
+    );
+  }, [data, globalFilter]);
+
   const handleEdit = (record) => {
     setEditRecord(record);
     setIsEditOpen(true);
@@ -145,11 +155,8 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
   const handleDragEnd = (event) => {
     const { active, over } = event;
     if (active && over && active.id !== over.id) {
-      const oldIndex = data.findIndex((item) => item.ID === active.id);
-      const newIndex = data.findIndex((item) => item.ID === over.id);
-      const reorderedData = arrayMove(data, oldIndex, newIndex);
-      reorderedData.forEach((item, index) => (item.Order = index));
-      onAddRecord(reorderedData);
+      console.log("Drag operation detected, but no data modification occurs.");
+      // No data modification here to ensure charts remain unaffected
     }
   };
 
@@ -217,7 +224,7 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
   ];
 
   const table = useReactTable({
-    data, // Use the original data
+    data: filteredData, // Use filtered data
     columns,
     state: { sorting, columnVisibility, rowSelection, pagination },
     getRowId: (row) => row.ID?.toString(), // Ensure row.ID exists
@@ -365,7 +372,7 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
                 ref={searchInputRef}
                 placeholder="Search..."
                 value={globalFilter}
-                onChange={(e) => setGlobalFilter(e.target.value)}
+                onChange={(e) => setGlobalFilter(e.target.value)} // Update globalFilter on input change
                 onFocus={() => setIsSearchFocused(true)}
                 onBlur={() => setIsSearchFocused(false)}
                 className={`transition-all duration-[2000ms] ease-out ${
@@ -505,115 +512,6 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
             </div>
           </div>
         </TabsContent>
-        <FormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSubmit={handleFormSubmit}>
-          <div>
-            <Label>Customer Name</Label>
-            <Input name="CustomerName" required />
-          </div>
-          <div>
-            <Label>Division</Label>
-            <Select name="Division" required>
-              <SelectTrigger>
-                <SelectValue placeholder="Select division" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Dhaka">Dhaka</SelectItem>
-                <SelectItem value="Chattogram">Chattogram</SelectItem>
-                <SelectItem value="Rajshahi">Rajshahi</SelectItem>
-                <SelectItem value="Khulna">Khulna</SelectItem>
-                <SelectItem value="Barishal">Barishal</SelectItem>
-                <SelectItem value="Sylhet">Sylhet</SelectItem>
-                <SelectItem value="Rangpur">Rangpur</SelectItem>
-                <SelectItem value="Mymensingh">Mymensingh</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>Gender</Label>
-            <Input name="Gender" required />
-          </div>
-          <div>
-            <Label>Marital Status</Label>
-            <Input name="MaritalStatus" required />
-          </div>
-          <div>
-            <Label>Age</Label>
-            <Input name="Age" type="number" min="0" max="200" required />
-          </div>
-          <div>
-            <Label>Income</Label>
-            <Input name="Income" type="number" min="0" required />
-          </div>
-        </FormModal>
-        {isEditOpen && editRecord && (
-          <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-            <DialogContent
-              style={{ backgroundColor: "oklch(224% 71.4% 4.1%)" }} // Updated background color
-            >
-              <DialogHeader>
-                <DialogTitle>Edit Item</DialogTitle>
-                <DialogClose onClick={() => setIsEditOpen(false)} />
-              </DialogHeader>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const formData = new FormData(e.target);
-                  const updatedData = Object.fromEntries(formData.entries());
-                  handleEditSubmit(updatedData);
-                }}
-                className="space-y-4"
-              >
-                <div>
-                  <Label>Customer Name</Label>
-                  <Input name="CustomerName" defaultValue={editRecord.CustomerName} />
-                </div>
-                <div>
-                  <Label>Division</Label>
-                  <Select defaultValue={editRecord.Division}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select division" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Dhaka">Dhaka</SelectItem>
-                      <SelectItem value="Chattogram">Chattogram</SelectItem>
-                      <SelectItem value="Rajshahi">Rajshahi</SelectItem>
-                      <SelectItem value="Khulna">Khulna</SelectItem>
-                      <SelectItem value="Barishal">Barishal</SelectItem>
-                      <SelectItem value="Sylhet">Sylhet</SelectItem>
-                      <SelectItem value="Rangpur">Rangpur</SelectItem>
-                      <SelectItem value="Mymensingh">Mymensingh</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>Gender</Label>
-                  <Input name="Gender" defaultValue={editRecord.Gender} />
-                </div>
-                <div>
-                  <Label>Marital Status</Label>
-                  <Input name="MaritalStatus" defaultValue={editRecord.MaritalStatus} />
-                </div>
-                <div>
-                  <Label>Age</Label>
-                  <Input name="Age" type="number" defaultValue={editRecord.Age} />
-                </div>
-                <div>
-                  <Label>Income</Label>
-                  <Input name="Income" type="number" defaultValue={editRecord.Income} />
-                </div>
-                <div className="flex justify-end">
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    className="bg-[oklch(var(--primary))] text-[oklch(var(--primary-foreground))] hover:bg-[oklch(var(--primary))]/90"
-                  >
-                    Save
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
-        )}
       </Tabs>
     </>
   );

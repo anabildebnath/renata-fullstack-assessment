@@ -9,15 +9,29 @@ import rawData from "./data.json";
 
 export default function App() {
   const [data, setData] = useState(() => {
-    const savedData = localStorage.getItem("data");
-    return savedData ? JSON.parse(savedData) : rawData;
+    try {
+      const savedData = localStorage.getItem("data");
+      return savedData ? JSON.parse(savedData) : rawData;
+    } catch (error) {
+      console.error("Failed to load data from localStorage:", error);
+      return rawData; // Fallback to rawData if localStorage fails
+    }
   });
 
   const [isFormOpen, setIsFormOpen] = useState(false); // Popup state
   const searchInputRef = React.useRef(null); // Create a ref for the search input
 
   useEffect(() => {
-    localStorage.setItem("data", JSON.stringify(data));
+    try {
+      const compressedData = JSON.stringify(data);
+      localStorage.setItem("data", compressedData);
+    } catch (error) {
+      if (error.name === "QuotaExceededError") {
+        console.warn("LocalStorage quota exceeded. Data will not be saved.");
+      } else {
+        console.error("Failed to save data to localStorage:", error);
+      }
+    }
   }, [data]);
 
   const handleAddRecord = (newRecord) => {
