@@ -16,27 +16,30 @@ import {
 } from "@/components/ui/chart"
 
 export function ChartAreaInteractive({ data }) {
+  // Filter out records with invalid or undefined Division values
+  const validData = data.filter((record) => record.Division && record.Division.trim() !== "");
+
   // Group data by division and calculate metrics
-  const grouped = data.reduce((acc, curr) => {
-    const division = curr.Division
+  const grouped = validData.reduce((acc, curr) => {
+    const division = curr.Division.trim(); // Ensure no leading/trailing whitespace
     if (!acc[division]) {
-      acc[division] = { count: 0, ages: [], salaries: [] }
+      acc[division] = { count: 0, ages: [], salaries: [] };
     }
-    acc[division].count += 1
-    acc[division].ages.push(curr.Age)
-    acc[division].salaries.push(curr.Income)
-    return acc
-  }, {})
+    acc[division].count += 1;
+    acc[division].ages.push(curr.Age);
+    acc[division].salaries.push(curr.Income);
+    return acc;
+  }, {});
 
   // Helper function to calculate median
   const calculateMedian = (arr) => {
-    if (!arr.length) return 0
-    const sorted = [...arr].sort((a, b) => a - b)
-    const mid = Math.floor(sorted.length / 2)
+    if (!arr.length) return 0;
+    const sorted = [...arr].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
     return sorted.length % 2 !== 0
       ? sorted[mid]
-      : (sorted[mid - 1] + sorted[mid]) / 2
-  }
+      : (sorted[mid - 1] + sorted[mid]) / 2;
+  };
 
   // Prepare chart data
   const rawChartData = Object.entries(grouped).map(([division, values]) => ({
@@ -44,33 +47,34 @@ export function ChartAreaInteractive({ data }) {
     count: values.count,
     medianAge: calculateMedian(values.ages),
     medianSalary: calculateMedian(values.salaries),
-  }))
+  }));
 
   // Find the highest median salary and age for normalization
-  const maxMedianSalary = Math.max(...rawChartData.map((d) => d.medianSalary))
-  const maxMedianAge = Math.max(...rawChartData.map((d) => d.medianAge))
+  const maxMedianSalary = Math.max(...rawChartData.map((d) => d.medianSalary));
+  const maxMedianAge = Math.max(...rawChartData.map((d) => d.medianAge));
+  const maxCount = Math.max(...rawChartData.map((d) => d.count));
 
   // Normalize median salary and age relative to the highest values
   const chartData = rawChartData.map((d) => ({
     ...d,
-    normalizedMedianSalary: (d.medianSalary / maxMedianSalary) * Math.max(...rawChartData.map((d) => d.count)),
-    normalizedMedianAge: (d.medianAge / maxMedianAge) * Math.max(...rawChartData.map((d) => d.count)),
-  }))
+    normalizedMedianSalary: (d.medianSalary / maxMedianSalary) * maxCount,
+    normalizedMedianAge: (d.medianAge / maxMedianAge) * maxCount,
+  }));
 
   const chartConfig = {
     count: {
       label: "Users",
-      color: "hsl(var(--chart-3))", // Use --chart-3 for count
+      color: "hsl(var(--chart-3))", // Green
     },
     normalizedMedianAge: {
       label: "Median Age",
-      color: "hsl(var(--chart-4))", // Use --chart-4 for median age
+      color: "hsl(var(--chart-4))", // Blue
     },
     normalizedMedianSalary: {
       label: "Median Salary",
-      color: "hsl(var(--chart-5))", // Use --chart-5 for median salary
+      color: "hsl(var(--chart-5))", // Red
     },
-  }
+  };
 
   return (
     <Card className="@container/card mx-6 rounded-[var(--radius)] border border-[oklch(0%_0%_98%)]">
@@ -185,6 +189,6 @@ export function ChartAreaInteractive({ data }) {
         </ChartContainer>
       </CardContent>
     </Card>
-  )
+  );
 }
 

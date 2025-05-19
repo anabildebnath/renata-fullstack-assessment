@@ -63,6 +63,15 @@ export default function App() {
     setIsFilterOpen(false); // Close the filter popup
   };
 
+  const handleAddRecord = (newRecord) => {
+    const timestampedRecord = { ...newRecord, addedAt: new Date().toISOString() }; // Add timestamp
+    setData((prevData) => {
+      const updatedData = [...prevData, timestampedRecord];
+      setFilteredData(updatedData); // Update filteredData immediately
+      return updatedData;
+    });
+  };
+
   return (
     <SidebarProvider>
       <div className="flex w-full min-h-screen bg-background text-foreground">
@@ -77,7 +86,7 @@ export default function App() {
             <div className="mt-6">
               <DataTable
                 data={filteredData}
-                onAddRecord={(newRecord) => setData((prev) => [...prev, newRecord])}
+                onAddRecord={handleAddRecord} // Use the updated handleAddRecord
                 onDeleteRecord={(id) => setData((prev) => prev.filter((record) => record.ID !== id))}
                 onEditRecord={(id, updatedRecord) =>
                   setData((prev) =>

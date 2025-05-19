@@ -15,7 +15,12 @@ export function SectionCards({ data }) {
   }
 
   const total = data.length;
-  const todayNew = useMemo(() => Math.floor(Math.random() * 10), [data]);
+
+  const todayNew = useMemo(() => {
+    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+    return data.filter((record) => record.addedAt?.startsWith(today)).length; // Count records added today
+  }, [data]);
+
   const freqDiv = useMemo(() => {
     if (!data.length) return "N/A"; // Fallback for empty data
     const counts = data.reduce((acc, cur) => {
@@ -27,18 +32,20 @@ export function SectionCards({ data }) {
     const sortedEntries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
     return sortedEntries.length > 0 ? sortedEntries[0][0] : "N/A"; // Fallback to "N/A" if no divisions
   }, [data]);
+
   const median = (arr) => {
     if (!arr.length) return 0; // Fallback for empty arrays
     const sorted = [...arr].sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
     return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
   };
+
   const medIncome = median(data.map((d) => d.Income || 0));
   const medAge = median(data.map((d) => d.Age || 0));
 
   const cards = [
     { title: "Total Customers", desc: `${total}` },
-    { title: "New Customers Today", desc: `${todayNew}` },
+    { title: "New Customers Today", desc: `${todayNew}` }, // Use accurate count
     { title: "Most Frequent Division", desc: freqDiv },
     { title: "Median (Age/Inc)", desc: `${medAge.toFixed(1)}/${medIncome.toFixed(0)}` },
   ];
