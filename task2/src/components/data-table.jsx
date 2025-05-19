@@ -3,16 +3,15 @@
 import * as React from "react";
 import {
   DndContext,
-  KeyboardSensor,
-  MouseSensor,
-  TouchSensor,
   closestCenter,
   useSensor,
   useSensors,
+  MouseSensor,
+  TouchSensor,
+  KeyboardSensor,
 } from "@dnd-kit/core";
 import {
   SortableContext,
-  useSortable,
   verticalListSortingStrategy,
   arrayMove,
 } from "@dnd-kit/sortable";
@@ -86,6 +85,8 @@ import {
 import { FormModal } from "@/components/ui/form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { AppSidebar } from "@/components/app-sidebar"; // Import AppSidebar
+import { DragHandle } from "@/components/drag-handle";
+import { useSortable } from "@dnd-kit/sortable"; // Add this import
 
 export const schema = z.object({
   ID: z.string(),
@@ -100,90 +101,12 @@ export const schema = z.object({
 // Create a context for managing the form popup state
 export const FormContext = React.createContext();
 
-function DragHandle({ id }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={{
-        transform: CSS.Transform.toString(transform),
-        transition,
-      }}
-    >
-      <Button
-        {...attributes}
-        {...listeners}
-        variant="ghost"
-        size="icon"
-        className="size-7 text-muted-foreground hover:bg-transparent"
-      >
-        <GripVerticalIcon className="size-3 text-muted-foreground" />
-        <span className="sr-only">Drag to reorder</span>
-      </Button>
-    </div>
-  );
-}
-
-const columns = [
-  {
-    id: "drag",
-    header: () => null,
-    cell: ({ row }) => <DragHandle id={row.original.ID} />,
-    size: 30,
-  },
-  { accessorKey: "CustomerName", header: "Customer Name" },
-  { accessorKey: "Division", header: "Division" },
-  { accessorKey: "Gender", header: "Gender" },
-  { accessorKey: "MaritalStatus", header: "Marital Status" },
-  { accessorKey: "Age", header: "Age" },
-  { accessorKey: "Income", header: "Income" },
-  {
-    id: "actions",
-    header: () => null,
-    cell: ({ row }) => <RowActions row={row} onEdit={handleEdit} onDelete={handleDelete} onCopy={handleCopy} onFavorite={handleFavorite} />,
-  },
-];
-
-function RowActions({ row, onEdit, onDelete, onCopy, onFavorite }) {
-  const record = row?.original;
-
-  if (!record) {
-    return null;
+export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isFormOpen, setIsFormOpen, searchInputRef }) {
+  if (!Array.isArray(data) || data.length === 0) {
+    console.error("Data passed to DataTable is invalid or empty:", data);
+    return <div>No valid data available</div>; // Handle invalid data gracefully
   }
 
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="flex size-8 text-[oklch(var(--muted-foreground))] hover:bg-[oklch(var(--muted))] hover:text-[oklch(var(--foreground))]"
-        >
-          <MoreVerticalIcon />
-          <span className="sr-only">Open menu</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-32">
-        <DropdownMenuItem onClick={() => onEdit(record)}>
-          Edit
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onCopy(record)}>
-          Make a Copy
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onFavorite(record)}>
-          Favorite
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => onDelete(record.ID)}>
-          Delete
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
-export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isFormOpen, setIsFormOpen, searchInputRef }) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [globalFilter, setGlobalFilter] = React.useState(""); // Global filter state
@@ -194,32 +117,115 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
   const [isSearchFocused, setIsSearchFocused] = React.useState(false); // Track focus state of the search box
 
   const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { delay: 500, tolerance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }), // Adjust activation constraint
+    useSensor(TouchSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor)
   );
 
-  // Filter data directly in the render logic instead of modifying the table's data
-  const filteredData = React.useMemo(() => {
-    if (!globalFilter) return data; // If no filter value, return all rows
-    const lowerFilterValue = globalFilter.toLowerCase();
-    return data.filter((row) =>
-      Object.values(row).some((value) =>
-        value?.toString().toLowerCase().includes(lowerFilterValue)
-      )
-    );
-  }, [data, globalFilter]);
+  const handleEdit = (record) => {
+    setEditRecord(record);
+    setIsEditOpen(true);
+  };
+
+  const handleCopy = (record) => {
+    const copiedRecord = { ...record, ID: `COPY${Date.now()}` };
+    onAddRecord(copiedRecord);
+    toast.success("Record copied!");
+  };
+
+  const handleFavorite = (record) => {
+    toast.success(`${record.CustomerName} marked as favorite!`);
+  };
+
+  const handleDelete = (id) => {
+    onDeleteRecord(id);
+    toast.success("Item deleted!");
+  };
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (active && over && active.id !== over.id) {
+      const oldIndex = data.findIndex((item) => item.ID === active.id);
+      const newIndex = data.findIndex((item) => item.ID === over.id);
+      const reorderedData = arrayMove(data, oldIndex, newIndex);
+      reorderedData.forEach((item, index) => (item.Order = index));
+      onAddRecord(reorderedData);
+    }
+  };
+
+  const columns = [
+    {
+      id: "select",
+      header: ({ table }) => {
+        const ref = React.useRef();
+
+        React.useEffect(() => {
+          if (ref.current) {
+            ref.current.indeterminate = table.getIsSomePageRowsSelected(); // Set indeterminate state
+          }
+        }, [table.getIsSomePageRowsSelected()]);
+
+        return (
+          <div className="flex items-center justify-center">
+            <Checkbox
+              ref={ref} // Attach ref to the checkbox
+              checked={table.getIsAllPageRowsSelected()} // Select only if all rows are selected
+              onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+              aria-label="Select all"
+            />
+          </div>
+        );
+      },
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+        </div>
+      ),
+      enableSorting: false,
+      enableHiding: false,
+      size: 30,
+    },
+    {
+      id: "drag",
+      header: () => null,
+      cell: ({ row }) => <DragHandle id={row.original.ID} />,
+      size: 30,
+    },
+    { accessorKey: "CustomerName", header: "Customer Name" },
+    { accessorKey: "Division", header: "Division" },
+    { accessorKey: "Gender", header: "Gender" },
+    { accessorKey: "MaritalStatus", header: "Marital Status" },
+    { accessorKey: "Age", header: "Age" },
+    { accessorKey: "Income", header: "Income" },
+    {
+      id: "actions",
+      header: () => null,
+      cell: ({ row }) => (
+        <RowActions
+          row={row}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onCopy={handleCopy}
+          onFavorite={handleFavorite}
+        />
+      ),
+    },
+  ];
 
   const table = useReactTable({
     data, // Use the original data
     columns,
     state: { sorting, columnVisibility, rowSelection, pagination },
-    getRowId: (row) => row.ID.toString(),
+    getRowId: (row) => row.ID?.toString(), // Ensure row.ID exists
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
     onPaginationChange: setPagination,
-    enableRowSelection: true,
+    enableRowSelection: true, // Enable row selection
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -265,36 +271,68 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
     }
   };
 
-  const handleEdit = (record) => {
-    setEditRecord(record);
-    setIsEditOpen(true);
-  };
+  function RowActions({ row, onEdit, onDelete, onCopy, onFavorite }) {
+    const record = row?.original;
 
-  const handleCopy = (record) => {
-    const copiedRecord = { ...record, ID: `COPY${Date.now()}` };
-    onAddRecord(copiedRecord);
-    toast.success("Record copied!");
-  };
-
-  const handleFavorite = (record) => {
-    toast.success(`${record.CustomerName} marked as favorite!`);
-  };
-
-  const handleDelete = (id) => {
-    onDeleteRecord(id);
-    toast.success("Item deleted!");
-  };
-
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
-    if (active && over && active.id !== over.id) {
-      const oldIndex = data.findIndex((item) => item.ID === active.id);
-      const newIndex = data.findIndex((item) => item.ID === over.id);
-      const reorderedData = arrayMove(data, oldIndex, newIndex);
-      reorderedData.forEach((item, index) => (item.Order = index));
-      onAddRecord(reorderedData);
+    if (!record) {
+      return null;
     }
-  };
+
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="flex size-8 text-[oklch(var(--muted-foreground))] hover:bg-[oklch(var(--muted))] hover:text-[oklch(var(--foreground))]"
+          >
+            <MoreVerticalIcon />
+            <span className="sr-only">Open menu</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-32">
+          <DropdownMenuItem onClick={() => onEdit(record)}>
+            Edit
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onCopy(record)}>
+            Make a Copy
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onFavorite(record)}>
+            Favorite
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => onDelete(record.ID)}>
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
+  function DraggableRow({ row }) {
+    const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
+      id: row.original.ID, // Use row.original.ID directly
+    });
+
+    return (
+      <TableRow
+        ref={setNodeRef}
+        style={{
+          transform: CSS.Transform.toString(transform),
+          transition,
+        }}
+        className={`relative z-0 ${isDragging ? "opacity-50" : ""}`}
+        {...attributes} // Add drag attributes
+        {...listeners} // Add drag listeners
+      >
+        {row.getVisibleCells().map((cell) => (
+          <TableCell key={cell.id}>
+            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          </TableCell>
+        ))}
+      </TableRow>
+    );
+  }
 
   return (
     <>
@@ -356,7 +394,7 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
         <TabsContent value="outline" className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
           <div className="overflow-hidden rounded-[0.75rem] border">
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={filteredData.map((item) => item.ID)} strategy={verticalListSortingStrategy}>
+              <SortableContext items={data.map((item) => item.ID)} strategy={verticalListSortingStrategy}>
                 <Table>
                   <TableHeader className="sticky top-0 z-10 bg-muted">
                     {table.getHeaderGroups().map((hg) => (
@@ -370,10 +408,10 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
                     ))}
                   </TableHeader>
                   <TableBody>
-                    {filteredData.length ? (
-                      filteredData.map((row) => (
+                    {table.getRowModel().rows.length ? (
+                      table.getRowModel().rows.map((row) => (
                         <DraggableRow
-                          key={row.ID}
+                          key={row.id}
                           row={row}
                           onEdit={handleEdit}
                           onDelete={handleDelete}
@@ -392,6 +430,79 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
                 </Table>
               </SortableContext>
             </DndContext>
+          </div>
+          <div className="flex items-center justify-between px-4">
+            <div className="hidden flex-1 text-sm text-muted-foreground lg:flex">
+              {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected.
+            </div>
+            <div className="flex w-full items-center gap-8 lg:w-fit">
+              <div className="hidden items-center gap-2 lg:flex">
+                <Label htmlFor="rows-per-page" className="text-sm font-medium">
+                  Rows per page
+                </Label>
+                <Select
+                  value={`${table.getState().pagination.pageSize}`}
+                  onValueChange={(value) => {
+                    table.setPageSize(Number(value));
+                  }}
+                >
+                  <SelectTrigger className="w-20" id="rows-per-page">
+                    <SelectValue placeholder={table.getState().pagination.pageSize} />
+                  </SelectTrigger>
+                  <SelectContent side="top">
+                    {[10, 20, 30, 40, 50].map((pageSize) => (
+                      <SelectItem key={pageSize} value={`${pageSize}`}>
+                        {pageSize}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex w-fit items-center justify-center text-sm font-medium">
+                Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+              </div>
+              <div className="ml-auto flex items-center gap-2 lg:ml-0">
+                <Button
+                  variant="outline"
+                  className="hidden h-8 w-8 p-0 lg:flex"
+                  onClick={() => table.setPageIndex(0)}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  <span className="sr-only">Go to first page</span>
+                  <ChevronsLeftIcon />
+                </Button>
+                <Button
+                  variant="outline"
+                  className="size-8"
+                  size="icon"
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  <span className="sr-only">Go to previous page</span>
+                  <ChevronLeftIcon />
+                </Button>
+                <Button
+                  variant="outline"
+                  className="size-8"
+                  size="icon"
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                >
+                  <span className="sr-only">Go to next page</span>
+                  <ChevronRightIcon />
+                </Button>
+                <Button
+                  variant="outline"
+                  className="hidden size-8 lg:flex"
+                  size="icon"
+                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                  disabled={!table.getCanNextPage()}
+                >
+                  <span className="sr-only">Go to last page</span>
+                  <ChevronsRightIcon />
+                </Button>
+              </div>
+            </div>
           </div>
         </TabsContent>
         <FormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSubmit={handleFormSubmit}>
@@ -505,37 +616,5 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
         )}
       </Tabs>
     </>
-  );
-}
-
-function DraggableRow({ row, onEdit, onDelete, onCopy, onFavorite }) {
-  const { setNodeRef, transform, transition, isDragging } = useSortable({
-    id: row.ID,
-  });
-
-  return (
-    <TableRow
-      ref={setNodeRef}
-      style={{
-        transform: CSS.Transform.toString(transform),
-        transition,
-      }}
-      className={`relative z-0 ${isDragging ? "opacity-50" : ""}`}
-    >
-      {columns.map((column) => (
-        <TableCell key={column.accessorKey || column.id}>
-          {column.accessorKey ? row[column.accessorKey] : null}
-        </TableCell>
-      ))}
-      <TableCell>
-        <RowActions
-          row={{ original: row }}
-          onEdit={onEdit} // Use the passed prop
-          onDelete={onDelete} // Use the passed prop
-          onCopy={onCopy} // Use the passed prop
-          onFavorite={onFavorite} // Use the passed prop
-        />
-      </TableCell>
-    </TableRow>
   );
 }

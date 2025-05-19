@@ -152,6 +152,27 @@
   color: var(--foreground);
 }
 
+.select {
+  width: 100%;
+  height: 2.5rem; /* Ensure square shape */
+  padding: 0.5rem;
+  border: 2px solid white; /* White visible borders */
+  border-radius: 0.25rem; /* Rounded edges */
+  background-color: transparent;
+  color: var(--foreground);
+  box-sizing: border-box;
+}
+
+/* Add hover and focus styles for better visibility */
+.select:hover {
+  border-color: var(--primary); /* Highlight border on hover */
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--ring); /* Highlight border on focus */
+}
+
 .btn {
   padding: 0.5rem 1rem;
   background-color: transparent;
