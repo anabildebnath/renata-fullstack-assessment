@@ -350,38 +350,7 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
     <>
       <Tabs defaultValue="outline" className="flex w-full flex-col gap-6">
         <div className="flex items-center justify-between px-4 lg:px-6">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                <ColumnsIcon />
-                <span className="hidden lg:inline">Customize Columns</span>
-                <span className="lg:hidden">Columns</span>
-                <ChevronDownIcon />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              {table
-                .getAllColumns()
-                .filter(
-                  (column) =>
-                    typeof column.accessorFn !== "undefined" &&
-                    column.getCanHide()
-                )
-                .map((column) => (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ml-auto"> {/* Align buttons to the top right */}
             <div className="relative flex items-center">
               <Input
                 ref={searchInputRef}
@@ -394,19 +363,17 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
                   isSearchFocused ? "w-[240px]" : "w-[160px]"
                 }`}
                 style={{
-                  position: "absolute",
-                  right: 0,
                   borderRadius: "10px",
-                  backgroundColor: "transparent", // Set background color to black
-                  color: "white", // Ensure text is visible on black background
+                  backgroundColor: "transparent",
+                  color: "white",
                 }}
               />
             </div>
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setIsFormOpen(true)} // Open the form
-              className="bg-transparent text-[oklch(var(--foreground))] hover:bg-gray-300 hover:text-[oklch(var(--foreground))]" 
+              onClick={() => setIsFormOpen(true)} // Open the form popup
+              className="bg-transparent text-[oklch(var(--foreground))] hover:bg-gray-300 hover:text-[oklch(var(--foreground))]"
             >
               <PlusIcon className="size-4 mr-1" />
               <span className="hidden lg:inline">Add Customer</span>

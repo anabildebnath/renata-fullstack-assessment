@@ -21,6 +21,7 @@ export default function App() {
 
   const [filteredData, setFilteredData] = useState(data); // Filtered data state
   const [isFilterOpen, setIsFilterOpen] = useState(false); // Filter popup state
+  const [isFormOpen, setIsFormOpen] = useState(false); // Form popup state
 
   useEffect(() => {
     try {
@@ -62,7 +63,7 @@ export default function App() {
   return (
     <SidebarProvider>
       <div className="flex w-full min-h-screen bg-background text-foreground">
-        <AppSidebar setIsFilterOpen={setIsFilterOpen} />
+        <AppSidebar setIsFormOpen={setIsFormOpen} setIsFilterOpen={setIsFilterOpen} />
         <SidebarInset>
           <SiteHeader />
           <main className="flex flex-1 flex-col p-6">
@@ -80,6 +81,8 @@ export default function App() {
                     prev.map((record) => (record.ID === id ? { ...record, ...updatedRecord } : record))
                   )
                 }
+                isFormOpen={isFormOpen} // Pass isFormOpen
+                setIsFormOpen={setIsFormOpen} // Pass setIsFormOpen
               />
             </div>
           </main>
