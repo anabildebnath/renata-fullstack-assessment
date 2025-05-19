@@ -345,27 +345,37 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
     <>
       <Tabs defaultValue="outline" className="flex w-full flex-col gap-6">
         <div className="flex items-center justify-between px-4 lg:px-6">
-          <Select defaultValue="outline">
-            <SelectTrigger className="flex w-fit @4xl/main:hidden" id="view-selector">
-              <SelectValue placeholder="Select view" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="outline">Outline</SelectItem>
-              <SelectItem value="past-performance">Past Performance</SelectItem>
-              <SelectItem value="key-personnel">Key Personnel</SelectItem>
-              <SelectItem value="focus-documents">Focus Documents</SelectItem>
-            </SelectContent>
-          </Select>
-          <TabsList className="hidden @4xl/main:flex">
-            <TabsTrigger value="outline">Outline</TabsTrigger>
-            <TabsTrigger value="past-performance">
-              Past Performance <Badge variant="secondary">3</Badge>
-            </TabsTrigger>
-            <TabsTrigger value="key-personnel">
-              Key Personnel <Badge variant="secondary">2</Badge>
-            </TabsTrigger>
-            <TabsTrigger value="focus-documents">Focus Documents</TabsTrigger>
-          </TabsList>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <ColumnsIcon />
+                <span className="hidden lg:inline">Customize Columns</span>
+                <span className="lg:hidden">Columns</span>
+                <ChevronDownIcon />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              {table
+                .getAllColumns()
+                .filter(
+                  (column) =>
+                    typeof column.accessorFn !== "undefined" &&
+                    column.getCanHide()
+                )
+                .map((column) => (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
           <div className="flex items-center gap-2">
             <div className="relative flex items-center">
               <Input
@@ -400,7 +410,7 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
         </div>
         <TabsContent value="outline" className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
           <div className="overflow-hidden rounded-[0.75rem] border">
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <DndContext sensors={sensors} collisionDetection={closestCenter}>
               <SortableContext items={data.map((item) => item.ID)} strategy={verticalListSortingStrategy}>
                 <Table>
                   <TableHeader className="sticky top-0 z-10 bg-muted">
