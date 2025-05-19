@@ -132,7 +132,13 @@ function FormMessage({
   );
 }
 
-function FormModal({ isOpen, onClose, onSubmit }) {
+function FormModal({ isOpen, onClose, onSubmit, defaultValues = {} }) {
+  // Memoize defaultValues to ensure stability
+  const safeDefaultValues = React.useMemo(
+    () => (defaultValues && typeof defaultValues === "object" ? defaultValues : {}),
+    [defaultValues]
+  );
+
   const formMethods = useForm({
     defaultValues: {
       CustomerName: "",
@@ -141,9 +147,24 @@ function FormModal({ isOpen, onClose, onSubmit }) {
       MaritalStatus: "",
       Age: "",
       Income: "",
+      ...safeDefaultValues, // Merge safe default values for editing
     },
     mode: "onBlur",
   });
+
+  // Track whether the form has been reset to avoid unnecessary resets
+  const hasReset = React.useRef(false);
+
+  React.useEffect(() => {
+    if (isOpen && !hasReset.current) {
+      formMethods.reset(safeDefaultValues); // Reset form values only when modal opens
+      hasReset.current = true; // Mark as reset
+    } else if (!isOpen) {
+      hasReset.current = false; // Reset the flag when the modal closes
+    }
+  }, [isOpen, safeDefaultValues, formMethods]);
+
+  const isEditing = Object.keys(safeDefaultValues).length > 0; // Check if editing
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -168,7 +189,7 @@ function FormModal({ isOpen, onClose, onSubmit }) {
           onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the form
         >
           <DialogHeader>
-            <DialogTitle>Add Customer</DialogTitle>
+            <DialogTitle>{isEditing ? "Edit Customer" : "Add Customer"}</DialogTitle>
           </DialogHeader>
           <button
             className="absolute top-2 right-2 text-white bg-red-500 rounded-full p-1 hover:bg-red-600"
@@ -279,7 +300,7 @@ function FormModal({ isOpen, onClose, onSubmit }) {
               </FormItem>
               <div className="flex justify-end mt-4">
                 <button type="submit" className="btn btn-primary">
-                  Submit
+                  {isEditing ? "Update" : "Submit"}
                 </button>
               </div>
             </form>

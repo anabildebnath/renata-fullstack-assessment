@@ -138,8 +138,8 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
   }, [data, globalFilter]);
 
   const handleEdit = (record) => {
-    setEditRecord(record);
-    setIsEditOpen(true);
+    setEditRecord(record); // Set the record to be edited
+    setIsEditOpen(true); // Open the edit modal
   };
 
   const handleCopy = (record) => {
@@ -279,11 +279,11 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
     };
 
     try {
-      schema.parse(updatedItem);
-      onEditRecord(editRecord.ID, updatedItem);
+      schema.parse(updatedItem); // Validate the updated data
+      onEditRecord(editRecord.ID, updatedItem); // Update the record
       toast.success("Item updated!");
-      setIsEditOpen(false);
-      setEditRecord(null);
+      setIsEditOpen(false); // Close the edit modal
+      setEditRecord(null); // Clear the edit record
     } catch (error) {
       console.error("Validation Error:", error);
       toast.error("Failed to update item.");
@@ -503,9 +503,15 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
         </TabsContent>
       </Tabs>
       <FormModal
-        isOpen={isFormOpen} // Render the form modal when isFormOpen is true
+        isOpen={isFormOpen} // Render the form modal for adding new records
         onClose={() => setIsFormOpen(false)} // Close the modal
         onSubmit={handleFormSubmit} // Handle form submission
+      />
+      <FormModal
+        isOpen={isEditOpen} // Render the form modal for editing records
+        onClose={() => setIsEditOpen(false)} // Close the modal
+        onSubmit={handleEditSubmit} // Handle edit submission
+        defaultValues={editRecord} // Pass the record to be edited as default values
       />
     </>
   );
