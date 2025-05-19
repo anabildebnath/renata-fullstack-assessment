@@ -5,33 +5,47 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
 
 export function SectionCards({ data }) {
-  const total = data.length
-  const todayNew = useMemo(() => Math.floor(Math.random() * 10), [data])
-  const freqDiv = useMemo(() => {
-    const counts = data.reduce((acc, cur) => {
-      acc[cur.Division] = (acc[cur.Division] || 0) + 1
-      return acc
-    }, {})
-    return Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0]
-  }, [data])
-  const median = arr => {
-    const sorted = [...arr].sort((a, b) => a - b)
-    const mid = Math.floor(sorted.length / 2)
-    return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2
+  if (!data.length) {
+    return (
+      <div className="text-center text-muted-foreground">
+        <p className="text-lg font-medium">No data available</p>
+        <p className="text-sm">Try adjusting your filters or adding new records.</p>
+      </div>
+    );
   }
-  const medIncome = median(data.map(d => d.Income || 0))
-  const medAge = median(data.map(d => d.Age))
+
+  const total = data.length;
+  const todayNew = useMemo(() => Math.floor(Math.random() * 10), [data]);
+  const freqDiv = useMemo(() => {
+    if (!data.length) return "N/A"; // Fallback for empty data
+    const counts = data.reduce((acc, cur) => {
+      if (cur.Division) {
+        acc[cur.Division] = (acc[cur.Division] || 0) + 1;
+      }
+      return acc;
+    }, {});
+    const sortedEntries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    return sortedEntries.length > 0 ? sortedEntries[0][0] : "N/A"; // Fallback to "N/A" if no divisions
+  }, [data]);
+  const median = (arr) => {
+    if (!arr.length) return 0; // Fallback for empty arrays
+    const sorted = [...arr].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+  };
+  const medIncome = median(data.map((d) => d.Income || 0));
+  const medAge = median(data.map((d) => d.Age || 0));
 
   const cards = [
-    { title: 'Total Customers', desc: `${total}` },
-    { title: 'New Customers Today', desc: `${todayNew}` },
-    { title: 'Most Frequent Division', desc: freqDiv },
-    { title: 'Median (Age/Inc)', desc: `${medAge.toFixed(1)}/${medIncome.toFixed(0)}` },
-  ]
+    { title: "Total Customers", desc: `${total}` },
+    { title: "New Customers Today", desc: `${todayNew}` },
+    { title: "Most Frequent Division", desc: freqDiv },
+    { title: "Median (Age/Inc)", desc: `${medAge.toFixed(1)}/${medIncome.toFixed(0)}` },
+  ];
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 px-4 lg:px-6">
-      {cards.map(c => (
+      {cards.map((c) => (
         <Card key={c.title} className="@container/card">
           <CardHeader className="relative">
             <CardDescription>{c.title}</CardDescription>
@@ -43,14 +57,11 @@ export function SectionCards({ data }) {
                 variant="outline"
                 className="flex gap-1 rounded-[var(--radius)] text-xs bg-[oklch(var(--muted))] text-[oklch(var(--muted-foreground))]"
               >
-                {c.title === 'New Customers Today' || c.title === 'Most Frequent Division' ? (
+                {c.title === "New Customers Today" || c.title === "Most Frequent Division" ? (
                   <TrendingDownIcon className="size-3 text-[oklch(var(--destructive))]" />
                 ) : (
                   <TrendingUpIcon className="size-3 text-[oklch(var(--chart-1))]" />
                 )}
-                {c.title === 'Total Customers'
-                  ? '+' + ((total / data.length) * 100).toFixed(1) + '%'
-                  : ''}
               </Badge>
             </div>
           </CardHeader>
@@ -63,5 +74,5 @@ export function SectionCards({ data }) {
         </Card>
       ))}
     </div>
-  )
+  );
 }

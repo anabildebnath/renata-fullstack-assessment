@@ -104,7 +104,12 @@ export const FormContext = React.createContext();
 export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isFormOpen, setIsFormOpen, searchInputRef }) {
   if (!Array.isArray(data) || data.length === 0) {
     console.error("Data passed to DataTable is invalid or empty:", data);
-    return <div>No valid data available</div>; // Handle invalid data gracefully
+    return (
+      <div className="text-center text-muted-foreground">
+        <p className="text-lg font-medium">No valid data available</p>
+        <p className="text-sm">Try adjusting your filters or adding new records.</p>
+      </div>
+    ); // Handle invalid data gracefully
   }
 
   const [rowSelection, setRowSelection] = React.useState({});

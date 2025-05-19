@@ -10,7 +10,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-export function NavMain({ items = [], setIsFormOpen, onSearchClick }) {
+export function NavMain({ items = [], setIsFormOpen, setIsFilterOpen, onSearchClick }) {
   const navigate = useNavigate();
 
   const handleQuickCreate = () => {
@@ -26,6 +26,14 @@ export function NavMain({ items = [], setIsFormOpen, onSearchClick }) {
       onSearchClick(); // Trigger focus on search box
     } else {
       console.error("onSearchClick is not a function");
+    }
+  };
+
+  const handleFilterClick = () => {
+    if (typeof setIsFilterOpen === "function") {
+      setIsFilterOpen(true); // Open the filter popup
+    } else {
+      console.error("setIsFilterOpen is not a function");
     }
   };
 
@@ -57,8 +65,8 @@ export function NavMain({ items = [], setIsFormOpen, onSearchClick }) {
               <SidebarMenuButton
                 tooltip={item.title}
                 onClick={() => {
-                  if (item.title === "Dashboard") navigate("/dashboard");
-                  else if (item.title === "Filter Search") alert("Filter Search: Page opened.");
+                  if (item.title === "Filter") handleFilterClick(); // Trigger filter popup
+                  else if (item.title === "Dashboard") navigate("/dashboard");
                   else if (item.title === "Analytics") navigate("/analytics");
                   else if (item.title === "Projects" || item.title === "Team") alert(`${item.title}: Placeholder.`);
                 }}

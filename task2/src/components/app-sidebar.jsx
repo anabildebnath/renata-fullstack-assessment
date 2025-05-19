@@ -152,7 +152,7 @@ const data = {
   ],
 }
 
-export function AppSidebar({ setIsFormOpen, onSearchClick, ...props }) {
+export function AppSidebar({ setIsFormOpen, setIsFilterOpen, onSearchClick, ...props }) {
   return (
     <Sidebar
       collapsible="offcanvas"
@@ -168,9 +168,9 @@ export function AppSidebar({ setIsFormOpen, onSearchClick, ...props }) {
             >
               <a href="#" className="flex items-center gap-2">
                 <img
-                  src="/assets/renata-logo2.png" // Ensure the image is in the public/assets folder
+                  src="/assets/renata-logo2.png"
                   alt="Renata Logo"
-                  className="h-5 w-5" // Adjust size to be proportionate
+                  className="h-5 w-5"
                 />
                 <span className="text-base font-semibold">Renata PLC</span>
               </a>
@@ -182,6 +182,7 @@ export function AppSidebar({ setIsFormOpen, onSearchClick, ...props }) {
         <NavMain
           items={data.navMain}
           setIsFormOpen={setIsFormOpen}
+          setIsFilterOpen={setIsFilterOpen}
           onSearchClick={onSearchClick}
         />
         <NavDocuments items={data.documents} />
