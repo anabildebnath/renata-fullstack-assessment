@@ -209,7 +209,14 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
     },
     { accessorKey: "CustomerName", header: "Customer Name" },
     { accessorKey: "Division", header: "Division" },
-    { accessorKey: "Gender", header: "Gender" },
+    {
+      accessorKey: "Gender",
+      header: "Gender",
+      cell: ({ row }) => {
+        const gender = row.original.Gender;
+        return gender === "M" ? "Male" : gender === "F" ? "Female" : gender;
+      },
+    },
     { accessorKey: "MaritalStatus", header: "Marital Status" },
     { accessorKey: "Age", header: "Age" },
     { accessorKey: "Income", header: "Income" },

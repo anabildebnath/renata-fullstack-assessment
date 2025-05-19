@@ -40,10 +40,13 @@ export default function App() {
     console.log("Applying filters:", filters); // Debugging: Log the filters
 
     const filtered = data.filter((record) => {
+      // Normalize Gender field for comparison
+      const normalizedGender = record.Gender === "M" ? "Male" : record.Gender === "F" ? "Female" : record.Gender;
+
       return (
-        (!filters.CustomerName || record.CustomerName.toLowerCase().includes(filters.CustomerName.toLowerCase())) &&
+        (!filters.CustomerName || record.CustomerName.toLowerCase().includes(filters.CustomerName.toLowerCase().trim())) &&
         (filters.Division === "all" || record.Division === filters.Division) &&
-        (filters.Gender === "all" || record.Gender === filters.Gender) &&
+        (filters.Gender === "all" || normalizedGender === filters.Gender) &&
         (filters.MaritalStatus === "all" || record.MaritalStatus === filters.MaritalStatus) &&
         (!filters.Age || record.Age === Number(filters.Age)) &&
         (!filters.Income || record.Income === Number(filters.Income))
