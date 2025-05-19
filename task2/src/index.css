@@ -252,8 +252,8 @@ button, .btn, .btn-primary {
   background: transparent; /* Removed background color */
   color: var(--primary-foreground);
   border-radius: 0.5rem;
-  border: #2d2d2d solid .2px; /* Updated border color */
-  border-color: "hsl(48.3, 92%, 95.1%)";
+  border: #2d2d2d solid 0.2px; /* Updated border color */
+  /* Removed unnecessary border-color override */
 }
 button:hover, .btn:hover, .btn-primary:hover {
   background: rgb(43, 43, 43); /* Removed hover background color */

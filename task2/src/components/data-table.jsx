@@ -390,7 +390,7 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setIsFormOpen(true)}
+              onClick={() => setIsFormOpen(true)} // Open the form
               className="bg-transparent text-[oklch(var(--foreground))] hover:bg-gray-300 hover:text-[oklch(var(--foreground))]" 
             >
               <PlusIcon className="size-4 mr-1" />
@@ -513,6 +513,11 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
           </div>
         </TabsContent>
       </Tabs>
+      <FormModal
+        isOpen={isFormOpen} // Render the form modal when isFormOpen is true
+        onClose={() => setIsFormOpen(false)} // Close the modal
+        onSubmit={handleFormSubmit} // Handle form submission
+      />
     </>
   );
 }

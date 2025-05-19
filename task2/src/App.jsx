@@ -57,7 +57,7 @@ export default function App() {
   return (
     <SidebarProvider>
       <div className="flex w-full min-h-screen bg-background text-foreground">
-        <AppSidebar setIsFormOpen={setIsFormOpen} onSearchClick={setSearchFocus} /> {/* Pass setSearchFocus */}
+        <AppSidebar setIsFormOpen={setIsFormOpen} onSearchClick={setSearchFocus} /> {/* Pass setIsFormOpen */}
         <SidebarInset>
           <SiteHeader />
           <main className="flex flex-1 flex-col p-6">

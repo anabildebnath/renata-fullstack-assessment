@@ -10,7 +10,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-export function NavMain({ items = [], setIsFormOpen, onSearchClick }) { // Accept onSearchClick as a prop
+export function NavMain({ items = [], setIsFormOpen, onSearchClick }) {
   const navigate = useNavigate();
 
   const handleQuickCreate = () => {
