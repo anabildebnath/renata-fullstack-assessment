@@ -1,10 +1,35 @@
 import React from "react";
-import { FileIcon } from "lucide-react";
+import { FileIcon, DownloadIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function ExcelFilesPage() {
   const getUploadedFiles = () => {
     const files = localStorage.getItem("uploadedFiles");
     return files ? JSON.parse(files) : [];
+  };
+
+  const handleDownload = (file) => {
+    // Get the data associated with this file
+    const allData = JSON.parse(localStorage.getItem("data")) || [];
+    
+    // Create a CSV string from the data
+    const headers = ["ID,CustomerName,Division,Gender,MaritalStatus,Age,Income,addedAt\n"];
+    const csvData = allData.map(row => 
+      `${row.ID},${row.CustomerName},${row.Division},${row.Gender},${row.MaritalStatus},${row.Age},${row.Income},${row.addedAt}`
+    ).join("\n");
+    
+    const csvContent = headers + csvData;
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
+    // Create temporary link and trigger download
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', file.name);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const files = getUploadedFiles();
@@ -21,6 +46,7 @@ export default function ExcelFilesPage() {
             <div
               key={index}
               className="border border-border rounded-lg p-6 flex flex-col items-center hover:bg-accent/10 cursor-pointer"
+              onClick={() => handleDownload(file)}
             >
               <FileIcon className="w-12 h-12 mb-4 text-green-500" />
               <p className="text-lg font-medium text-center mb-2">{file.name}</p>
@@ -30,6 +56,18 @@ export default function ExcelFilesPage() {
               <p className="text-xs text-muted-foreground mt-2">
                 {(file.size / 1024).toFixed(2)} KB
               </p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="mt-4"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDownload(file);
+                }}
+              >
+                <DownloadIcon className="w-4 h-4 mr-2" />
+                Download
+              </Button>
             </div>
           ))
         ) : (
