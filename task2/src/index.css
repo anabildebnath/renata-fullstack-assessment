@@ -196,9 +196,9 @@
   justify-content: center;
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
-  backdrop-filter: blur(1px); /* Apply blur effect */
-  z-index: 9999; /* Ensure it appears above other elements */
+  background-color: rgba(0, 0, 0, 0.6); /* Slightly darker background */
+  backdrop-filter: blur(8px); /* Increased blur effect */
+  z-index: 9999;
 }
 
 .dialog-content {
@@ -279,10 +279,12 @@ button, .btn, .btn-primary {
   border: #252525 solid 0.2px; /* Updated border color */
   border-radius: 8px; /* Optional: Add rounded corners */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8); /* Optional: Add a shadow for better visibility */
-  padding: 1.5rem; /* Add padding for better spacing */
+  padding: 2rem; /* Increased padding */
   opacity: 1; /* Ensure no transparency */
-  max-width: 600px; /* Restore original width */
-  width: 100%; /* Ensure it takes full width up to the maxWidth */
+  width: 800px; /* Increased width */
+  min-height: 500px; /* Set minimum height */
+  max-height: 80vh; /* Prevent too tall popups */
+  overflow-y: auto; /* Add scroll if content is too long */
 }
 
 /* General styles for sidebar-menu-button */

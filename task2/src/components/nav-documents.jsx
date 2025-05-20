@@ -1,7 +1,7 @@
 "use client"
 
 import { IconDots, IconFolder, IconShare3, IconTrash } from "@tabler/icons-react";
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -21,12 +21,14 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { ExcelFilesModal } from "@/components/excel-files-modal";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 export function NavDocuments({
   items
 }) {
   const { isMobile } = useSidebar()
   const [isExcelFilesOpen, setIsExcelFilesOpen] = React.useState(false);
+  const [isDataLibraryOpen, setIsDataLibraryOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleWordAssistantRedirect = () => {
@@ -42,8 +44,13 @@ export function NavDocuments({
   const handleItemClick = (itemName) => {
     if (itemName === "Data Files") {
       navigate("/excel-files");
+    } else if (itemName === "Data Library") {
+      setIsDataLibraryOpen(true);
     }
-    // ...handle other items...
+  };
+
+  const handleDialogClose = () => {
+    setIsDataLibraryOpen(false);
   };
 
   return (
@@ -114,6 +121,41 @@ export function NavDocuments({
         isOpen={isExcelFilesOpen} 
         onClose={() => setIsExcelFilesOpen(false)} 
       />
+
+      <Dialog 
+        modal={false} // Allow clicking outside to close
+        open={isDataLibraryOpen} 
+        onOpenChange={handleDialogClose}
+      >
+        <div 
+          className="dialog-backdrop"
+          onClick={handleDialogClose} // Close when clicking the backdrop
+        >
+          <DialogContent 
+            className="popup-form" 
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the content
+            style={{
+              width: '800px',
+              minHeight: '200px',
+              backgroundColor: '#0a0a0a',
+              border: '#252525 solid 0.2px',
+              borderRadius: '8px',
+              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.8)',
+              padding: '4rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative'
+            }}
+          >
+            <div className="absolute inset-0 flex items-center justify-center px-32">
+              <p className="text-xl font-light text-white text-center whitespace-normal">
+                Due to constraints of time, this feature would be implemented based on further requirements.
+              </p>
+            </div>
+          </DialogContent>
+        </div>
+      </Dialog>
     </>
   );
 }
