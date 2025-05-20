@@ -83,6 +83,15 @@ export function FileUploadModal({ isOpen, onClose, onUpload }) {
         );
       }
 
+      // Save file metadata to localStorage
+      const uploadedFiles = JSON.parse(localStorage.getItem("uploadedFiles") || "[]");
+      uploadedFiles.push({
+        name: file.name,
+        uploadedAt: new Date().toISOString(),
+        size: file.size
+      });
+      localStorage.setItem("uploadedFiles", JSON.stringify(uploadedFiles));
+
       onUpload(formattedData);
       toast.success(`Successfully imported ${formattedData.length} records`);
       setFile(null);

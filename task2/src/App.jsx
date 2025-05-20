@@ -8,6 +8,7 @@ import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import AnalyticsPage from "@/pages/analytics";
 import Dashboard from "@/pages/Dashboard";
+import ExcelFilesPage from "@/pages/ExcelFilesPage";
 import rawData from "./data.json";
 import "@/index.css";
 import { FormModal } from "@/components/ui/form";
@@ -142,7 +143,7 @@ function AppContent() {
                       onEditRecord={handleEditRecord}
                       onDeleteRecord={handleDeleteRecord}
                       onDeleteSelectedRecords={handleDeleteSelectedRecords}
-                      onApplyFilter={handleApplyFilter} // Pass the filter handler
+                      onApplyFilter={handleApplyFilter}
                     />
                   </ProtectedRoute>
                 }
@@ -152,6 +153,14 @@ function AppContent() {
                 element={
                   <ProtectedRoute>
                     <AnalyticsPage data={filteredData} />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/excel-files"
+                element={
+                  <ProtectedRoute>
+                    <ExcelFilesPage />
                   </ProtectedRoute>
                 }
               />
@@ -170,7 +179,7 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/dashboard/*" element={<AppContent />} />
+        <Route path="/*" element={<AppContent />} /> {/* Change from /dashboard/* to /* */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </AuthProvider>
