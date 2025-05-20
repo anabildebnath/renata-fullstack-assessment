@@ -27,16 +27,32 @@ export function SectionCards({ data = [] }) {
     return sortedEntries.length > 0 ? sortedEntries[0][0] : "No data"; // Fallback to "No data" if no divisions
   }, [data]);
 
-  const median = (arr) => {
-    const validNumbers = arr.filter((num) => typeof num === "number" && !isNaN(num)); // Filter out invalid numbers
-    if (!validNumbers.length) return 0; // Fallback for empty arrays
-    const sorted = [...validNumbers].sort((a, b) => a - b);
-    const mid = Math.floor(sorted.length / 2);
-    return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+  const calculateMedian = (arr) => {
+    // Filter out undefined/null values and convert to numbers
+    const validNumbers = arr
+      .filter(val => val !== undefined && val !== null)
+      .map(Number)
+      .filter(num => !isNaN(num))
+      .sort((a, b) => a - b);
+
+    if (validNumbers.length === 0) return 0;
+
+    const mid = Math.floor(validNumbers.length / 2);
+    return validNumbers.length % 2 !== 0
+      ? validNumbers[mid]
+      : (validNumbers[mid - 1] + validNumbers[mid]) / 2;
   };
 
-  const medIncome = median(data.map((d) => d.Income)); // Ensure valid numbers
-  const medAge = median(data.map((d) => d.Age)); // Ensure valid numbers
+  // Calculate medians from raw data
+  const medianAge = React.useMemo(() => {
+    const ages = data.map(item => item.Age);
+    return calculateMedian(ages);
+  }, [data]);
+
+  const medianIncome = React.useMemo(() => {
+    const incomes = data.map(item => item.Income);
+    return calculateMedian(incomes);
+  }, [data]);
 
   const cards = [
     { 
@@ -59,7 +75,7 @@ export function SectionCards({ data = [] }) {
     },
     { 
       title: "Median (Age/Income)", 
-      desc: data.length ? `${medAge.toFixed(1)}/${medIncome.toFixed(0)}` : "0/0",
+      desc: data.length ? `${medianAge.toFixed(1)}/${medianIncome.toLocaleString()}` : "0/0",
       empty: "0/0",
       trend: "neutral"
     },
