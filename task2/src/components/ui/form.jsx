@@ -133,12 +133,6 @@ function FormMessage({
 }
 
 function FormModal({ isOpen, onClose, onSubmit, defaultValues = {} }) {
-  // Memoize defaultValues to ensure stability
-  const safeDefaultValues = React.useMemo(
-    () => (defaultValues && typeof defaultValues === "object" ? defaultValues : {}),
-    [defaultValues]
-  );
-
   const formMethods = useForm({
     defaultValues: {
       CustomerName: "",
@@ -147,24 +141,40 @@ function FormModal({ isOpen, onClose, onSubmit, defaultValues = {} }) {
       MaritalStatus: "",
       Age: "",
       Income: "",
-      ...safeDefaultValues, // Merge safe default values for editing
-    },
-    mode: "onBlur",
+    }
   });
 
-  // Track whether the form has been reset to avoid unnecessary resets
-  const hasReset = React.useRef(false);
-
+  // Reset form when modal opens with proper default values
   React.useEffect(() => {
-    if (isOpen && !hasReset.current) {
-      formMethods.reset(safeDefaultValues); // Reset form values only when modal opens
-      hasReset.current = true; // Mark as reset
-    } else if (!isOpen) {
-      hasReset.current = false; // Reset the flag when the modal closes
+    if (isOpen) {
+      const formattedValues = {
+        CustomerName: defaultValues.CustomerName || "",
+        Division: defaultValues.Division || "",
+        Gender: defaultValues.Gender === 'F' ? 'Female' : 
+                defaultValues.Gender === 'M' ? 'Male' : 
+                defaultValues.Gender || "",
+        MaritalStatus: defaultValues.MaritalStatus || "",
+        Age: defaultValues.Age || "",
+        Income: defaultValues.Income || "",
+      };
+      
+      formMethods.reset(formattedValues);
     }
-  }, [isOpen, safeDefaultValues, formMethods]);
+  }, [isOpen]); // Only depend on isOpen
 
-  const isEditing = Object.keys(safeDefaultValues).length > 0; // Check if editing
+  const handleSubmit = (data) => {
+    const submissionData = {
+      ...data,
+      Gender: data.Gender === 'Female' ? 'F' : 
+              data.Gender === 'Male' ? 'M' : 
+              data.Gender
+    };
+    
+    onSubmit(submissionData);
+    onClose();
+  };
+
+  const isEditing = defaultValues && Object.keys(defaultValues).length > 0;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -199,10 +209,7 @@ function FormModal({ isOpen, onClose, onSubmit, defaultValues = {} }) {
           </button>
           <FormProvider {...formMethods}>
             <form
-              onSubmit={formMethods.handleSubmit((data) => {
-                onSubmit(data);
-                onClose();
-              })}
+              onSubmit={formMethods.handleSubmit(handleSubmit)}
               className="space-y-4"
             >
               <FormItem>
@@ -245,8 +252,8 @@ function FormModal({ isOpen, onClose, onSubmit, defaultValues = {} }) {
                     className="select"
                   >
                     <option value="">Select gender</option>
-                    <option value="Male">Male</option>
                     <option value="Female">Female</option>
+                    <option value="Male">Male</option>
                     <option value="Other">Other</option>
                   </select>
                 </FormControl>

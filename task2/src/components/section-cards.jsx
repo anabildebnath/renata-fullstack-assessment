@@ -5,17 +5,8 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
 
 export function SectionCards({ data = [] }) {
-  if (!Array.isArray(data) || data.length === 0) {
-    return (
-      <div className="text-center text-muted-foreground">
-        <p className="text-lg font-medium">No data available</p>
-        <p className="text-sm">Try adjusting your filters or adding new records.</p>
-      </div>
-    );
-  }
-
+  // Always show cards with default/empty values
   const total = data.length;
-
   const todayNew = React.useMemo(() => {
     const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
     return data.filter((record) => {
@@ -25,7 +16,7 @@ export function SectionCards({ data = [] }) {
   }, [data]); // Recalculate when `data` changes
 
   const freqDiv = React.useMemo(() => {
-    if (!data.length) return "N/A"; // Fallback for empty data
+    if (!data.length) return "No data"; // Changed from "N/A"
     const counts = data.reduce((acc, cur) => {
       if (cur.Division) {
         acc[cur.Division] = (acc[cur.Division] || 0) + 1;
@@ -33,7 +24,7 @@ export function SectionCards({ data = [] }) {
       return acc;
     }, {});
     const sortedEntries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-    return sortedEntries.length > 0 ? sortedEntries[0][0] : "N/A"; // Fallback to "N/A" if no divisions
+    return sortedEntries.length > 0 ? sortedEntries[0][0] : "No data"; // Fallback to "No data" if no divisions
   }, [data]);
 
   const median = (arr) => {
@@ -48,10 +39,30 @@ export function SectionCards({ data = [] }) {
   const medAge = median(data.map((d) => d.Age)); // Ensure valid numbers
 
   const cards = [
-    { title: "Total Customers", desc: `${total}` },
-    { title: "New Customers Today", desc: `${todayNew}` }, // Use accurate count
-    { title: "Most Frequent Division", desc: freqDiv },
-    { title: "Median (Age/Income)", desc: `${medAge.toFixed(1)}/${medIncome.toFixed(0)}` }, // Ensure valid numbers
+    { 
+      title: "Total Customers", 
+      desc: `${total}`,
+      empty: "0",
+      trend: "neutral"
+    },
+    { 
+      title: "New Customers Today", 
+      desc: `${todayNew}`,
+      empty: "0",
+      trend: "neutral"
+    },
+    { 
+      title: "Most Frequent Division", 
+      desc: freqDiv,
+      empty: "No divisions yet",
+      trend: "neutral"
+    },
+    { 
+      title: "Median (Age/Income)", 
+      desc: data.length ? `${medAge.toFixed(1)}/${medIncome.toFixed(0)}` : "0/0",
+      empty: "0/0",
+      trend: "neutral"
+    },
   ];
 
   return (
@@ -61,26 +72,27 @@ export function SectionCards({ data = [] }) {
           <CardHeader className="relative">
             <CardDescription>{c.title}</CardDescription>
             <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-              {c.desc}
+              {data.length ? c.desc : c.empty}
             </CardTitle>
             <div className="absolute right-4 top-4">
               <Badge
                 variant="outline"
                 className="flex gap-1 rounded-[var(--radius)] text-xs bg-[oklch(var(--muted))] text-[oklch(var(--muted-foreground))]"
               >
-                {c.title === "New Customers Today" || c.title === "Most Frequent Division" ? (
+                {c.trend === "down" ? (
                   <TrendingDownIcon className="size-3 text-[oklch(var(--destructive))]" />
-                ) : (
+                ) : c.trend === "up" ? (
                   <TrendingUpIcon className="size-3 text-[oklch(var(--chart-1))]" />
+                ) : (
+                  <span>•</span> // Neutral indicator
                 )}
               </Badge>
             </div>
           </CardHeader>
           <CardFooter className="flex-col items-start gap-1 text-sm">
-            <div className="line-clamp-1 flex gap-2 font-medium">
-              {c.title} <TrendingUpIcon className="size-4" />
+            <div className="text-muted-foreground">
+              {data.length ? "Based on your data set" : "No data available"}
             </div>
-            <div className="text-muted-foreground">Based on your data set</div>
           </CardFooter>
         </Card>
       ))}

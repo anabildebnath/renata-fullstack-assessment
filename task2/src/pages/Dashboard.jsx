@@ -8,7 +8,6 @@ export default function Dashboard({
   onDeleteRecord,
   onDeleteSelectedRecords,
   onAddRecord,
-  onApplyFilter,
 }) {
   const handleAddRecord = (newRecord) => {
     if (typeof onAddRecord === "function") {
@@ -17,12 +16,34 @@ export default function Dashboard({
   };
 
   const handleEditRecord = (id, updatedRecord) => {
-    // Create a new array with the updated record
+    // Convert gender format before updating
+    const formattedRecord = {
+      ...updatedRecord,
+      Gender:
+        updatedRecord.Gender === "Female"
+          ? "F"
+          : updatedRecord.Gender === "Male"
+          ? "M"
+          : updatedRecord.Gender,
+    };
+
+    // Find the original record to preserve addedAt and ID
+    const originalRecord = data.find((record) => record.ID === id);
+    if (!originalRecord) return;
+
+    // Create the updated record with preserved fields
+    const recordWithPreservedFields = {
+      ...formattedRecord,
+      ID: id, // Preserve the original ID
+      addedAt: originalRecord.addedAt, // Preserve the original timestamp
+    };
+
+    // Create new array with updated record
     const updatedData = data.map((record) =>
-      record.ID === id ? { ...record, ...updatedRecord } : record
+      record.ID === id ? recordWithPreservedFields : record
     );
 
-    // Use onAddRecord to update the state in the parent component
+    // Use this to update the entire data array
     if (typeof onAddRecord === "function") {
       onAddRecord(updatedData);
     }
@@ -48,10 +69,10 @@ export default function Dashboard({
       <ChartAreaInteractive data={data} />
       <DataTable
         data={data}
-        onAddRecord={handleAddRecord}
+        onAddRecord={onAddRecord}
         onEditRecord={handleEditRecord}
-        onDeleteRecord={onDeleteRecord}
-        onDeleteSelectedRecords={onDeleteSelectedRecords}
+        onDeleteRecord={handleDeleteRecord}
+        onDeleteSelectedRecords={handleDeleteSelectedRecords}
       />
     </div>
   );

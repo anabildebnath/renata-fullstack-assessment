@@ -38,6 +38,7 @@ import {
   MoreVerticalIcon,
   PlusIcon,
   TrendingUpIcon,
+  UploadIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -87,6 +88,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@
 import { AppSidebar } from "@/components/app-sidebar"; // Import AppSidebar
 import { DragHandle } from "@/components/drag-handle";
 import { useSortable } from "@dnd-kit/sortable"; // Add this import
+import { FileUploadModal } from "@/components/file-upload-modal";
 
 export const schema = z.object({
   ID: z.string(),
@@ -102,10 +104,17 @@ export const schema = z.object({
 export const FormContext = React.createContext();
 
 export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onDeleteSelectedRecords }) {
-  const searchInputRef = React.useRef(null); // Define the search input ref
+  const searchInputRef = React.useRef(null);
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [isEditOpen, setIsEditOpen] = React.useState(false);
   const [editRecord, setEditRecord] = React.useState(null);
+  const [isUploadModalOpen, setIsUploadModalOpen] = React.useState(false);
+  const [rowSelection, setRowSelection] = React.useState({});
+  const [columnVisibility, setColumnVisibility] = React.useState({});
+  const [globalFilter, setGlobalFilter] = React.useState("");
+  const [sorting, setSorting] = React.useState([]);
+  const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
+  const [isSearchFocused, setIsSearchFocused] = React.useState(false);
 
   const handleFormSubmit = (formData) => {
     onAddRecord({ ...formData, ID: `ID${Date.now()}` });
@@ -113,9 +122,19 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onD
   };
 
   const handleEditSubmit = (updatedData) => {
-    onEditRecord(editRecord.ID, updatedData);
-    setIsEditOpen(false);
-    setEditRecord(null);
+    if (editRecord && editRecord.ID) {
+      // Convert the form data to match the required format
+      const formattedData = {
+        ...updatedData,
+        ID: editRecord.ID, // Preserve the original ID
+        addedAt: editRecord.addedAt // Preserve the original timestamp
+      };
+      
+      onEditRecord(editRecord.ID, formattedData);
+      toast.success("Record updated successfully!");
+      setIsEditOpen(false);
+      setEditRecord(null);
+    }
   };
 
   const handleEdit = (record) => {
@@ -133,24 +152,19 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onD
     toast.success(`${record.CustomerName} marked as favorite!`);
   };
 
-  if (!Array.isArray(data) || data.length === 0) {
-    return (
-      <div className="text-center text-muted-foreground">
-        <p className="text-lg font-medium">No valid data available</p>
-        <p className="text-sm">Try adjusting your filters or adding new records.</p>
-      </div>
-    );
+  const handleBatchUpload = (records) => {
+    if (Array.isArray(records) && records.length > 0) {
+      onAddRecord(records); // Pass the entire array to onAddRecord
+    }
+  };
+
+  // Remove or modify the early return for empty data
+  if (!Array.isArray(data)) {
+    return <div>Invalid data format</div>;
   }
 
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [columnVisibility, setColumnVisibility] = React.useState({});
-  const [globalFilter, setGlobalFilter] = React.useState(""); // Global filter state
-  const [sorting, setSorting] = React.useState([]);
-  const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
-  const [isSearchFocused, setIsSearchFocused] = React.useState(false); // Track focus state of the search box
-
   const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }), // Adjust activation constraint
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
     useSensor(TouchSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor)
   );
@@ -167,6 +181,34 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onD
     );
   }, [data, globalFilter]);
 
+  // Define DraggableRow component inside DataTable before it's used
+  const DraggableRow = React.memo(({ row }) => {
+    const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
+      id: row.original.ID,
+    });
+
+    return (
+      <TableRow
+        ref={setNodeRef}
+        key={row.original.ID}
+        style={{
+          transform: CSS.Transform.toString(transform),
+          transition,
+        }}
+        className={`relative z-0 ${isDragging ? "opacity-50" : ""}`}
+        {...attributes}
+        {...listeners}
+      >
+        {row.getVisibleCells().map((cell) => (
+          <TableCell key={`${row.original.ID}_${cell.id}`}>
+            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          </TableCell>
+        ))}
+      </TableRow>
+    );
+  });
+
+  // Add handleDelete function before it's used
   const handleDelete = (id) => {
     if (typeof onDeleteRecord === 'function') {
       onDeleteRecord(id);
@@ -174,114 +216,20 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onD
     }
   };
 
+  // Add handleDeleteSelected function
   const handleDeleteSelected = () => {
-    const selectedIds = Object.keys(rowSelection).filter((id) => rowSelection[id]);
+    const selectedIds = Object.keys(rowSelection);
     if (selectedIds.length > 0 && typeof onDeleteSelectedRecords === 'function') {
       onDeleteSelectedRecords(selectedIds);
-      setRowSelection({});
+      setRowSelection({}); // Clear selection after deletion
       toast.success(`${selectedIds.length} record(s) deleted successfully!`);
     }
   };
 
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
-    if (active && over && active.id !== over.id) {
-      console.log("Drag operation detected, but no data modification occurs.");
-      // No data modification here to ensure charts remain unaffected
-    }
-  };
-
-  const columns = [
-    {
-      id: "select",
-      header: ({ table }) => {
-        const ref = React.useRef();
-
-        React.useEffect(() => {
-          if (ref.current) {
-            ref.current.indeterminate = table.getIsSomePageRowsSelected(); // Set indeterminate state
-          }
-        }, [table.getIsSomePageRowsSelected()]);
-
-        return (
-          <div className="flex items-center justify-center">
-            <Checkbox
-              ref={ref} // Attach ref to the checkbox
-              checked={table.getIsAllPageRowsSelected()} // Select only if all rows are selected
-              onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-              aria-label="Select all"
-            />
-          </div>
-        );
-      },
-      cell: ({ row }) => (
-        <div className="flex items-center justify-center">
-          <Checkbox
-            checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
-            aria-label="Select row"
-          />
-        </div>
-      ),
-      enableSorting: false,
-      enableHiding: false,
-      size: 30,
-    },
-    {
-      id: "drag",
-      header: () => null,
-      cell: ({ row }) => <DragHandle id={row.original.ID} />,
-      size: 30,
-    },
-    { accessorKey: "CustomerName", header: "Customer Name" },
-    { accessorKey: "Division", header: "Division" },
-    {
-      accessorKey: "Gender",
-      header: "Gender",
-      cell: ({ row }) => {
-        const gender = row.original.Gender;
-        return gender === "M" ? "Male" : gender === "F" ? "Female" : gender;
-      },
-    },
-    { accessorKey: "MaritalStatus", header: "Marital Status" },
-    { accessorKey: "Age", header: "Age" },
-    { accessorKey: "Income", header: "Income" },
-    {
-      id: "actions",
-      header: () => null,
-      cell: ({ row }) => (
-        <RowActions
-          row={row}
-          onEdit={handleEdit}
-          onDelete={() => handleDelete(row.original.ID)} // Pass the record ID for deletion
-          onCopy={handleCopy}
-          onFavorite={handleFavorite}
-        />
-      ),
-    },
-  ];
-
-  const table = useReactTable({
-    data: filteredData, // Use filtered data
-    columns,
-    state: { sorting, columnVisibility, rowSelection, pagination },
-    getRowId: (row) => (row.ID || row.id)?.toString(), // Handle both ID and id
-    onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
-    onColumnVisibilityChange: setColumnVisibility,
-    onPaginationChange: setPagination,
-    enableRowSelection: true, // Enable row selection
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-  });
-
-  function RowActions({ row, onEdit, onDelete, onCopy, onFavorite }) {
+  // Define RowActions component before it's used in columns
+  const RowActions = React.memo(({ row, onEdit, onDelete, onCopy, onFavorite }) => {
     const record = row?.original;
-
-    if (!record) {
-      return null;
-    }
+    if (!record) return null;
 
     return (
       <DropdownMenu>
@@ -312,41 +260,125 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onD
         </DropdownMenuContent>
       </DropdownMenu>
     );
-  }
+  });
 
-  function DraggableRow({ row }) {
-    const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
-      id: row.original.ID || row.id,
-    });
+  // Define columns with RowActions component
+  const columns = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <div className="flex items-center justify-center">
+          <Checkbox
+            checked={table.getIsAllPageRowsSelected()}
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Select all"
+          />
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+        </div>
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      id: "drag",
+      header: () => null,
+      cell: ({ row }) => <DragHandle id={row.original.ID} />,
+    },
+    { accessorKey: "CustomerName", header: "Customer Name" },
+    { accessorKey: "Division", header: "Division" },
+    {
+      accessorKey: "Gender",
+      header: "Gender",
+      cell: ({ row }) => {
+        const gender = row.original.Gender;
+        return gender === "M" ? "Male" : gender === "F" ? "Female" : gender;
+      },
+    },
+    { accessorKey: "MaritalStatus", header: "Marital Status" },
+    { accessorKey: "Age", header: "Age" },
+    { accessorKey: "Income", header: "Income" },
+    {
+      id: "actions",
+      header: () => null,
+      cell: ({ row }) => (
+        <RowActions
+          row={row}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onCopy={handleCopy}
+          onFavorite={handleFavorite}
+        />
+      ),
+    },
+  ];
 
-    return (
-      <TableRow
-        ref={setNodeRef}
-        style={{
-          transform: CSS.Transform.toString(transform),
-          transition,
-        }}
-        className={`relative z-0 ${isDragging ? "opacity-50" : ""}`}
-        {...attributes}
-        {...listeners}
-      >
-        {row.getVisibleCells().map((cell) => (
-          <TableCell key={cell.id}>
-            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-          </TableCell>
+  // Create table instance
+  const table = useReactTable({
+    data: filteredData,
+    columns,
+    state: { sorting, columnVisibility, rowSelection, pagination },
+    getRowId: (row) => row.ID,
+    onRowSelectionChange: setRowSelection,
+    onSortingChange: setSorting,
+    onColumnVisibilityChange: setColumnVisibility,
+    onPaginationChange: setPagination,
+    enableRowSelection: true,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+  });
+
+  // Move table-dependent JSX into a separate component
+  const TableContent = () => (
+    <Table>
+      <TableHeader className="sticky top-0 z-10 bg-muted">
+        {table.getHeaderGroups().map((hg) => (
+          <TableRow key={hg.id}>
+            {hg.headers.map((header) => (
+              <TableHead key={header.id} colSpan={header.colSpan}>
+                {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+              </TableHead>
+            ))}
+          </TableRow>
         ))}
-      </TableRow>
-    );
-  }
+      </TableHeader>
+      <TableBody>
+        {table.getRowModel().rows.length ? (
+          table.getRowModel().rows.map((row) => (
+            <DraggableRow
+              key={row.id}
+              row={row}
+            />
+          ))
+        ) : (
+          <TableRow>
+            <TableCell colSpan={columns.length + 1} className="h-24 text-center">
+              No data
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
+  );
 
+  // Keep the rest of the component's UI elements visible even when data is empty
   return (
     <>
       <Tabs defaultValue="outline" className="flex w-full flex-col gap-6">
         <div className="flex items-center justify-between px-4 lg:px-6">
           <div className="flex items-center gap-2 ml-auto">
+            {/* Always show the search input and buttons */}
             <div className="relative flex items-center">
               <Input
-                ref={searchInputRef} // Attach the ref to the search input
+                ref={searchInputRef}
                 placeholder="Search..."
                 value={globalFilter}
                 onChange={(e) => setGlobalFilter(e.target.value)}
@@ -365,6 +397,15 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onD
             <Button
               variant="outline"
               size="sm"
+              onClick={() => setIsUploadModalOpen(true)}
+              className="bg-transparent text-[oklch(var(--foreground))] hover:bg-gray-300 hover:text-[oklch(var(--foreground))]"
+            >
+              <UploadIcon className="size-4 mr-1" />
+              <span className="hidden lg:inline">Import</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setIsFormOpen(true)}
               className="bg-transparent text-[oklch(var(--foreground))] hover:bg-gray-300 hover:text-[oklch(var(--foreground))]"
             >
@@ -375,71 +416,63 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onD
         </div>
         <TabsContent value="outline" className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
           <div className="overflow-hidden rounded-[0.75rem] border">
-            <DndContext sensors={sensors} collisionDetection={closestCenter}>
-              <SortableContext
-                items={data.filter((item) => item.ID || item.id).map((item) => item.ID || item.id)} // Use only valid IDs
-                strategy={verticalListSortingStrategy}
-              >
-                <Table>
-                  <TableHeader className="sticky top-0 z-10 bg-muted">
-                    {table.getHeaderGroups().map((hg) => (
-                      <TableRow key={hg.id}>
-                        {hg.headers.map((header) => (
-                          <TableHead key={header.id} colSpan={header.colSpan}>
-                            {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                          </TableHead>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableHeader>
-                  <TableBody>
-                    {table.getRowModel().rows.length ? (
-                      table.getRowModel().rows.map((row) => (
-                        <DraggableRow
-                          key={row.id}
-                          row={row}
-                        />
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={columns.length + 1} className="h-24 text-center">
-                          No data
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </SortableContext>
-            </DndContext>
+            {data.length > 0 ? (
+              <DndContext sensors={sensors} collisionDetection={closestCenter}>
+                <SortableContext
+                  items={data.filter((item) => item.ID || item.id).map((item) => item.ID || item.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <TableContent />
+                </SortableContext>
+              </DndContext>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-8">
+                <p className="text-lg font-medium text-muted-foreground">No customer data available</p>
+                <p className="text-sm text-muted-foreground mb-4">Start by adding customers or importing data</p>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setIsFormOpen(true)}>
+                    <PlusIcon className="size-4 mr-1" />
+                    Add Customer
+                  </Button>
+                  <Button variant="outline" onClick={() => setIsUploadModalOpen(true)}>
+                    <UploadIcon className="size-4 mr-1" />
+                    Import Data
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
-          <div className="flex justify-end px-4">
-            {Object.keys(rowSelection).some((id) => rowSelection[id]) && (
+
+          {/* Move batch delete button here, before pagination */}
+          {Object.keys(rowSelection).length > 0 && (
+            <div className="flex justify-end mb-2">
               <Button
                 variant="destructive"
                 size="sm"
                 onClick={handleDeleteSelected}
                 className="bg-red-500 text-white rounded-md hover:bg-red-600"
               >
-                Delete Selected
+                Delete Selected ({Object.keys(rowSelection).length})
               </Button>
-            )}
-          </div>
-          <div className="flex items-center justify-between px-4">
-            <div className="hidden flex-1 text-sm text-muted-foreground lg:flex">
-              {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected.
             </div>
-            <div className="flex w-full items-center gap-8 lg:w-fit">
-              <div className="hidden items-center gap-2 lg:flex">
-                <Label htmlFor="rows-per-page" className="text-sm font-medium">
-                  Rows per page
-                </Label>
+          )}
+
+          {/* Pagination controls */}
+          <div className="flex items-center justify-between px-4">
+            <div className="flex-1 text-sm text-muted-foreground">
+              {table.getFilteredSelectedRowModel().rows.length} of{" "}
+              {table.getFilteredRowModel().rows.length} row(s) selected.
+            </div>
+            <div className="flex items-center space-x-6 lg:space-x-8">
+              <div className="flex items-center space-x-2">
+                <p className="text-sm font-medium">Rows per page</p>
                 <Select
                   value={`${table.getState().pagination.pageSize}`}
                   onValueChange={(value) => {
                     table.setPageSize(Number(value));
                   }}
                 >
-                  <SelectTrigger className="w-20" id="rows-per-page">
+                  <SelectTrigger className="h-8 w-[70px]">
                     <SelectValue placeholder={table.getState().pagination.pageSize} />
                   </SelectTrigger>
                   <SelectContent side="top">
@@ -451,10 +484,11 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onD
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex w-fit items-center justify-center text-sm font-medium">
-                Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+              <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+                Page {table.getState().pagination.pageIndex + 1} of{" "}
+                {table.getPageCount()}
               </div>
-              <div className="ml-auto flex items-center gap-2 lg:ml-0">
+              <div className="flex items-center space-x-2">
                 <Button
                   variant="outline"
                   className="hidden h-8 w-8 p-0 lg:flex"
@@ -462,37 +496,34 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onD
                   disabled={!table.getCanPreviousPage()}
                 >
                   <span className="sr-only">Go to first page</span>
-                  <ChevronsLeftIcon />
+                  <ChevronsLeftIcon className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="outline"
-                  className="size-8"
-                  size="icon"
+                  className="h-8 w-8 p-0"
                   onClick={() => table.previousPage()}
                   disabled={!table.getCanPreviousPage()}
                 >
                   <span className="sr-only">Go to previous page</span>
-                  <ChevronLeftIcon />
+                  <ChevronLeftIcon className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="outline"
-                  className="size-8"
-                  size="icon"
+                  className="h-8 w-8 p-0"
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
                 >
                   <span className="sr-only">Go to next page</span>
-                  <ChevronRightIcon />
+                  <ChevronRightIcon className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="outline"
-                  className="hidden size-8 lg:flex"
-                  size="icon"
+                  className="hidden h-8 w-8 p-0 lg:flex"
                   onClick={() => table.setPageIndex(table.getPageCount() - 1)}
                   disabled={!table.getCanNextPage()}
                 >
                   <span className="sr-only">Go to last page</span>
-                  <ChevronsRightIcon />
+                  <ChevronsRightIcon className="h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -509,6 +540,11 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onD
         onClose={() => setIsEditOpen(false)} // Close the modal
         onSubmit={handleEditSubmit} // Handle edit submission
         defaultValues={editRecord} // Pass the record to be edited as default values
+      />
+      <FileUploadModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        onUpload={handleBatchUpload}
       />
     </>
   );

@@ -16,20 +16,13 @@ import { ProtectedRoute } from "@/components/ProtectedRoute"; // Import Protecte
 
 function AppContent() {
   const { user } = useContext(AuthContext);
-  const [data, setData] = useState(() => {
-    try {
-      const savedData = localStorage.getItem("data");
-      const parsedData = savedData ? JSON.parse(savedData) : [];
-      return parsedData.filter((item) => item && item.ID);
-    } catch (error) {
-      return [];
-    }
-  });
+  const [data, setData] = useState([]);  // Initialize with empty array
+  const [filteredData, setFilteredData] = useState([]);
 
-  const [filteredData, setFilteredData] = useState(data);
+  // Remove the initialization from localStorage since we want to start fresh
 
   useEffect(() => {
-    setFilteredData(data); // Recalculate filtered data whenever `data` changes
+    setFilteredData(data); // Update filtered data whenever data changes
   }, [data]);
 
   const handleDeleteRecord = (id) => {
@@ -40,7 +33,7 @@ function AppContent() {
   };
 
   const handleDeleteSelectedRecords = (selectedIds) => {
-    const updatedData = data.filter((record) => !selectedIds.includes(record.ID));
+    const updatedData = data.filter(record => !selectedIds.includes(record.ID));
     setData(updatedData);
     setFilteredData(updatedData);
     localStorage.setItem("data", JSON.stringify(updatedData));
@@ -49,15 +42,53 @@ function AppContent() {
   const handleAddRecord = (newRecordOrData) => {
     let updatedData;
     
-    // Check if we're receiving an array (updating) or a single record (adding)
     if (Array.isArray(newRecordOrData)) {
-      updatedData = newRecordOrData;
+      if (newRecordOrData.some(record => record.ID && data.find(r => r.ID === record.ID))) {
+        // This is an update operation - replace entire data
+        updatedData = newRecordOrData;
+      } else {
+        // This is a batch insert - append new records
+        const timestamp = Date.now();
+        updatedData = [
+          ...data,
+          ...newRecordOrData.map((record, index) => ({
+            ...record,
+            ID: `BATCH${timestamp}_${index}`,
+            addedAt: new Date().toISOString()
+          }))
+        ];
+      }
     } else {
-      updatedData = [
-        ...data,
-        { ...newRecordOrData, addedAt: new Date().toISOString() },
-      ];
+      // Single record operation
+      if (newRecordOrData.ID && data.find(r => r.ID === newRecordOrData.ID)) {
+        // This is an update operation - replace the matching record
+        updatedData = data.map(record => 
+          record.ID === newRecordOrData.ID ? newRecordOrData : record
+        );
+      } else {
+        // This is an insert operation - append new record
+        updatedData = [
+          ...data,
+          {
+            ...newRecordOrData,
+            ID: `SINGLE${Date.now()}`,
+            addedAt: new Date().toISOString()
+          }
+        ];
+      }
     }
+    
+    setData(updatedData);
+    setFilteredData(updatedData);
+    localStorage.setItem("data", JSON.stringify(updatedData));
+  };
+
+  const handleEditRecord = (id, updatedRecord) => {
+    const updatedData = data.map(record => 
+      record.ID === id 
+        ? { ...record, ...updatedRecord, ID: id } // Preserve the ID and merge updates
+        : record
+    );
     
     setData(updatedData);
     setFilteredData(updatedData);
@@ -101,9 +132,10 @@ function AppContent() {
                   <ProtectedRoute>
                     <Dashboard
                       data={filteredData}
-                      onDeleteRecord={handleDeleteRecord} // Pass the single delete handler
-                      onDeleteSelectedRecords={handleDeleteSelectedRecords} // Pass the batch delete handler
                       onAddRecord={handleAddRecord}
+                      onEditRecord={handleEditRecord} // Pass the edit handler
+                      onDeleteRecord={handleDeleteRecord}
+                      onDeleteSelectedRecords={handleDeleteSelectedRecords}
                       onApplyFilter={handleApplyFilter}
                     />
                   </ProtectedRoute>
