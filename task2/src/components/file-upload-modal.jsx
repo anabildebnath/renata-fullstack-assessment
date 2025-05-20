@@ -10,25 +10,20 @@ export function FileUploadModal({ isOpen, onClose, onUpload }) {
   const validateAndFormatData = (rawData) => {
     console.log("Raw data:", rawData);
 
-    // Skip the header row and validate data rows
-    const validRows = rawData.filter((row, index) => {
-      // Skip the first row as it contains headers
-      if (index === 0) return false;
-
+    // Filter and validate rows without skipping any data rows
+    const validRows = rawData.filter((row) => {
       console.log("Processing row:", row);
 
       // Check if required fields exist and are valid
-      const isValid = Boolean(
+      return (
         row["ID"] &&
         row["Customer Name"] &&
         row["Division"] &&
         row["Gender"] &&
         row["MaritalStatus"] &&
-        row["Age"] &&
-        row["Income"]
+        row["Age"] !== undefined &&
+        row["Income"] !== undefined
       );
-
-      return isValid;
     });
 
     console.log("Valid rows before formatting:", validRows);
@@ -65,17 +60,17 @@ export function FileUploadModal({ isOpen, onClose, onUpload }) {
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
 
-      // Read Excel data keeping the original headers
+      // Convert Excel data to JSON with headers option set to true
       const rawData = utils.sheet_to_json(worksheet, {
         raw: false,
         defval: "",
         blankrows: false,
-        range: 0, // Start from the first row (headers)
+        headers: true, // This ensures the first row is treated as headers
       });
 
       console.log("Raw Excel data:", rawData);
 
-      if (rawData.length <= 1) {
+      if (rawData.length === 0) {
         throw new Error("No data found in the file");
       }
 
@@ -84,7 +79,7 @@ export function FileUploadModal({ isOpen, onClose, onUpload }) {
 
       if (formattedData.length === 0) {
         throw new Error(
-          "No valid records found. Please ensure your Excel file has the correct columns: ID, Customer Name, Division, Gender, MaritalStatus, Age, Income"
+          "No valid records found after validation. Please check your file format."
         );
       }
 
