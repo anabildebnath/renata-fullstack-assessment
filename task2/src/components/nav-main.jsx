@@ -48,6 +48,13 @@ export function NavMain({ items = [], setIsFormOpen, onApplyFilter }) {
     setIsFilterOpen(false);
   };
 
+  const handleItemClick = (item) => {
+    if (item.title === "Filter") handleFilterClick();
+    else if (item.title === "Dashboard") navigate("/dashboard");
+    else if (item.title === "Analytics") navigate("/dashboard/analytics");
+    else if (item.title === "Task1 Charts") window.location.href = "/task1"; // Handle Task1 Charts click
+  };
+
   return (
     <>
       <SidebarGroup>
@@ -76,11 +83,7 @@ export function NavMain({ items = [], setIsFormOpen, onApplyFilter }) {
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
                   tooltip={item.title}
-                  onClick={() => {
-                    if (item.title === "Filter") handleFilterClick(); // Trigger filter popup
-                    else if (item.title === "Dashboard") navigate("/dashboard"); // Correct path for Dashboard
-                    else if (item.title === "Analytics") navigate("/dashboard/analytics"); // Correct path for Analytics
-                  }}
+                  onClick={() => handleItemClick(item)}
                   className="nav-main-button min-w-8 bg-transparent text-sidebar-foreground duration-200 ease-linear hover:bg-gray-900"
                 >
                   {item.icon && <item.icon />}

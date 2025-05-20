@@ -18,6 +18,7 @@ import {
   ListIcon,
   SearchIcon,
   SettingsIcon,
+  TrendingUpIcon,
   UsersIcon,
 } from "lucide-react"
 
@@ -58,9 +59,9 @@ const data = {
       icon: BarChartIcon,
     },
     {
-      title: "Data Files",
-      url: "#",
-      icon: FolderIcon,
+      title: "Task1 Charts", // New button
+      url: "/task1",
+      icon: TrendingUpIcon,
     },
     {
       title: "Team",
@@ -134,6 +135,11 @@ const data = {
     },
   ],
   documents: [
+    {
+      name: "Data Files", // Moved from navMain to documents
+      url: "#",
+      icon: FolderIcon,
+    },
     {
       name: "Data Library",
       url: "#",
