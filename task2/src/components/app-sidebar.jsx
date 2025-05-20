@@ -152,7 +152,7 @@ const data = {
   ],
 }
 
-export function AppSidebar({ setIsFormOpen, setIsFilterOpen, onSearchClick, ...props }) {
+export function AppSidebar({ setIsFormOpen, ...props }) {
   return (
     <Sidebar
       collapsible="offcanvas"
@@ -182,8 +182,6 @@ export function AppSidebar({ setIsFormOpen, setIsFilterOpen, onSearchClick, ...p
         <NavMain
           items={data.navMain}
           setIsFormOpen={setIsFormOpen} // Pass setIsFormOpen to NavMain
-          setIsFilterOpen={setIsFilterOpen}
-          onSearchClick={onSearchClick}
         />
         <NavDocuments items={data.documents} />
         <NavSecondary

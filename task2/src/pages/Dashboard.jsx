@@ -63,8 +63,10 @@ export default function Dashboard({
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
-      <p className="text-muted-foreground">Overview of your data and insights.</p>
+      <div className="px-4 lg:px-6"> {/* Add padding here to match cards */}
+        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <p className="text-muted-foreground">Overview of your data and insights.</p>
+      </div>
       <SectionCards data={data} />
       <ChartAreaInteractive data={data} />
       <DataTable

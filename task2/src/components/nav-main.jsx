@@ -10,7 +10,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-export function NavMain({ items = [], setIsFormOpen, setIsFilterOpen, onSearchClick }) {
+export function NavMain({ items = [], setIsFormOpen }) {
   const navigate = useNavigate();
 
   const handleQuickCreate = () => {
@@ -18,22 +18,6 @@ export function NavMain({ items = [], setIsFormOpen, setIsFilterOpen, onSearchCl
       setIsFormOpen(true); // Open the Add Customer form
     } else {
       console.error("setIsFormOpen is not a function");
-    }
-  };
-
-  const handleSearchClick = () => {
-    if (typeof onSearchClick === "function") {
-      onSearchClick(); // Trigger focus on search box
-    } else {
-      console.error("onSearchClick is not a function");
-    }
-  };
-
-  const handleFilterClick = () => {
-    if (typeof setIsFilterOpen === "function") {
-      setIsFilterOpen(true); // Open the filter popup
-    } else {
-      console.error("setIsFilterOpen is not a function");
     }
   };
 

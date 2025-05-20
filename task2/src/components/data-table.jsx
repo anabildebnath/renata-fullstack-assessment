@@ -374,6 +374,9 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onD
     <>
       <Tabs defaultValue="outline" className="flex w-full flex-col gap-6">
         <div className="flex items-center justify-between px-4 lg:px-6">
+          <AppSidebar 
+            setIsFormOpen={setIsFormOpen} // Pass setIsFormOpen to AppSidebar
+          />
           <div className="flex items-center gap-2 ml-auto">
             {/* Always show the search input and buttons */}
             <div className="relative flex items-center">
