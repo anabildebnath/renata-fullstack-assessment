@@ -37,7 +37,10 @@ function AppContent() {
   };
 
   const handleAddRecord = (newRecord) => {
-    const updatedData = [...data, { ...newRecord, addedAt: new Date().toISOString() }];
+    const updatedData = [
+      ...data,
+      { ...newRecord, addedAt: new Date().toISOString() }, // Add timestamp for every new record
+    ];
     setData(updatedData);
     setFilteredData(updatedData); // Update filtered data as well
     localStorage.setItem("data", JSON.stringify(updatedData));

@@ -18,8 +18,11 @@ export function SectionCards({ data = [] }) {
 
   const todayNew = React.useMemo(() => {
     const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
-    return data.filter((record) => record.addedAt?.startsWith(today)).length; // Count records added today
-  }, [data]);
+    return data.filter((record) => {
+      const addedAtDate = record.addedAt?.split("T")[0]; // Extract the date part of the timestamp
+      return addedAtDate === today; // Check if the record was added today
+    }).length; // Count records added today
+  }, [data]); // Recalculate when `data` changes
 
   const freqDiv = React.useMemo(() => {
     if (!data.length) return "N/A"; // Fallback for empty data
@@ -48,7 +51,7 @@ export function SectionCards({ data = [] }) {
     { title: "Total Customers", desc: `${total}` },
     { title: "New Customers Today", desc: `${todayNew}` }, // Use accurate count
     { title: "Most Frequent Division", desc: freqDiv },
-    { title: "Median (Age/Inc)", desc: `${medAge.toFixed(1)}/${medIncome.toFixed(0)}` }, // Ensure valid numbers
+    { title: "Median (Age/Income)", desc: `${medAge.toFixed(1)}/${medIncome.toFixed(0)}` }, // Ensure valid numbers
   ];
 
   return (
