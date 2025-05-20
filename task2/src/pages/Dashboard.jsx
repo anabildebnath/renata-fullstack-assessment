@@ -1,24 +1,38 @@
-import React, { useState } from "react";
+import React from "react";
 import { SectionCards } from "@/components/section-cards";
-import { ChartAreaInteractive } from "@/components/chart-area-interactive"; // Import the chart component
+import { ChartAreaInteractive } from "@/components/chart-area-interactive";
 import { DataTable } from "@/components/data-table";
 
-export default function Dashboard({ data, onUpdateData }) {
+export default function Dashboard({
+  data,
+  onDeleteRecord,
+  onDeleteSelectedRecords,
+  onAddRecord,
+  onApplyFilter,
+}) {
   const handleAddRecord = (newRecord) => {
-    const updatedData = [...data, newRecord];
-    onUpdateData(updatedData);
+    if (typeof onAddRecord === "function") {
+      onAddRecord(newRecord); // Use onAddRecord prop instead of onUpdateData
+    }
   };
 
   const handleEditRecord = (id, updatedRecord) => {
     const updatedData = data.map((record) =>
       record.ID === id ? updatedRecord : record
     );
-    onUpdateData(updatedData);
+    onAddRecord(updatedData); // Use onAddRecord for updates as well
   };
 
   const handleDeleteRecord = (id) => {
-    const updatedData = data.filter((record) => record.ID !== id);
-    onUpdateData(updatedData);
+    if (typeof onDeleteRecord === "function") {
+      onDeleteRecord(id);
+    }
+  };
+
+  const handleDeleteSelectedRecords = (selectedIds) => {
+    if (typeof onDeleteSelectedRecords === "function") {
+      onDeleteSelectedRecords(selectedIds);
+    }
   };
 
   return (
@@ -26,12 +40,13 @@ export default function Dashboard({ data, onUpdateData }) {
       <h1 className="text-2xl font-bold">Dashboard</h1>
       <p className="text-muted-foreground">Overview of your data and insights.</p>
       <SectionCards data={data} />
-      <ChartAreaInteractive data={data} /> {/* Add the chart component here */}
+      <ChartAreaInteractive data={data} />
       <DataTable
-        data={data} // Pass filtered data to DataTable
+        data={data}
         onAddRecord={handleAddRecord}
         onEditRecord={handleEditRecord}
         onDeleteRecord={handleDeleteRecord}
+        onDeleteSelectedRecords={handleDeleteSelectedRecords}
       />
     </div>
   );

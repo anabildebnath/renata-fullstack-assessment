@@ -101,7 +101,7 @@ export const schema = z.object({
 // Create a context for managing the form popup state
 export const FormContext = React.createContext();
 
-export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord }) {
+export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onDeleteSelectedRecords }) {
   const searchInputRef = React.useRef(null); // Define the search input ref
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [isEditOpen, setIsEditOpen] = React.useState(false);
@@ -118,14 +118,28 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord }) {
     setEditRecord(null);
   };
 
+  const handleEdit = (record) => {
+    setEditRecord(record);
+    setIsEditOpen(true);
+  };
+
+  const handleCopy = (record) => {
+    const copiedRecord = { ...record, ID: `COPY${Date.now()}` };
+    onAddRecord(copiedRecord);
+    toast.success("Record copied!");
+  };
+
+  const handleFavorite = (record) => {
+    toast.success(`${record.CustomerName} marked as favorite!`);
+  };
+
   if (!Array.isArray(data) || data.length === 0) {
-    console.error("Data passed to DataTable is invalid or empty:", data);
     return (
       <div className="text-center text-muted-foreground">
         <p className="text-lg font-medium">No valid data available</p>
         <p className="text-sm">Try adjusting your filters or adding new records.</p>
       </div>
-    ); // Handle invalid data gracefully
+    );
   }
 
   const [rowSelection, setRowSelection] = React.useState({});
@@ -142,33 +156,31 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord }) {
   );
 
   const filteredData = React.useMemo(() => {
-    if (!globalFilter) return data;
+    const validData = data.filter((row) => row.ID);
+    if (!globalFilter) return validData;
+
     const lowerCaseFilter = globalFilter.toLowerCase();
-    return data.filter((row) =>
+    return validData.filter((row) =>
       Object.values(row).some((value) =>
         String(value).toLowerCase().includes(lowerCaseFilter)
       )
     );
   }, [data, globalFilter]);
 
-  const handleEdit = (record) => {
-    setEditRecord(record); // Set the record to be edited
-    setIsEditOpen(true); // Open the edit modal
-  };
-
-  const handleCopy = (record) => {
-    const copiedRecord = { ...record, ID: `COPY${Date.now()}` };
-    onAddRecord(copiedRecord);
-    toast.success("Record copied!");
-  };
-
-  const handleFavorite = (record) => {
-    toast.success(`${record.CustomerName} marked as favorite!`);
-  };
-
   const handleDelete = (id) => {
-    onDeleteRecord(id);
-    toast.success("Item deleted!");
+    if (typeof onDeleteRecord === 'function') {
+      onDeleteRecord(id);
+      toast.success("Record deleted successfully!");
+    }
+  };
+
+  const handleDeleteSelected = () => {
+    const selectedIds = Object.keys(rowSelection).filter((id) => rowSelection[id]);
+    if (selectedIds.length > 0 && typeof onDeleteSelectedRecords === 'function') {
+      onDeleteSelectedRecords(selectedIds);
+      setRowSelection({});
+      toast.success(`${selectedIds.length} record(s) deleted successfully!`);
+    }
   };
 
   const handleDragEnd = (event) => {
@@ -241,7 +253,7 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord }) {
         <RowActions
           row={row}
           onEdit={handleEdit}
-          onDelete={handleDelete}
+          onDelete={() => handleDelete(row.original.ID)} // Pass the record ID for deletion
           onCopy={handleCopy}
           onFavorite={handleFavorite}
         />
@@ -253,7 +265,7 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord }) {
     data: filteredData, // Use filtered data
     columns,
     state: { sorting, columnVisibility, rowSelection, pagination },
-    getRowId: (row) => row.ID?.toString(), // Ensure row.ID exists
+    getRowId: (row) => (row.ID || row.id)?.toString(), // Handle both ID and id
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
@@ -304,7 +316,7 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord }) {
 
   function DraggableRow({ row }) {
     const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
-      id: row.original.ID, // Use row.original.ID directly
+      id: row.original.ID || row.id,
     });
 
     return (
@@ -315,8 +327,8 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord }) {
           transition,
         }}
         className={`relative z-0 ${isDragging ? "opacity-50" : ""}`}
-        {...attributes} // Add drag attributes
-        {...listeners} // Add drag listeners
+        {...attributes}
+        {...listeners}
       >
         {row.getVisibleCells().map((cell) => (
           <TableCell key={cell.id}>
@@ -364,7 +376,10 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord }) {
         <TabsContent value="outline" className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
           <div className="overflow-hidden rounded-[0.75rem] border">
             <DndContext sensors={sensors} collisionDetection={closestCenter}>
-              <SortableContext items={data.map((item) => item.ID)} strategy={verticalListSortingStrategy}>
+              <SortableContext
+                items={data.filter((item) => item.ID || item.id).map((item) => item.ID || item.id)} // Use only valid IDs
+                strategy={verticalListSortingStrategy}
+              >
                 <Table>
                   <TableHeader className="sticky top-0 z-10 bg-muted">
                     {table.getHeaderGroups().map((hg) => (
@@ -383,10 +398,6 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord }) {
                         <DraggableRow
                           key={row.id}
                           row={row}
-                          onEdit={handleEdit}
-                          onDelete={handleDelete}
-                          onCopy={handleCopy}
-                          onFavorite={handleFavorite}
                         />
                       ))
                     ) : (
@@ -400,6 +411,18 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord }) {
                 </Table>
               </SortableContext>
             </DndContext>
+          </div>
+          <div className="flex justify-end px-4">
+            {Object.keys(rowSelection).some((id) => rowSelection[id]) && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleDeleteSelected}
+                className="bg-red-500 text-white rounded-md hover:bg-red-600"
+              >
+                Delete Selected
+              </Button>
+            )}
           </div>
           <div className="flex items-center justify-between px-4">
             <div className="hidden flex-1 text-sm text-muted-foreground lg:flex">

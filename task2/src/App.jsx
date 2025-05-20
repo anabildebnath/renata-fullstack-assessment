@@ -19,30 +19,39 @@ function AppContent() {
   const [data, setData] = useState(() => {
     try {
       const savedData = localStorage.getItem("data");
-      return savedData ? JSON.parse(savedData) : [];
+      const parsedData = savedData ? JSON.parse(savedData) : [];
+      return parsedData.filter((item) => item && item.ID);
     } catch (error) {
-      console.error("Failed to load data from localStorage:", error);
       return [];
     }
   });
 
   const [filteredData, setFilteredData] = useState(data);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const handleUpdateData = (updatedData) => {
+  useEffect(() => {
+    setFilteredData(data); // Recalculate filtered data whenever `data` changes
+  }, [data]);
+
+  const handleDeleteRecord = (id) => {
+    const updatedData = data.filter((record) => record.ID !== id);
     setData(updatedData);
-    setFilteredData(updatedData); // Update filtered data as well
+    setFilteredData(updatedData);
+    localStorage.setItem("data", JSON.stringify(updatedData));
+  };
+
+  const handleDeleteSelectedRecords = (selectedIds) => {
+    const updatedData = data.filter((record) => !selectedIds.includes(record.ID));
+    setData(updatedData);
+    setFilteredData(updatedData);
     localStorage.setItem("data", JSON.stringify(updatedData));
   };
 
   const handleAddRecord = (newRecord) => {
     const updatedData = [
       ...data,
-      { ...newRecord, addedAt: new Date().toISOString() }, // Add timestamp for every new record
+      { ...newRecord, addedAt: new Date().toISOString() },
     ];
     setData(updatedData);
-    setFilteredData(updatedData); // Update filtered data as well
     localStorage.setItem("data", JSON.stringify(updatedData));
   };
 
@@ -63,12 +72,6 @@ function AppContent() {
     });
 
     setFilteredData(filtered);
-    setIsFilterOpen(false);
-  };
-
-  const handleResetFilter = () => {
-    setFilteredData(data);
-    setIsFilterOpen(false);
   };
 
   if (!user) {
@@ -78,10 +81,7 @@ function AppContent() {
   return (
     <SidebarProvider>
       <div className="flex w-full min-h-screen bg-background text-foreground">
-        <AppSidebar
-          setIsFormOpen={setIsFormOpen}
-          setIsFilterOpen={setIsFilterOpen}
-        />
+        <AppSidebar />
         <SidebarInset>
           <SiteHeader />
           <main className="flex flex-1 flex-col p-6">
@@ -90,7 +90,13 @@ function AppContent() {
                 path="/"
                 element={
                   <ProtectedRoute>
-                    <Dashboard data={filteredData} onUpdateData={handleUpdateData} />
+                    <Dashboard
+                      data={filteredData}
+                      onDeleteRecord={handleDeleteRecord} // Pass the single delete handler
+                      onDeleteSelectedRecords={handleDeleteSelectedRecords} // Pass the batch delete handler
+                      onAddRecord={handleAddRecord}
+                      onApplyFilter={handleApplyFilter}
+                    />
                   </ProtectedRoute>
                 }
               />
@@ -107,17 +113,6 @@ function AppContent() {
           </main>
         </SidebarInset>
       </div>
-      <FormModal
-        isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
-        onSubmit={handleAddRecord} // Use handleAddRecord for adding new records
-      />
-      <FilterPopup
-        isOpen={isFilterOpen}
-        onClose={() => setIsFilterOpen(false)}
-        onApplyFilter={handleApplyFilter}
-        onResetFilter={handleResetFilter}
-      />
     </SidebarProvider>
   );
 }
