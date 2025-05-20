@@ -66,6 +66,15 @@ export function PieChartLabel({ data = [] }) {
     "#ffc0cb",
   ];
 
+  // Define a valid config for ChartContainer
+  const chartConfig = chartData.reduce((acc, entry, index) => {
+    acc[entry.division] = {
+      label: entry.division,
+      color: colors[index % colors.length],
+    };
+    return acc;
+  }, {});
+
   return (
     <Card>
       <CardHeader>
@@ -75,7 +84,7 @@ export function PieChartLabel({ data = [] }) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer className="aspect-auto h-[300px] w-full">
+        <ChartContainer config={chartConfig} className="aspect-auto h-[300px] w-full">
           <PieChart>
             <Pie
               data={chartData}

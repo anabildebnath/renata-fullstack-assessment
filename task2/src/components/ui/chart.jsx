@@ -48,10 +48,9 @@ function ChartContainer({ id, className, children, config = {}, ...props }) {
 }
 
 const ChartStyle = ({ id, config }) => {
-  // Validate the config prop
+  // Safeguard against invalid or empty config
   if (!config || typeof config !== "object" || Object.keys(config).length === 0) {
-    console.warn("Invalid or empty config provided to ChartStyle:", config);
-    return null;
+    return null; // Do not render anything if config is invalid
   }
 
   const colorConfig = Object.entries(config).filter(([, config]) => config.theme || config.color);
@@ -123,13 +122,9 @@ function ChartTooltipContent({
 }) {
   const { config } = useChart();
 
-  // Ensure payload is valid
-  if (!active || !payload?.length) {
-    return null;
-  }
-
+  // Ensure hooks are called unconditionally
   const tooltipLabel = React.useMemo(() => {
-    if (hideLabel || !payload?.length) {
+    if (!payload?.length || hideLabel) {
       return null;
     }
 
@@ -156,54 +151,43 @@ function ChartTooltipContent({
     return <div className={cn("font-medium", labelClassName)}>{value}</div>;
   }, [label, labelFormatter, payload, hideLabel, labelClassName, config, labelKey]);
 
-  const itemPayload = payload[0]?.payload;
-
-  if (!itemPayload) {
-    console.warn("Invalid payload structure in ChartTooltipContent:", payload);
+  // Ensure payload is valid
+  if (!active || !payload?.length) {
     return null;
   }
+
+  const itemPayload = payload[0]?.payload || {};
+  const productName = itemPayload.product || "N/A";
+  const totalValue = itemPayload.totalValue || "N/A";
+  const totalSales = itemPayload.totalSales || "N/A";
 
   return (
     <div
       className={cn(
-        "border-border/50 bg-background grid min-w-[8rem] items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl",
+        "border border-gray-300 bg-gray-100 grid min-w-[8rem] items-start gap-1.5 rounded-lg px-2.5 py-1.5 text-xs shadow-xl",
         className
       )}
     >
-      {!hideLabel && tooltipLabel}
+      {tooltipLabel}
       <div className="grid gap-1.5">
-        {payload.map((item, index) => {
-          const key = `${nameKey || item.name || item.dataKey || "value"}`;
-          const itemConfig = getPayloadConfigFromPayload(config, item, key);
-          const indicatorColor = color || item.payload.fill || item.color;
-
-          return (
-            <div
-              key={item.dataKey || index}
-              className={cn(
-                "[&>svg]:text-muted-foreground flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5",
-                indicator === "dot" && "items-center"
-              )}
-            >
-              {!hideIndicator && (
-                <div
-                  className="shrink-0 rounded-[2px]"
-                  style={{
-                    backgroundColor: indicatorColor,
-                  }}
-                />
-              )}
-              <div className="flex flex-1 justify-between leading-none">
-                <span className="text-muted-foreground">
-                  {itemConfig?.label || item.name}
-                </span>
-                <span className="text-foreground font-mono font-medium tabular-nums">
-                  {item.value?.toLocaleString()}
-                </span>
-              </div>
-            </div>
-          );
-        })}
+        <div className="flex justify-between leading-none items-center">
+          <span className="text-muted-foreground">Product:</span>
+          <span className="text-foreground font-mono font-medium tabular-nums">
+            {productName}
+          </span>
+        </div>
+        <div className="flex justify-between leading-none items-center">
+          <span className="text-muted-foreground">TotalValue:</span>
+          <span className="text-foreground font-mono font-medium tabular-nums">
+            {totalValue !== "N/A" ? totalValue.toLocaleString() : totalValue}
+          </span>
+        </div>
+        <div className="flex justify-between leading-none items-center">
+          <span className="text-muted-foreground">TotalSales:</span>
+          <span className="text-foreground font-mono font-medium tabular-nums">
+            {totalSales !== "N/A" ? totalSales.toLocaleString() : totalSales}
+          </span>
+        </div>
       </div>
     </div>
   );
