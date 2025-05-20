@@ -8,6 +8,7 @@ export default function Dashboard({
   onDeleteRecord,
   onDeleteSelectedRecords,
   onAddRecord,
+  onApplyFilter, // Add this prop
 }) {
   const handleAddRecord = (newRecord) => {
     if (typeof onAddRecord === "function") {
@@ -75,6 +76,7 @@ export default function Dashboard({
         onEditRecord={handleEditRecord}
         onDeleteRecord={handleDeleteRecord}
         onDeleteSelectedRecords={handleDeleteSelectedRecords}
+        onApplyFilter={onApplyFilter} // Pass the filter handler
       />
     </div>
   );

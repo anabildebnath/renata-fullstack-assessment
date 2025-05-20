@@ -97,8 +97,11 @@ function AppContent() {
 
   const handleApplyFilter = (filters) => {
     const filtered = data.filter((record) => {
+      // Convert gender format for comparison
       const normalizedGender =
-        record.Gender === "M" ? "Male" : record.Gender === "F" ? "Female" : record.Gender;
+        record.Gender === "F" ? "Female" : 
+        record.Gender === "M" ? "Male" : 
+        record.Gender;
 
       return (
         (!filters.CustomerName ||
@@ -133,10 +136,10 @@ function AppContent() {
                     <Dashboard
                       data={filteredData}
                       onAddRecord={handleAddRecord}
-                      onEditRecord={handleEditRecord} // Pass the edit handler
+                      onEditRecord={handleEditRecord}
                       onDeleteRecord={handleDeleteRecord}
                       onDeleteSelectedRecords={handleDeleteSelectedRecords}
-                      onApplyFilter={handleApplyFilter}
+                      onApplyFilter={handleApplyFilter} // Pass the filter handler
                     />
                   </ProtectedRoute>
                 }

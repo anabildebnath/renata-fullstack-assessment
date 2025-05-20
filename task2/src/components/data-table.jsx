@@ -103,7 +103,7 @@ export const schema = z.object({
 // Create a context for managing the form popup state
 export const FormContext = React.createContext();
 
-export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onDeleteSelectedRecords }) {
+export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onDeleteSelectedRecords, onApplyFilter }) {
   const searchInputRef = React.useRef(null);
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [isEditOpen, setIsEditOpen] = React.useState(false);
@@ -375,7 +375,8 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onD
       <Tabs defaultValue="outline" className="flex w-full flex-col gap-6">
         <div className="flex items-center justify-between px-4 lg:px-6">
           <AppSidebar 
-            setIsFormOpen={setIsFormOpen} // Pass setIsFormOpen to AppSidebar
+            setIsFormOpen={setIsFormOpen}
+            onApplyFilter={onApplyFilter} // Pass onApplyFilter to AppSidebar
           />
           <div className="flex items-center gap-2 ml-auto">
             {/* Always show the search input and buttons */}
