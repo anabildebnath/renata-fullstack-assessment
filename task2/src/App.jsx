@@ -46,12 +46,21 @@ function AppContent() {
     localStorage.setItem("data", JSON.stringify(updatedData));
   };
 
-  const handleAddRecord = (newRecord) => {
-    const updatedData = [
-      ...data,
-      { ...newRecord, addedAt: new Date().toISOString() },
-    ];
+  const handleAddRecord = (newRecordOrData) => {
+    let updatedData;
+    
+    // Check if we're receiving an array (updating) or a single record (adding)
+    if (Array.isArray(newRecordOrData)) {
+      updatedData = newRecordOrData;
+    } else {
+      updatedData = [
+        ...data,
+        { ...newRecordOrData, addedAt: new Date().toISOString() },
+      ];
+    }
+    
     setData(updatedData);
+    setFilteredData(updatedData);
     localStorage.setItem("data", JSON.stringify(updatedData));
   };
 

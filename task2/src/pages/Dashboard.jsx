@@ -12,15 +12,20 @@ export default function Dashboard({
 }) {
   const handleAddRecord = (newRecord) => {
     if (typeof onAddRecord === "function") {
-      onAddRecord(newRecord); // Use onAddRecord prop instead of onUpdateData
+      onAddRecord(newRecord);
     }
   };
 
   const handleEditRecord = (id, updatedRecord) => {
+    // Create a new array with the updated record
     const updatedData = data.map((record) =>
-      record.ID === id ? updatedRecord : record
+      record.ID === id ? { ...record, ...updatedRecord } : record
     );
-    onAddRecord(updatedData); // Use onAddRecord for updates as well
+
+    // Use onAddRecord to update the state in the parent component
+    if (typeof onAddRecord === "function") {
+      onAddRecord(updatedData);
+    }
   };
 
   const handleDeleteRecord = (id) => {
@@ -45,8 +50,8 @@ export default function Dashboard({
         data={data}
         onAddRecord={handleAddRecord}
         onEditRecord={handleEditRecord}
-        onDeleteRecord={handleDeleteRecord}
-        onDeleteSelectedRecords={handleDeleteSelectedRecords}
+        onDeleteRecord={onDeleteRecord}
+        onDeleteSelectedRecords={onDeleteSelectedRecords}
       />
     </div>
   );
