@@ -3,16 +3,16 @@
 import * as React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { MultiSelect } from "@/components/ui/multi-select"; // Import MultiSelect component
 
 export function FilterPopup({ isOpen, onClose, onApplyFilter, onResetFilter }) {
   const [filters, setFilters] = React.useState({
     CustomerName: "",
-    Division: "all",
-    Gender: "all",
-    MaritalStatus: "all",
-    Age: "",
-    Income: "",
+    Division: [],
+    Gender: [],
+    MaritalStatus: [],
+    AgeRange: [0, 100], // Default range for Age
+    IncomeRange: [0, 100000], // Default range for Income
   });
 
   const handleInputChange = (field, value) => {
@@ -27,11 +27,11 @@ export function FilterPopup({ isOpen, onClose, onApplyFilter, onResetFilter }) {
   const handleReset = () => {
     setFilters({
       CustomerName: "",
-      Division: "all",
-      Gender: "all",
-      MaritalStatus: "all",
-      Age: "",
-      Income: "",
+      Division: [],
+      Gender: [],
+      MaritalStatus: [],
+      AgeRange: [0, 100],
+      IncomeRange: [0, 100000],
     });
     onResetFilter();
     onClose();
@@ -39,135 +39,108 @@ export function FilterPopup({ isOpen, onClose, onApplyFilter, onResetFilter }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <div
-        className="dialog-backdrop"
-        onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            onClose(); // Close the popup only when clicking outside the modal content
-          }
-        }}
-      >
-        <DialogContent
-          className="popup-form relative"
-          style={{
-            backgroundColor: "#0a0a0a", // Solid pitch-dark background color
-            color: "#ffffff", // Ensure text is visible on the dark background
-            borderRadius: "8px", // Rounded corners
-            boxShadow: "0 4px 10px rgba(0, 0, 0, 0.8)", // Shadow for better visibility
-            maxWidth: "600px", // Maximum width
-            width: "100%", // Full width up to the maxWidth
-          }}
-          onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the form
-        >
-          <DialogHeader>
-            <DialogTitle>Filter Records</DialogTitle>
-          </DialogHeader>
-          <button
-            className="absolute top-2 right-2 text-white bg-red-500 rounded-full p-1 hover:bg-red-600"
-            onClick={onClose} // Close the popup when clicking the close button
-          >
-            ✕
+      <DialogContent className="popup-form">
+        <DialogHeader>
+          <DialogTitle>Filter Records</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium">Customer Name</label>
+            <Input
+              value={filters.CustomerName}
+              onChange={(e) => handleInputChange("CustomerName", e.target.value)}
+              placeholder="Enter customer name"
+              className="w-full"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Division</label>
+            <MultiSelect
+              options={[
+                "Dhaka",
+                "Chattogram",
+                "Rajshahi",
+                "Khulna",
+                "Barishal",
+                "Sylhet",
+                "Rangpur",
+                "Mymensingh",
+              ]}
+              selected={filters.Division}
+              onChange={(value) => handleInputChange("Division", value)}
+              placeholder="Select divisions"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Gender</label>
+            <MultiSelect
+              options={["Male", "Female", "Other"]}
+              selected={filters.Gender}
+              onChange={(value) => handleInputChange("Gender", value)}
+              placeholder="Select genders"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Marital Status</label>
+            <MultiSelect
+              options={["Single", "Married", "Divorced"]}
+              selected={filters.MaritalStatus}
+              onChange={(value) => handleInputChange("MaritalStatus", value)}
+              placeholder="Select marital statuses"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Age Range</label>
+            <div className="flex gap-2">
+              <Input
+                type="number"
+                value={filters.AgeRange[0]}
+                onChange={(e) =>
+                  handleInputChange("AgeRange", [Number(e.target.value), filters.AgeRange[1]])
+                }
+                placeholder="Min age"
+              />
+              <Input
+                type="number"
+                value={filters.AgeRange[1]}
+                onChange={(e) =>
+                  handleInputChange("AgeRange", [filters.AgeRange[0], Number(e.target.value)])
+                }
+                placeholder="Max age"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Income Range</label>
+            <div className="flex gap-2">
+              <Input
+                type="number"
+                value={filters.IncomeRange[0]}
+                onChange={(e) =>
+                  handleInputChange("IncomeRange", [Number(e.target.value), filters.IncomeRange[1]])
+                }
+                placeholder="Min income"
+              />
+              <Input
+                type="number"
+                value={filters.IncomeRange[1]}
+                onChange={(e) =>
+                  handleInputChange("IncomeRange", [filters.IncomeRange[0], Number(e.target.value)])
+                }
+                placeholder="Max income"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-end mt-4 gap-2">
+          <button className="btn btn-secondary" onClick={handleReset}>
+            Reset
           </button>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium">Customer Name</label>
-              <Input
-                value={filters.CustomerName}
-                onChange={(e) => handleInputChange("CustomerName", e.target.value)}
-                placeholder="Enter customer name"
-                className="w-full" // Ensure consistent width
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Division</label>
-              <Select
-                value={filters.Division}
-                onValueChange={(value) => handleInputChange("Division", value)}
-                className="w-full" // Ensure consistent width
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select division" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="Dhaka">Dhaka</SelectItem>
-                  <SelectItem value="Chattogram">Chattogram</SelectItem>
-                  <SelectItem value="Rajshahi">Rajshahi</SelectItem>
-                  <SelectItem value="Khulna">Khulna</SelectItem>
-                  <SelectItem value="Barishal">Barishal</SelectItem>
-                  <SelectItem value="Sylhet">Sylhet</SelectItem>
-                  <SelectItem value="Rangpur">Rangpur</SelectItem>
-                  <SelectItem value="Mymensingh">Mymensingh</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Gender</label>
-              <Select
-                value={filters.Gender}
-                onValueChange={(value) => handleInputChange("Gender", value)}
-                className="w-full" // Ensure consistent width
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select gender" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="Male">Male</SelectItem>
-                  <SelectItem value="Female">Female</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Marital Status</label>
-              <Select
-                value={filters.MaritalStatus}
-                onValueChange={(value) => handleInputChange("MaritalStatus", value)}
-                className="w-full" // Ensure consistent width
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select marital status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="Single">Single</SelectItem>
-                  <SelectItem value="Married">Married</SelectItem>
-                  <SelectItem value="Divorced">Divorced</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Age</label>
-              <Input
-                type="number"
-                value={filters.Age}
-                onChange={(e) => handleInputChange("Age", e.target.value)}
-                placeholder="Enter age"
-                className="w-full" // Ensure consistent width
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Income</label>
-              <Input
-                type="number"
-                value={filters.Income}
-                onChange={(e) => handleInputChange("Income", e.target.value)}
-                placeholder="Enter income"
-                className="w-full" // Ensure consistent width
-              />
-            </div>
-          </div>
-          <div className="flex justify-end mt-4 gap-2">
-            <button className="btn btn-secondary" onClick={handleReset}>
-              Reset
-            </button>
-            <button className="btn btn-primary" onClick={handleApply}>
-              Apply
-            </button>
-          </div>
-        </DialogContent>
-      </div>
+          <button className="btn btn-primary" onClick={handleApply}>
+            Apply
+          </button>
+        </div>
+      </DialogContent>
     </Dialog>
   );
 }

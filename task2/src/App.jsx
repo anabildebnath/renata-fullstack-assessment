@@ -52,12 +52,13 @@ function AppContent() {
         record.Gender === "M" ? "Male" : record.Gender === "F" ? "Female" : record.Gender;
 
       return (
-        (!filters.CustomerName || record.CustomerName.toLowerCase().includes(filters.CustomerName.toLowerCase().trim())) &&
-        (filters.Division === "all" || record.Division === filters.Division) &&
-        (filters.Gender === "all" || normalizedGender === filters.Gender) &&
-        (filters.MaritalStatus === "all" || record.MaritalStatus === filters.MaritalStatus) &&
-        (!filters.Age || record.Age === Number(filters.Age)) &&
-        (!filters.Income || record.Income === Number(filters.Income))
+        (!filters.CustomerName ||
+          record.CustomerName.toLowerCase().includes(filters.CustomerName.toLowerCase().trim())) &&
+        (filters.Division.length === 0 || filters.Division.includes(record.Division)) &&
+        (filters.Gender.length === 0 || filters.Gender.includes(normalizedGender)) &&
+        (filters.MaritalStatus.length === 0 || filters.MaritalStatus.includes(record.MaritalStatus)) &&
+        (record.Age >= filters.AgeRange[0] && record.Age <= filters.AgeRange[1]) &&
+        (record.Income >= filters.IncomeRange[0] && record.Income <= filters.IncomeRange[1])
       );
     });
 
