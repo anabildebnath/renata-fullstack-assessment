@@ -181,7 +181,7 @@ export function AppSidebar({ setIsFormOpen, setIsFilterOpen, onSearchClick, ...p
       <SidebarContent>
         <NavMain
           items={data.navMain}
-          setIsFormOpen={setIsFormOpen}
+          setIsFormOpen={setIsFormOpen} // Pass setIsFormOpen to NavMain
           setIsFilterOpen={setIsFilterOpen}
           onSearchClick={onSearchClick}
         />

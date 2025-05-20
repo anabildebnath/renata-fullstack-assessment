@@ -4,8 +4,8 @@ import React, { useMemo } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
 
-export function SectionCards({ data }) {
-  if (!data.length) {
+export function SectionCards({ data = [] }) {
+  if (!Array.isArray(data) || data.length === 0) {
     return (
       <div className="text-center text-muted-foreground">
         <p className="text-lg font-medium">No data available</p>

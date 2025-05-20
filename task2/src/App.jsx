@@ -1,42 +1,40 @@
-import React, { useState, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
-import { SectionCards } from "@/components/section-cards";
-import { ChartAreaInteractive } from "@/components/chart-area-interactive";
-import { DataTable } from "@/components/data-table";
-import { FilterPopup } from "@/components/filter-popup";
+import { AuthProvider, AuthContext } from "@/context/AuthContext";
+import Login from "@/pages/Login";
+import Signup from "@/pages/Signup";
 import AnalyticsPage from "@/pages/analytics";
+import Dashboard from "@/pages/Dashboard";
 import rawData from "./data.json";
+import "@/index.css";
+import { FormModal } from "@/components/ui/form";
+import { FilterPopup } from "@/components/filter-popup";
+import { ProtectedRoute } from "@/components/ProtectedRoute"; // Import ProtectedRoute
 
-export default function App() {
+function AppContent() {
+  const { user } = useContext(AuthContext);
   const [data, setData] = useState(() => {
     try {
       const savedData = localStorage.getItem("data");
-      return savedData ? JSON.parse(savedData) : rawData;
+      return savedData ? JSON.parse(savedData) : [];
     } catch (error) {
       console.error("Failed to load data from localStorage:", error);
-      return rawData;
+      return [];
     }
   });
 
   const [filteredData, setFilteredData] = useState(data);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  useEffect(() => {
-    try {
-      const compressedData = JSON.stringify(data);
-      localStorage.setItem("data", compressedData);
-    } catch (error) {
-      if (error.name === "QuotaExceededError") {
-        console.warn("LocalStorage quota exceeded. Data will not be saved.");
-      } else {
-        console.error("Failed to save data to localStorage:", error);
-      }
-    }
-  }, [data]);
+  const handleUpdateData = (updatedData) => {
+    setData(updatedData);
+    setFilteredData(updatedData);
+    localStorage.setItem("data", JSON.stringify(updatedData));
+  };
 
   const handleApplyFilter = (filters) => {
     const filtered = data.filter((record) => {
@@ -62,54 +60,52 @@ export default function App() {
     setIsFilterOpen(false);
   };
 
-  const handleAddRecord = (newRecord) => {
-    const timestampedRecord = { ...newRecord, addedAt: new Date().toISOString() };
-    setData((prevData) => {
-      const updatedData = [...prevData, timestampedRecord];
-      setFilteredData(updatedData);
-      return updatedData;
-    });
-  };
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <SidebarProvider>
       <div className="flex w-full min-h-screen bg-background text-foreground">
-        <AppSidebar setIsFormOpen={setIsFormOpen} setIsFilterOpen={setIsFilterOpen} />
+        <AppSidebar
+          setIsFormOpen={setIsFormOpen}
+          setIsFilterOpen={setIsFilterOpen}
+        />
         <SidebarInset>
           <SiteHeader />
           <main className="flex flex-1 flex-col p-6">
             <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route
-                path="/dashboard"
+                path="/"
                 element={
-                  <>
-                    <SectionCards data={filteredData} />
-                    <div className="mt-6">
-                      <ChartAreaInteractive data={filteredData} />
-                    </div>
-                    <div className="mt-6">
-                      <DataTable
-                        data={filteredData}
-                        onAddRecord={handleAddRecord}
-                        onDeleteRecord={(id) => setData((prev) => prev.filter((record) => record.ID !== id))}
-                        onEditRecord={(id, updatedRecord) =>
-                          setData((prev) =>
-                            prev.map((record) => (record.ID === id ? { ...record, ...updatedRecord } : record))
-                          )
-                        }
-                        isFormOpen={isFormOpen}
-                        setIsFormOpen={setIsFormOpen}
-                      />
-                    </div>
-                  </>
+                  <ProtectedRoute>
+                    <Dashboard data={filteredData} onUpdateData={handleUpdateData} />
+                  </ProtectedRoute>
                 }
               />
-              <Route path="/analytics" element={<AnalyticsPage data={filteredData} />} />
+              <Route
+                path="/analytics"
+                element={
+                  <ProtectedRoute>
+                    <AnalyticsPage data={filteredData} />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
         </SidebarInset>
       </div>
+      <FormModal
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSubmit={(newRecord) => {
+          const updatedData = [...data, newRecord];
+          setData(updatedData);
+          setFilteredData(updatedData);
+          localStorage.setItem("data", JSON.stringify(updatedData));
+        }}
+      />
       <FilterPopup
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
@@ -117,5 +113,18 @@ export default function App() {
         onResetFilter={handleResetFilter}
       />
     </SidebarProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/dashboard/*" element={<AppContent />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </AuthProvider>
   );
 }

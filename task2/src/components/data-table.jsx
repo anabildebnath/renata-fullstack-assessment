@@ -101,7 +101,23 @@ export const schema = z.object({
 // Create a context for managing the form popup state
 export const FormContext = React.createContext();
 
-export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isFormOpen, setIsFormOpen, searchInputRef }) {
+export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord }) {
+  const searchInputRef = React.useRef(null); // Define the search input ref
+  const [isFormOpen, setIsFormOpen] = React.useState(false);
+  const [isEditOpen, setIsEditOpen] = React.useState(false);
+  const [editRecord, setEditRecord] = React.useState(null);
+
+  const handleFormSubmit = (formData) => {
+    onAddRecord({ ...formData, ID: `ID${Date.now()}` });
+    setIsFormOpen(false);
+  };
+
+  const handleEditSubmit = (updatedData) => {
+    onEditRecord(editRecord.ID, updatedData);
+    setIsEditOpen(false);
+    setEditRecord(null);
+  };
+
   if (!Array.isArray(data) || data.length === 0) {
     console.error("Data passed to DataTable is invalid or empty:", data);
     return (
@@ -117,8 +133,6 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
   const [globalFilter, setGlobalFilter] = React.useState(""); // Global filter state
   const [sorting, setSorting] = React.useState([]);
   const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
-  const [isEditOpen, setIsEditOpen] = React.useState(false);
-  const [editRecord, setEditRecord] = React.useState(null);
   const [isSearchFocused, setIsSearchFocused] = React.useState(false); // Track focus state of the search box
 
   const sensors = useSensors(
@@ -250,46 +264,6 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
     getSortedRowModel: getSortedRowModel(),
   });
 
-  const handleFormSubmit = (formData) => {
-    const newId = `ITEM${Date.now()}`;
-    const newItem = {
-      ID: newId,
-      ...formData,
-      Age: Number(formData.Age),
-      Income: Number(formData.Income),
-    };
-
-    try {
-      schema.parse(newItem);
-      onAddRecord(newItem);
-      toast.success("New item added!");
-      setIsFormOpen(false);
-    } catch (error) {
-      console.error("Validation Error:", error);
-      toast.error("Failed to add item.");
-    }
-  };
-
-  const handleEditSubmit = (updatedData) => {
-    const updatedItem = {
-      ...editRecord,
-      ...updatedData,
-      Age: Number(updatedData.Age),
-      Income: Number(updatedData.Income),
-    };
-
-    try {
-      schema.parse(updatedItem); // Validate the updated data
-      onEditRecord(editRecord.ID, updatedItem); // Update the record
-      toast.success("Item updated!");
-      setIsEditOpen(false); // Close the edit modal
-      setEditRecord(null); // Clear the edit record
-    } catch (error) {
-      console.error("Validation Error:", error);
-      toast.error("Failed to update item.");
-    }
-  };
-
   function RowActions({ row, onEdit, onDelete, onCopy, onFavorite }) {
     const record = row?.original;
 
@@ -357,13 +331,13 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
     <>
       <Tabs defaultValue="outline" className="flex w-full flex-col gap-6">
         <div className="flex items-center justify-between px-4 lg:px-6">
-          <div className="flex items-center gap-2 ml-auto"> {/* Align buttons to the top right */}
+          <div className="flex items-center gap-2 ml-auto">
             <div className="relative flex items-center">
               <Input
-                ref={searchInputRef}
+                ref={searchInputRef} // Attach the ref to the search input
                 placeholder="Search..."
                 value={globalFilter}
-                onChange={(e) => setGlobalFilter(e.target.value)} // Update globalFilter on input change
+                onChange={(e) => setGlobalFilter(e.target.value)}
                 onFocus={() => setIsSearchFocused(true)}
                 onBlur={() => setIsSearchFocused(false)}
                 className={`transition-all duration-[2000ms] ease-out ${
@@ -379,7 +353,7 @@ export function DataTable({ data, onAddRecord, onDeleteRecord, onEditRecord, isF
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setIsFormOpen(true)} // Open the form popup
+              onClick={() => setIsFormOpen(true)}
               className="bg-transparent text-[oklch(var(--foreground))] hover:bg-gray-300 hover:text-[oklch(var(--foreground))]"
             >
               <PlusIcon className="size-4 mr-1" />

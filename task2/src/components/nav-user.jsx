@@ -1,3 +1,6 @@
+import { useContext } from "react";
+import { AuthContext } from "@/context/AuthContext";
+
 import {
   IconCreditCard,
   IconDotsVertical,
@@ -30,11 +33,11 @@ import {
 export function NavUser({
   user
 }) {
+  const { logout } = useContext(AuthContext); // Access the logout function
   const { isMobile } = useSidebar()
 
   const handleLogout = () => {
-    // Logic for logout
-    alert("Logged out successfully.")
+    logout(); // Call the logout function
   }
 
   const handleAccountRedirect = () => {

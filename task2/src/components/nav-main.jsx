@@ -15,7 +15,7 @@ export function NavMain({ items = [], setIsFormOpen, setIsFilterOpen, onSearchCl
 
   const handleQuickCreate = () => {
     if (typeof setIsFormOpen === "function") {
-      setIsFormOpen(true); // Open the popup
+      setIsFormOpen(true); // Open the Add Customer form
     } else {
       console.error("setIsFormOpen is not a function");
     }
@@ -44,7 +44,7 @@ export function NavMain({ items = [], setIsFormOpen, setIsFilterOpen, onSearchCl
           <SidebarMenuItem className="flex items-center gap-2">
             <SidebarMenuButton
               tooltip="Quick Create"
-              onClick={handleQuickCreate} // Trigger popup
+              onClick={handleQuickCreate} // Trigger Add Customer form
               className="min-w-8 bg-white text-black duration-200 ease-linear hover:bg-gray-100 hover:text-black active:bg-gray-200 active:text-black"
             >
               <IconCirclePlusFilled />
@@ -66,9 +66,8 @@ export function NavMain({ items = [], setIsFormOpen, setIsFilterOpen, onSearchCl
                 tooltip={item.title}
                 onClick={() => {
                   if (item.title === "Filter") handleFilterClick(); // Trigger filter popup
-                  else if (item.title === "Dashboard") navigate("/dashboard");
-                  else if (item.title === "Analytics") navigate("/analytics"); // Redirect to Analytics page
-                  else if (item.title === "Projects" || item.title === "Team") alert(`${item.title}: Placeholder.`);
+                  else if (item.title === "Dashboard") navigate("/dashboard"); // Correct path for Dashboard
+                  else if (item.title === "Analytics") navigate("/dashboard/analytics"); // Correct path for Analytics
                 }}
                 className="nav-main-button min-w-8 bg-transparent text-sidebar-foreground duration-200 ease-linear hover:bg-gray-900"
               >
@@ -77,17 +76,6 @@ export function NavMain({ items = [], setIsFormOpen, setIsFilterOpen, onSearchCl
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
-          {/* Add Search button */}
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip="Search"
-              onClick={handleSearchClick} // Trigger onSearchClick prop
-              className="min-w-8 bg-transparent text-sidebar-foreground duration-200 ease-linear hover:bg-gray-200 hover:text-black active:bg-gray-300 active:text-black"
-            >
-              <IconSearch />
-              <span>Search</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
