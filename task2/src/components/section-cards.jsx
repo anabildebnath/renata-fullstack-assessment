@@ -16,12 +16,12 @@ export function SectionCards({ data = [] }) {
 
   const total = data.length;
 
-  const todayNew = useMemo(() => {
+  const todayNew = React.useMemo(() => {
     const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
     return data.filter((record) => record.addedAt?.startsWith(today)).length; // Count records added today
   }, [data]);
 
-  const freqDiv = useMemo(() => {
+  const freqDiv = React.useMemo(() => {
     if (!data.length) return "N/A"; // Fallback for empty data
     const counts = data.reduce((acc, cur) => {
       if (cur.Division) {
@@ -34,20 +34,21 @@ export function SectionCards({ data = [] }) {
   }, [data]);
 
   const median = (arr) => {
-    if (!arr.length) return 0; // Fallback for empty arrays
-    const sorted = [...arr].sort((a, b) => a - b);
+    const validNumbers = arr.filter((num) => typeof num === "number" && !isNaN(num)); // Filter out invalid numbers
+    if (!validNumbers.length) return 0; // Fallback for empty arrays
+    const sorted = [...validNumbers].sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
     return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
   };
 
-  const medIncome = median(data.map((d) => d.Income || 0));
-  const medAge = median(data.map((d) => d.Age || 0));
+  const medIncome = median(data.map((d) => d.Income)); // Ensure valid numbers
+  const medAge = median(data.map((d) => d.Age)); // Ensure valid numbers
 
   const cards = [
     { title: "Total Customers", desc: `${total}` },
     { title: "New Customers Today", desc: `${todayNew}` }, // Use accurate count
     { title: "Most Frequent Division", desc: freqDiv },
-    { title: "Median (Age/Inc)", desc: `${medAge.toFixed(1)}/${medIncome.toFixed(0)}` },
+    { title: "Median (Age/Inc)", desc: `${medAge.toFixed(1)}/${medIncome.toFixed(0)}` }, // Ensure valid numbers
   ];
 
   return (

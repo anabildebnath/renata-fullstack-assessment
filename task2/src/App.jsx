@@ -32,7 +32,14 @@ function AppContent() {
 
   const handleUpdateData = (updatedData) => {
     setData(updatedData);
-    setFilteredData(updatedData);
+    setFilteredData(updatedData); // Update filtered data as well
+    localStorage.setItem("data", JSON.stringify(updatedData));
+  };
+
+  const handleAddRecord = (newRecord) => {
+    const updatedData = [...data, { ...newRecord, addedAt: new Date().toISOString() }];
+    setData(updatedData);
+    setFilteredData(updatedData); // Update filtered data as well
     localStorage.setItem("data", JSON.stringify(updatedData));
   };
 
@@ -99,12 +106,7 @@ function AppContent() {
       <FormModal
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        onSubmit={(newRecord) => {
-          const updatedData = [...data, newRecord];
-          setData(updatedData);
-          setFilteredData(updatedData);
-          localStorage.setItem("data", JSON.stringify(updatedData));
-        }}
+        onSubmit={handleAddRecord} // Use handleAddRecord for adding new records
       />
       <FilterPopup
         isOpen={isFilterOpen}
