@@ -16,14 +16,17 @@ import { ProtectedRoute } from "@/components/ProtectedRoute"; // Import Protecte
 
 function AppContent() {
   const { user } = useContext(AuthContext);
-  const [data, setData] = useState([]);  // Initialize with empty array
+  const [data, setData] = useState(() => {
+    // Initialize data from localStorage or use empty array if nothing stored
+    const storedData = localStorage.getItem("data");
+    return storedData ? JSON.parse(storedData) : [];
+  });
   const [filteredData, setFilteredData] = useState([]);
 
-  // Remove the initialization from localStorage since we want to start fresh
-
+  // Initialize filteredData with data on component mount
   useEffect(() => {
-    setFilteredData(data); // Update filtered data whenever data changes
-  }, [data]);
+    setFilteredData(data);
+  }, []); // Run only once on mount
 
   const handleDeleteRecord = (id) => {
     const updatedData = data.filter((record) => record.ID !== id);
