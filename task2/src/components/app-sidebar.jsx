@@ -136,9 +136,9 @@ const data = {
   ],
   documents: [
     {
-      name: "Data Files", // Moved from navMain to documents
+      name: "Data Files",
       url: "#",
-      icon: FolderIcon,
+      icon: (props) => <FolderIcon {...props} className="h-4 w-4" />, // Make icon smaller
     },
     {
       name: "Data Library",

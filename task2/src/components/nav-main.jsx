@@ -63,10 +63,10 @@ export function NavMain({ items = [], setIsFormOpen, onApplyFilter }) {
             <SidebarMenuItem className="flex items-center gap-2">
               <SidebarMenuButton
                 tooltip="Quick Create"
-                onClick={handleQuickCreate} // Trigger Add Customer form
-                className="min-w-8 bg-white text-black duration-200 ease-linear hover:bg-gray-100 hover:text-black active:bg-gray-200 active:text-black"
+                onClick={handleQuickCreate}
+                className="min-w-8 bg-white text-black duration-200 ease-linear hover:bg-gray-100 hover:text-black active:bg-gray-200 active:text-black [&>span]:text-black" // Added [&>span]:text-black
               >
-                <IconCirclePlusFilled />
+                <IconCirclePlusFilled className="text-black" /> {/* Added text-black */}
                 <span>Quick Create</span>
               </SidebarMenuButton>
               <button

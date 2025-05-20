@@ -48,7 +48,7 @@ export function NavDocuments({
 
   return (
     <>
-      <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+      <SidebarGroup className="group-data-[collapsible=icon]:hidden documents-section">
         <SidebarGroupLabel>Documents</SidebarGroupLabel>
         <SidebarMenu>
           {items.map((item) => (
@@ -56,14 +56,15 @@ export function NavDocuments({
               <SidebarMenuButton
                 onClick={() => handleItemClick(item.name)}
                 asChild={item.name !== "Data Files"}
+                className={`${item.name === "Data Files" ? "border-none !bg-transparent" : ""}`}
               >
                 {item.name === "Data Files" ? (
-                  <button className="flex items-center w-full">
+                  <button className="flex items-center gap-2 w-full border-none bg-transparent">
                     <item.icon />
                     <span>{item.name}</span>
                   </button>
                 ) : (
-                  <a href={item.url}>
+                  <a href={item.url} className="flex items-center gap-2">
                     <item.icon />
                     <span>{item.name}</span>
                   </a>

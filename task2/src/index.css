@@ -249,14 +249,8 @@ input, select, textarea {
 
 /* Button styles */
 button, .btn, .btn-primary {
-  background: transparent; /* Removed background color */
-  color: var(--primary-foreground);
   border-radius: 0.5rem;
-  border: #2d2d2d solid 0.2px; /* Updated border color */
-  /* Removed unnecessary border-color override */
-}
-button:hover, .btn:hover, .btn-primary:hover {
-  background: rgb(43, 43, 43); /* Removed hover background color */
+  color: var(--primary-foreground);
 }
 
 /* Accent for charts */
@@ -328,4 +322,24 @@ button:hover, .btn:hover, .btn-primary:hover {
 .sidebar-menu-button.quick-create:hover {
   background-color: gray !important; /* Apply light gray hover color */
   color: black !important; /* Ensure black text on hover */
+}
+
+/* Add these specific selectors after the existing sidebar-menu-button styles */
+.group-data-[collapsible=icon]:hidden button.flex.items-center.w-full,
+.documents-section .sidebar-menu-button {
+  border: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.documents-section .sidebar-menu-button:hover {
+  background-color: hsl(215, 27.9%, 16.9%) !important;
+  color: var(--sidebar-foreground);
+}
+
+/* Override any conflicting styles */
+[data-slot=sidebar-menu-button].border-none {
+  border: none !important;
+  box-shadow: none !important;
 }
