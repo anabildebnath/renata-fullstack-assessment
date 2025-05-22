@@ -48,6 +48,8 @@ export function NavDocuments({
       setIsDataLibraryOpen(true);
     } else if (itemName === "Reports") {
       navigate("/reports");
+    } else if (itemName === "Word Assistant") {
+      window.open("https://gemini.google.com/", "_blank"); // Open Gemini in new tab
     }
   };
 
