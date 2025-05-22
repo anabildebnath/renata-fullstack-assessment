@@ -88,7 +88,7 @@ function ChartTooltipContent({
   payload,
   className,
   indicator = "dot",
-  hideLabel = false, // Keep hideLabel prop but we'll ignore it for custom content
+  hideLabel = false,
   hideIndicator = false,
   label,
   labelFormatter,
@@ -100,14 +100,10 @@ function ChartTooltipContent({
 }) {
   const { config } = useChart()
 
-  // We will generate the content directly in the return statement
-  // based on the payload data for the specific keys we want.
   const tooltipLabel = React.useMemo(() => {
-    // This part can be simplified or removed if we always show custom content
     if (hideLabel || !payload?.length) {
       return null
     }
-    // Original logic for default label - we'll replace this with custom rendering
     const [item] = payload
     const key = `${labelKey || item?.dataKey || item?.name || "value"}`
     const itemConfig = getPayloadConfigFromPayload(config, item, key)
@@ -144,52 +140,36 @@ function ChartTooltipContent({
     return null
   }
 
-  // Extract the relevant data from the first item in the payload (for Pie Chart, there's usually one)
   const itemPayload = payload[0]?.payload;
 
   if (!itemPayload) {
-      return null; // Don't show tooltip if payload data is missing
+      return null;
   }
 
-  // Access the specific data points you want to display
   const productName = itemPayload.product;
   const totalValue = itemPayload.totalValue;
   const totalSales = itemPayload.totalSales;
 
 
   return (
-    // Modified className here for solid gray background
     <div
       className={cn(
         "border border-gray-300 bg-gray-100 grid min-w-[8rem] items-start gap-1.5 rounded-lg px-2.5 py-1.5 text-xs shadow-xl",
         className
       )}>
-      {/* Render your custom tooltip content */}
       <div className="grid gap-1.5">
-        {/* Display Product Name */}
         <div className="flex justify-between leading-none items-center">
            <span className="text-muted-foreground">Product:</span>
            <span className="text-foreground font-mono font-medium tabular-nums">{productName}</span>
         </div>
-
-        {/* Display Total Value */}
          <div className="flex justify-between leading-none items-center">
            <span className="text-muted-foreground">TotalValue:</span>
            <span className="text-foreground font-mono font-medium tabular-nums">{totalValue !== undefined ? totalValue.toLocaleString() : 'N/A'}</span>
         </div>
-
-        {/* Display Total Sales */}
          <div className="flex justify-between leading-none items-center">
            <span className="text-muted-foreground">TotalSales:</span>
            <span className="text-foreground font-mono font-medium tabular-nums">{totalSales !== undefined ? totalSales.toLocaleString() : 'N/A'}</span>
         </div>
-
-        {/* You can keep or remove the original payload mapping if you want to show other data */}
-        {/*
-        {payload.map((item, index) => {
-           // ... original mapping logic if needed
-        })}
-        */}
       </div>
     </div>
   );
@@ -244,7 +224,6 @@ function ChartLegendContent({
   );
 }
 
-// Helper to extract item config from a payload.
 function getPayloadConfigFromPayload(
   config,
   payload,

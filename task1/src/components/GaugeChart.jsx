@@ -15,45 +15,73 @@ import {
   CardTitle
 } from "@/components/ui/card.jsx";
 import { Button } from "@/components/ui/button.jsx";
+import salesData from '../data/task2-data.json';
 
-// Data provided by the user
-const monthlySalesData = [
-  { month: 'January',   sales: 100000  },
-  { month: 'February',  sales: 200000  },
-  { month: 'March',     sales: 312000  },
-  { month: 'April',     sales: 400000  },
-  { month: 'May',       sales: 500000  },
-  { month: 'June',      sales: 600000  },
-  { month: 'July',      sales: 700000  },
-  { month: 'August',    sales: 800000  },
-  { month: 'September', sales: 900000  },
-  { month: 'October',   sales: 1000000 },
-  { month: 'November',  sales: 5100000 },
-  { month: 'December',  sales: 10000000 }
-];
-
-// Gauge segments
-const gaugeData = [
-  { name: 'Low',    value: 3000000, color: '#EF4444' },
-  { name: 'Medium', value: 4000000, color: '#F59E0B' },
-  { name: 'High',   value: 3000000, color: '#3B82F6' }
-];
-
+const { monthlySales, ranges } = salesData;
 const MAX_GAUGE_VALUE = 10000000;
+
+const gaugeData = [
+  { name: 'Low', value: 33.33, color: '#EF4444' },    // First third (-45° to 45°)
+  { name: 'Medium', value: 33.33, color: '#F59E0B' }, // Second third (45° to 135°)
+  { name: 'High', value: 33.34, color: '#3B82F6' }    // Final third (135° to 225°)
+];
+
+const getCategory = (value) => {
+  if (value <= ranges.low) return 'Low';
+  if (value <= ranges.medium) return 'Medium';
+  return 'High';
+};
+
+
+const mapValueToAngle = (value) => {
+  if (value <= ranges.low) {
+    // Low: 225° (left-bottom) to 315° (right-top, -45°)
+    const percentage = value / ranges.low;
+    return 225 + (percentage * 90); // 225° to 315°
+  } else if (value <= ranges.medium) {
+    // Medium: 315° (-45°) to 45° (top)
+    const percentage = (value - ranges.low) / (ranges.medium - ranges.low);
+    return 315 + (percentage * 90); // 315° to 45° (wraps around)
+  } else {
+    // High: 45° (top) to 135° (left-top)
+    const percentage = (value - ranges.medium) / (MAX_GAUGE_VALUE - ranges.medium);
+    return 45 + (percentage * 90); // 45° to 135°
+  }
+};
+
+// Normalize angle to [-135, 225] for SVG (since 315° == -45°)
+const normalizeAngle = (angle) => {
+  if (angle > 225) return angle - 360;
+  return angle;
+};
+
+// Custom tooltip component
+const CustomTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    const value = payload[0].payload.value;
+    return (
+      <div className="bg-white p-2 border rounded shadow">
+        <p>{`Category: ${payload[0].payload.name}`}</p>
+        <p>{`Range: ${(value / 1000000).toFixed(1)}M`}</p>
+      </div>
+    );
+  }
+  return null;
+};
 
 // Needle component
 function Needle({ value, cx, cy, innerRadius, outerRadius, color }) {
-  const startAngle = 234;
-  const endAngle   = -54;
-
+  const startAngle = 225;   // Start at 225 degrees (lowest left)
+  const endAngle = 135;     // End at 135 degrees (highest left)
+  
   const [animatedAngle, setAnimatedAngle] = useState(startAngle);
   const previousValue = useRef(value);
   const raf = useRef(null);
 
   const targetAngle = useMemo(() => {
     if (value == null) return startAngle;
-    const range = ((endAngle - startAngle) + 360) % 360;
-    return (startAngle + (value / MAX_GAUGE_VALUE) * (range < 0 ? range + 360 : range)) % 360;
+    const angle = mapValueToAngle(value);
+    return normalizeAngle(angle);
   }, [value]);
 
   useEffect(() => {
@@ -102,17 +130,17 @@ function Needle({ value, cx, cy, innerRadius, outerRadius, color }) {
 
 export default function GaugeChart() {
   const [selectedSales, setSelectedSales] = useState(null);
-
   const pieChartData = useMemo(() => gaugeData, []);
 
   return (
+    
     <Card className="flex flex-col lg:flex-row">
       <CardHeader className="flex-shrink-0 lg:w-1/4 pb-0 lg:pb-6">
         <CardTitle className="text-xl mb-4 text-center lg:text-left">
           Months
         </CardTitle>
         <div className="flex flex-wrap lg:flex-col gap-2 justify-center lg:justify-start">
-          {monthlySalesData.map(item => (
+          {monthlySales.map(item => (
             <Button
               key={item.month}
               onClick={() => setSelectedSales(item.sales)}
@@ -123,22 +151,25 @@ export default function GaugeChart() {
               }`}
             >
               {item.month}
+              {selectedSales === item.sales && (
+                <span className="ml-2">({getCategory(item.sales)})</span>
+              )}
             </Button>
           ))}
         </div>
       </CardHeader>
 
       <CardContent className="flex-1 flex items-center justify-center pt-6">
-        <div className="relative w-full max-w-sm aspect-square">
+        <div className="relative w-full max-w-md aspect-square"> {/* Changed from max-w-sm to max-w-md */}
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={pieChartData}
                 dataKey="value"
-                startAngle={234}
-                endAngle={-54}
-                innerRadius={80}
-                outerRadius={100}
+                startAngle={-45}
+                endAngle={225}
+                innerRadius={120}    // Increased from 80
+                outerRadius={150}    // Increased from 100
                 paddingAngle={2}
                 cornerRadius={4}
               >
@@ -146,20 +177,18 @@ export default function GaugeChart() {
                   <Cell key={idx} fill={entry.color} />
                 ))}
               </Pie>
-              {/* Always‑visible needle */}
               <Needle
                 value={selectedSales ?? 0}
-                cx={0.5}      // relative units not supported here; we’ll absolute-position below
-                cy={1}        // but we wrap inside ResponsiveContainer so override:
+                cx={0.5}
+                cy={1}
                 color="#333"
-                innerRadius={80}
-                outerRadius={100}
+                innerRadius={135}    // Increased to make needle shorter
+                outerRadius={150}
               />
-              <Tooltip cursor={false} />
+              <Tooltip content={<CustomTooltip />} />
             </PieChart>
           </ResponsiveContainer>
 
-          {/* Overlay actual absolute needle via transform */}
           <svg
             viewBox="0 0 200 200"
             className="absolute inset-0 w-full h-full pointer-events-none"
@@ -167,8 +196,8 @@ export default function GaugeChart() {
             <Needle
               value={selectedSales ?? 0}
               cx={100} cy={100}
-              innerRadius={50}
-              outerRadius={90}
+              innerRadius={110}    // Increased to make needle shorter
+              outerRadius={140}
               color="#333"
             />
           </svg>
