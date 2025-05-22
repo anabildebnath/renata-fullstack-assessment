@@ -179,7 +179,7 @@ function FormModal({ isOpen, onClose, onSubmit, defaultValues = {} }) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <div
-        className="dialog-backdrop"
+        className="dialog-backdrop "
         onClick={(e) => {
           if (e.target === e.currentTarget) {
             onClose(); // Close the form only when clicking outside the modal content
@@ -202,8 +202,8 @@ function FormModal({ isOpen, onClose, onSubmit, defaultValues = {} }) {
             <DialogTitle>{isEditing ? "Edit Customer" : "Add Customer"}</DialogTitle>
           </DialogHeader>
           <button
-            className="absolute top-2 right-2 text-white bg-red-500 rounded-full p-1 hover:bg-red-600"
-            onClick={onClose} // Close the form when clicking the close button
+            className="absolute top-2 right-2 p-2 text-gray-400 hover:text-white transition-colors"
+            onClick={onClose}
           >
             ✕
           </button>
@@ -306,7 +306,7 @@ function FormModal({ isOpen, onClose, onSubmit, defaultValues = {} }) {
                 <FormMessage />
               </FormItem>
               <div className="flex justify-end mt-4">
-                <button type="submit" className="btn btn-primary">
+                <button type="submit" className="btn btn-primary border border-gray-600">
                   {isEditing ? "Update" : "Submit"}
                 </button>
               </div>

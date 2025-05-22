@@ -2,7 +2,7 @@
 
 import { IconDots, IconFolder, IconShare3, IconTrash } from "@tabler/icons-react";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import {
   DropdownMenu,
@@ -24,7 +24,7 @@ import { ExcelFilesModal } from "@/components/excel-files-modal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 export function NavDocuments({
-  items
+  items = []
 }) {
   const { isMobile } = useSidebar()
   const [isExcelFilesOpen, setIsExcelFilesOpen] = React.useState(false);
@@ -46,6 +46,8 @@ export function NavDocuments({
       navigate("/excel-files");
     } else if (itemName === "Data Library") {
       setIsDataLibraryOpen(true);
+    } else if (itemName === "Reports") {
+      navigate("/reports");
     }
   };
 
@@ -60,23 +62,15 @@ export function NavDocuments({
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.name}>
-              <SidebarMenuButton
-                onClick={() => handleItemClick(item.name)}
-                asChild={item.name !== "Data Files"}
-                className={`${item.name === "Data Files" ? "border-none !bg-transparent" : ""}`}
-              >
-                {item.name === "Data Files" ? (
-                  <button className="flex items-center gap-2 w-full border-none bg-transparent">
-                    <item.icon />
-                    <span>{item.name}</span>
-                  </button>
-                ) : (
-                  <a href={item.url} className="flex items-center gap-2">
-                    <item.icon />
-                    <span>{item.name}</span>
-                  </a>
-                )}
-              </SidebarMenuButton>
+              <div className="w-full">
+                <Link
+                  to={item.url}
+                  className="flex items-center gap-2 w-full p-2 hover:bg-gray-100 rounded-md"
+                >
+                  {item.icon && <item.icon className="h-4 w-4" />}
+                  <span>{item.name}</span>
+                </Link>
+              </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuAction showOnHover className="data-[state=open]:bg-accent rounded-sm">

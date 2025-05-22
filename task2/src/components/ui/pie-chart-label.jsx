@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Pie, PieChart, Cell, Tooltip } from "recharts";
+import { Pie } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 import {
   Card,
@@ -10,11 +11,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 export function PieChartLabel({ data = [] }) {
   // Validate the data prop
@@ -35,45 +33,35 @@ export function PieChartLabel({ data = [] }) {
     );
   }
 
-  // Group data by division and find the highest salary and its holder
-  const groupedData = data.reduce((acc, record) => {
-    const division = record.Division || "Unknown";
-    if (!acc[division]) {
-      acc[division] = { highestSalary: 0, highestSalaryHolder: "" };
-    }
-    if (record.Income > acc[division].highestSalary) {
-      acc[division].highestSalary = record.Income;
-      acc[division].highestSalaryHolder = record.CustomerName || "Unknown";
-    }
-    return acc;
-  }, {});
+  const chartData = {
+    labels: data.map((item) => item.name),
+    datasets: [
+      {
+        data: data.map((item) => item.value),
+        backgroundColor: [
+          "rgba(255, 99, 132, 0.5)",
+          "rgba(54, 162, 235, 0.5)",
+          "rgba(255, 206, 86, 0.5)",
+          "rgba(75, 192, 192, 0.5)",
+          "rgba(153, 102, 255, 0.5)",
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
 
-  // Prepare chart data
-  const chartData = Object.entries(groupedData).map(([division, details]) => ({
-    division,
-    highestSalary: details.highestSalary,
-    highestSalaryHolder: details.highestSalaryHolder,
-  }));
-
-  const colors = [
-    "#8884d8",
-    "#82ca9d",
-    "#ffc658",
-    "#ff8042",
-    "#8dd1e1",
-    "#a4de6c",
-    "#d0ed57",
-    "#ffc0cb",
-  ];
-
-  // Define a valid config for ChartContainer
-  const chartConfig = chartData.reduce((acc, entry, index) => {
-    acc[entry.division] = {
-      label: entry.division,
-      color: colors[index % colors.length],
-    };
-    return acc;
-  }, {});
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top",
+      },
+      title: {
+        display: true,
+        text: "Division Distribution",
+      },
+    },
+  };
 
   return (
     <Card>
@@ -84,39 +72,9 @@ export function PieChartLabel({ data = [] }) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="aspect-auto h-[300px] w-full">
-          <PieChart>
-            <Pie
-              data={chartData}
-              dataKey="highestSalary"
-              nameKey="division"
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-              label={({ name, highestSalary }) =>
-                `${highestSalary.toLocaleString()}`
-              }
-              isAnimationActive={false}
-            >
-              {chartData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={colors[index % colors.length]}
-                />
-              ))}
-            </Pie>
-            <Tooltip
-              content={
-                <ChartTooltipContent
-                  formatter={(value, name, props) => [
-                    `Highest Salary Holder: ${props.payload.highestSalaryHolder}`,
-                    props.payload.division,
-                  ]}
-                />
-              }
-            />
-          </PieChart>
-        </ChartContainer>
+        <div className="w-full h-[300px] p-4 bg-white rounded-lg shadow">
+          <Pie data={chartData} options={options} />
+        </div>
       </CardContent>
     </Card>
   );

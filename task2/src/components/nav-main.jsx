@@ -1,5 +1,5 @@
 import { IconCirclePlusFilled, IconMail, IconSearch } from "@tabler/icons-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useState, useContext } from "react"; // Import useState and useContext
 import { FormContext } from "@/components/data-table"; // Import FormContext
 import { FilterPopup } from "@/components/filter-popup"; // Import FilterPopup
@@ -49,10 +49,9 @@ export function NavMain({ items = [], setIsFormOpen, onApplyFilter }) {
   };
 
   const handleItemClick = (item) => {
-    if (item.title === "Filter") handleFilterClick();
-    else if (item.title === "Dashboard") navigate("/dashboard");
-    else if (item.title === "Analytics") navigate("/dashboard/analytics");
-    else if (item.title === "Task1 Charts") window.location.href = "/task1"; // Handle Task1 Charts click
+    if (item.title === "Filter") {
+      handleFilterClick();
+    }
   };
 
   return (
@@ -81,13 +80,24 @@ export function NavMain({ items = [], setIsFormOpen, onApplyFilter }) {
           <SidebarMenu>
             {items.map((item) => (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton
-                  tooltip={item.title}
-                  onClick={() => handleItemClick(item)}
-                  className="nav-main-button min-w-8 bg-transparent text-sidebar-foreground duration-200 ease-linear hover:bg-gray-900"
-                >
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
+                <SidebarMenuButton asChild>
+                  {item.title === "Filter" ? (
+                    <button
+                      onClick={() => handleItemClick(item)}
+                      className="flex items-center gap-2 w-full nav-main-button min-w-8 bg-transparent text-sidebar-foreground duration-200 ease-linear hover:bg-gray-900"
+                    >
+                      {item.icon && <item.icon />}
+                      <span>{item.title}</span>
+                    </button>
+                  ) : (
+                    <Link
+                      to={item.url === "#" ? "/" : item.url}
+                      className="flex items-center gap-2 w-full nav-main-button min-w-8 bg-transparent text-sidebar-foreground duration-200 ease-linear hover:bg-gray-900"
+                    >
+                      {item.icon && <item.icon />}
+                      <span>{item.title}</span>
+                    </Link>
+                  )}
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}

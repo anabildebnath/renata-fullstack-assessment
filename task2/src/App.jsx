@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
@@ -9,6 +9,7 @@ import Signup from "@/pages/Signup";
 import AnalyticsPage from "@/pages/analytics";
 import Dashboard from "@/pages/Dashboard";
 import ExcelFilesPage from "@/pages/ExcelFilesPage";
+import ReportsPage from "@/pages/ReportsPage";
 import rawData from "./data.json";
 import "@/index.css";
 import { FormModal } from "@/components/ui/form";
@@ -18,16 +19,15 @@ import { ProtectedRoute } from "@/components/ProtectedRoute"; // Import Protecte
 function AppContent() {
   const { user } = useContext(AuthContext);
   const [data, setData] = useState(() => {
-    // Initialize data from localStorage or use empty array if nothing stored
     const storedData = localStorage.getItem("data");
-    return storedData ? JSON.parse(storedData) : [];
+    return storedData ? JSON.parse(storedData) : rawData; // Use rawData as fallback
   });
   const [filteredData, setFilteredData] = useState([]);
 
   // Initialize filteredData with data on component mount
   useEffect(() => {
     setFilteredData(data);
-  }, []); // Run only once on mount
+  }, [data]); // Update when data changes
 
   const handleDeleteRecord = (id) => {
     const updatedData = data.filter((record) => record.ID !== id);
@@ -133,38 +133,33 @@ function AppContent() {
           <SiteHeader />
           <main className="flex flex-1 flex-col p-6">
             <Routes>
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <Dashboard
-                      data={filteredData}
-                      onAddRecord={handleAddRecord}
-                      onEditRecord={handleEditRecord}
-                      onDeleteRecord={handleDeleteRecord}
-                      onDeleteSelectedRecords={handleDeleteSelectedRecords}
-                      onApplyFilter={handleApplyFilter}
-                    />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/analytics"
-                element={
-                  <ProtectedRoute>
-                    <AnalyticsPage data={filteredData} />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/excel-files"
-                element={
-                  <ProtectedRoute>
-                    <ExcelFilesPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="*" element={<Navigate to="/" replace />} />
+              <Route path="/" element={
+                <ProtectedRoute>
+                  <Dashboard
+                    data={filteredData}
+                    onAddRecord={handleAddRecord}
+                    onEditRecord={handleEditRecord}
+                    onDeleteRecord={handleDeleteRecord}
+                    onDeleteSelectedRecords={handleDeleteSelectedRecords}
+                    onApplyFilter={handleApplyFilter}
+                  />
+                </ProtectedRoute>
+              } />
+              <Route path="/analytics" element={
+                <ProtectedRoute>
+                  <AnalyticsPage data={filteredData} />
+                </ProtectedRoute>
+              } />
+              <Route path="/excel-files" element={
+                <ProtectedRoute>
+                  <ExcelFilesPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports" element={
+                <ProtectedRoute>
+                  <ReportsPage />
+                </ProtectedRoute>
+              } />
             </Routes>
           </main>
         </SidebarInset>
@@ -179,7 +174,7 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/*" element={<AppContent />} /> {/* Change from /dashboard/* to /* */}
+        <Route path="/*" element={<AppContent />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </AuthProvider>

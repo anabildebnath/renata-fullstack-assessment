@@ -116,23 +116,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* REMOVE or comment out this entire block that uses OKLCH for --chart-X */
-/*
-:root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  ...
-  --chart-1: oklch(0.646 0.222 41.116); // REMOVE THIS LINE and others
-  ...
-}
 
-.dark {
-  --background: oklch(0.13 0.028 261.692);
-  ...
-  --chart-1: oklch(0.488 0.243 264.376); // REMOVE THIS LINE and others
-  ...
-}
-*/
 
 @layer base {
   * {
@@ -180,6 +164,7 @@
   border: none;
   border-radius: 0.25rem;
   cursor: pointer;
+  border: #535050 solid 0.2px; /* Updated border color */
 }
 
 /* .btn-primary {
@@ -285,6 +270,161 @@ button, .btn, .btn-primary {
   min-height: 500px; /* Set minimum height */
   max-height: 80vh; /* Prevent too tall popups */
   overflow-y: auto; /* Add scroll if content is too long */
+  padding-bottom: 2rem;
+}
+
+/* Filter popup specific styles */
+.filter-popup {
+  width: 800px;
+  min-height: 400px;
+  max-height: 600px;
+  padding: 1.5rem;
+  background-color: #0a0a0a;
+  color: #ffffff;
+  border: #252525 solid 0.2px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+}
+
+/* Add backdrop styling for filter popup */
+.filter-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+/* Make the content area scrollable */
+.filter-popup .grid.gap-6 {
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 0.5rem; /* Add space for the scrollbar */
+  margin-bottom: 1rem;
+}
+
+/* Style the scrollbar */
+.filter-popup .grid.gap-6::-webkit-scrollbar {
+  width: 6px;
+}
+
+.filter-popup .grid.gap-6::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.filter-popup .grid.gap-6::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;  /* Reduced from 1.5rem */
+}
+
+.filter-label {
+  flex: 0 0 120px;
+  font-weight: 500;
+}
+
+.filter-content {
+  flex: 1;
+  display: flex;
+  gap: 1rem;
+}
+
+.filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Override dialog content styles for filter popup */
+.filter-popup .sm\:max-w-\[625px\] {
+  max-width: 600px !important;
+}
+
+.filter-popup .grid.gap-6 > div {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.filter-popup .grid.gap-6 > div > label {
+  flex: 0 0 120px;
+}
+
+.filter-popup .grid.gap-6 > div > div {
+  flex: 1;
+}
+
+/* Updated styles for specific filter rows */
+.filter-row .filter-form-input .multi-select {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.filter-row .multi-select-option {
+  flex: 0 0 auto;
+  padding: 0.25rem 0.75rem;
+  margin: 0.25rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+/* Updated MultiSelect layout for Division, Gender, and Marital Status */
+.filter-row .multi-select-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 80px;
+}
+
+/* Selected options row */
+.filter-row .multi-select-container .selected-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  min-height: 42px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Options row */
+.filter-row .multi-select-container .options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.filter-row .multi-select-option {
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--border);
+  background-color: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.filter-row .multi-select-option.selected {
+  background-color: var(--primary);
+  color: white;
 }
 
 /* General styles for sidebar-menu-button */
@@ -344,4 +484,52 @@ button, .btn, .btn-primary {
 [data-slot=sidebar-menu-button].border-none {
   border: none !important;
   box-shadow: none !important;
+}
+
+
+
+.multi-select-option:hover {
+  background-color: var(--accent);
+}
+
+.multi-select-option.selected {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+
+}
+
+.multi-select-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  min-height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  background-color: transparent;
+}
+
+/* Updated MultiSelect styles */
+.multi-select-container {
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  background-color: transparent;
+  overflow: hidden;
+}
+
+.multi-select-container .selected-section {
+  background-color: transparent;
+}
+
+.multi-select-container .options-section {
+  background-color: transparent;
+}
+
+.multi-select-container button {
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+
+.multi-select-container button:hover {
+  background-color: var(--accent);
 }

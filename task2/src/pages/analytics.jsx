@@ -15,54 +15,81 @@ import { PieChartLabel } from "@/components/ui/pie-chart-label";
 import { LineChartInteractive } from "@/components/ui/line-chart-interactive";
 import { LineChartLabel } from "@/components/ui/line-chart-label";
 import { BarChartCustomLabel } from "@/components/ui/bar-chart-custom-label";
+import { ChartErrorBoundary } from "@/components/ChartErrorBoundary";
 
-export default function AnalyticsPage({ data }) {
+export default function AnalyticsPage({ data = [] }) {
+  // Basic validation
+  const safeData = Array.isArray(data) ? data : [];
+
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Analytics Dashboard</h1>
-      <p className="text-muted-foreground">Explore various insights from your data.</p>
+      <p className="text-muted-foreground">
+        Explore various insights from your data.
+      </p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Chart 1: Division Metrics */}
-        <ChartAreaInteractive data={data} />
-        {/* Chart 2: Gradient Area Chart */}
-        <GradientChart data={data} />
-        {/* Chart 3: Bar Chart */}
-        <BarChartComponent data={data} />
-        {/* Chart 4: Stacked Bar Chart */}
-        <StackedBarChart data={data} />
+        <ChartErrorBoundary>
+          <ChartAreaInteractive data={safeData} />
+        </ChartErrorBoundary>
+        <ChartErrorBoundary>
+          <GradientChart data={safeData} />
+        </ChartErrorBoundary>
+        <ChartErrorBoundary>
+          <BarChartComponent data={safeData} />
+        </ChartErrorBoundary>
+        <ChartErrorBoundary>
+          <StackedBarChart data={safeData} />
+        </ChartErrorBoundary>
       </div>
       {/* Interactive Bar Chart */}
       <div className="mt-6">
-        <InteractiveBarChart data={data} />
+        <InteractiveBarChart data={safeData} />
       </div>
       {/* Radial Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <RadialChartText data={data} />
-        <RadialChartShape data={data} />
+        <ChartErrorBoundary>
+          <RadialChartText data={safeData} />
+        </ChartErrorBoundary>
+        <ChartErrorBoundary>
+          <RadialChartShape data={safeData} />
+        </ChartErrorBoundary>
       </div>
       {/* Next Row of Radial Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <RadialChartStacked data={data} />
-        <RadialChartLabel data={data} />
+        <ChartErrorBoundary>
+          <RadialChartStacked data={safeData} />
+        </ChartErrorBoundary>
+        <ChartErrorBoundary>
+          <RadialChartLabel data={safeData} />
+        </ChartErrorBoundary>
       </div>
       {/* Radar Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <RadarChartLines data={data} />
-        <RadarChartGrid data={data} />
+        <ChartErrorBoundary>
+          <RadarChartLines data={safeData} />
+        </ChartErrorBoundary>
+        <ChartErrorBoundary>
+          <RadarChartGrid data={safeData} />
+        </ChartErrorBoundary>
       </div>
       {/* Pie Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <PieChartInteractive data={data} />
-        <PieChartLabel data={data} />
+        <ChartErrorBoundary>
+          <PieChartInteractive data={safeData} />
+        </ChartErrorBoundary>
+        <ChartErrorBoundary>
+          <PieChartLabel data={safeData} />
+        </ChartErrorBoundary>
       </div>
-      {/* Line Chart */}
-      <div className="mt-6">
-        <LineChartInteractive data={data} />
-      </div>
-      {/* Line Chart with Labels and Bar Chart with Custom Labels */}
+
+      {/* Line Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <LineChartLabel data={data} />
-        <BarChartCustomLabel data={data} />
+        <ChartErrorBoundary>
+          <LineChartLabel data={safeData} />
+        </ChartErrorBoundary>
+        <ChartErrorBoundary>
+          <BarChartCustomLabel data={safeData} />
+        </ChartErrorBoundary>
       </div>
     </div>
   );
