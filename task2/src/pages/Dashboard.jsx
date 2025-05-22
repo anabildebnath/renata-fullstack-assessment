@@ -8,7 +8,7 @@ export default function Dashboard({
   onDeleteRecord,
   onDeleteSelectedRecords,
   onAddRecord,
-  onApplyFilter, // Add this prop
+  onApplyFilter,
 }) {
   const handleAddRecord = (newRecord) => {
     if (typeof onAddRecord === "function") {
@@ -17,7 +17,6 @@ export default function Dashboard({
   };
 
   const handleEditRecord = (id, updatedRecord) => {
-    // Convert gender format before updating
     const formattedRecord = {
       ...updatedRecord,
       Gender:
@@ -28,23 +27,19 @@ export default function Dashboard({
           : updatedRecord.Gender,
     };
 
-    // Find the original record to preserve addedAt and ID
     const originalRecord = data.find((record) => record.ID === id);
     if (!originalRecord) return;
 
-    // Create the updated record with preserved fields
     const recordWithPreservedFields = {
       ...formattedRecord,
-      ID: id, // Preserve the original ID
-      addedAt: originalRecord.addedAt, // Preserve the original timestamp
+      ID: id,
+      addedAt: originalRecord.addedAt,
     };
 
-    // Create new array with updated record
     const updatedData = data.map((record) =>
       record.ID === id ? recordWithPreservedFields : record
     );
 
-    // Use this to update the entire data array
     if (typeof onAddRecord === "function") {
       onAddRecord(updatedData);
     }
@@ -64,7 +59,7 @@ export default function Dashboard({
 
   return (
     <div className="p-6 space-y-6">
-      <div className="px-4 lg:px-6"> {/* Add padding here to match cards */}
+      <div className="px-4 lg:px-6">
         <h1 className="text-2xl font-bold">Dashboard</h1>
         <p className="text-muted-foreground">Overview of your data and insights.</p>
       </div>
@@ -76,7 +71,7 @@ export default function Dashboard({
         onEditRecord={handleEditRecord}
         onDeleteRecord={handleDeleteRecord}
         onDeleteSelectedRecords={handleDeleteSelectedRecords}
-        onApplyFilter={onApplyFilter} // Pass the filter handler
+        onApplyFilter={onApplyFilter}
       />
     </div>
   );

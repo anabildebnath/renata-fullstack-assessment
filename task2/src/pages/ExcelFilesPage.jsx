@@ -9,20 +9,14 @@ export default function ExcelFilesPage() {
   };
 
   const handleDownload = (file) => {
-    // Get the data associated with this file
     const allData = JSON.parse(localStorage.getItem("data")) || [];
-    
-    // Create a CSV string from the data
     const headers = ["ID,CustomerName,Division,Gender,MaritalStatus,Age,Income,addedAt\n"];
     const csvData = allData.map(row => 
       `${row.ID},${row.CustomerName},${row.Division},${row.Gender},${row.MaritalStatus},${row.Age},${row.Income},${row.addedAt}`
     ).join("\n");
-    
     const csvContent = headers + csvData;
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-    
-    // Create temporary link and trigger download
     const link = document.createElement('a');
     link.href = url;
     link.setAttribute('download', file.name);
@@ -39,7 +33,6 @@ export default function ExcelFilesPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Uploaded Excel Files</h1>
       </div>
-      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {files.length > 0 ? (
           files.map((file, index) => (

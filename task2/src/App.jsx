@@ -14,20 +14,19 @@ import rawData from "./data.json";
 import "@/index.css";
 import { FormModal } from "@/components/ui/form";
 import { FilterPopup } from "@/components/filter-popup";
-import { ProtectedRoute } from "@/components/ProtectedRoute"; // Import ProtectedRoute
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 function AppContent() {
   const { user } = useContext(AuthContext);
   const [data, setData] = useState(() => {
     const storedData = localStorage.getItem("data");
-    return storedData ? JSON.parse(storedData) : rawData; // Use rawData as fallback
+    return storedData ? JSON.parse(storedData) : rawData;
   });
   const [filteredData, setFilteredData] = useState([]);
 
-  // Initialize filteredData with data on component mount
   useEffect(() => {
     setFilteredData(data);
-  }, [data]); // Update when data changes
+  }, [data]);
 
   const handleDeleteRecord = (id) => {
     const updatedData = data.filter((record) => record.ID !== id);
@@ -45,13 +44,10 @@ function AppContent() {
 
   const handleAddRecord = (newRecordOrData) => {
     let updatedData;
-    
     if (Array.isArray(newRecordOrData)) {
       if (newRecordOrData.some(record => record.ID && data.find(r => r.ID === record.ID))) {
-        // This is an update operation - replace entire data
         updatedData = newRecordOrData;
       } else {
-        // This is a batch insert - append new records
         const timestamp = Date.now();
         updatedData = [
           ...data,
@@ -63,14 +59,11 @@ function AppContent() {
         ];
       }
     } else {
-      // Single record operation
       if (newRecordOrData.ID && data.find(r => r.ID === newRecordOrData.ID)) {
-        // This is an update operation - replace the matching record
         updatedData = data.map(record => 
           record.ID === newRecordOrData.ID ? newRecordOrData : record
         );
       } else {
-        // This is an insert operation - append new record
         updatedData = [
           ...data,
           {
@@ -81,7 +74,6 @@ function AppContent() {
         ];
       }
     }
-    
     setData(updatedData);
     setFilteredData(updatedData);
     localStorage.setItem("data", JSON.stringify(updatedData));
@@ -90,10 +82,9 @@ function AppContent() {
   const handleEditRecord = (id, updatedRecord) => {
     const updatedData = data.map(record => 
       record.ID === id 
-        ? { ...record, ...updatedRecord, ID: id } // Preserve the ID and merge updates
+        ? { ...record, ...updatedRecord, ID: id }
         : record
     );
-    
     setData(updatedData);
     setFilteredData(updatedData);
     localStorage.setItem("data", JSON.stringify(updatedData));
@@ -101,12 +92,10 @@ function AppContent() {
 
   const handleApplyFilter = (filters) => {
     const filtered = data.filter((record) => {
-      // Convert gender format for comparison
       const normalizedGender =
         record.Gender === "F" ? "Female" : 
         record.Gender === "M" ? "Male" : 
         record.Gender;
-
       return (
         (!filters.CustomerName ||
           record.CustomerName.toLowerCase().includes(filters.CustomerName.toLowerCase().trim())) &&
@@ -117,7 +106,6 @@ function AppContent() {
         (record.Income >= filters.IncomeRange[0] && record.Income <= filters.IncomeRange[1])
       );
     });
-
     setFilteredData(filtered);
   };
 

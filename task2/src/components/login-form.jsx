@@ -33,7 +33,7 @@ export function LoginForm({
         </h1>
         <p className="text-balance text-sm text-muted-foreground">
           {isSignup
-            ? "Sign up for an Acme Inc account"
+            ? "Sign up for an Renata Sales account"
             : "Enter your email below to login to your account"}
         </p>
       </div>

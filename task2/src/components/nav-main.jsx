@@ -1,7 +1,7 @@
 import { IconCirclePlusFilled } from "@tabler/icons-react";
 import { useNavigate, Link } from "react-router-dom";
-import { useState } from "react"; // Import useState
-import { FilterPopup } from "@/components/filter-popup"; // Import FilterPopup
+import { useState } from "react";
+import { FilterPopup } from "@/components/filter-popup";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -12,11 +12,11 @@ import {
 
 export function NavMain({ items = [], setIsFormOpen, onApplyFilter }) {
   const navigate = useNavigate();
-  const [isFilterOpen, setIsFilterOpen] = useState(false); // Add filter state
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const handleQuickCreate = () => {
     if (typeof setIsFormOpen === "function") {
-      setIsFormOpen(true); // Open the Add Customer form
+      setIsFormOpen(true);
     } else {
       console.error("setIsFormOpen is not a function");
     }
@@ -28,7 +28,7 @@ export function NavMain({ items = [], setIsFormOpen, onApplyFilter }) {
 
   const handleApplyFilter = (filters) => {
     if (typeof onApplyFilter === "function") {
-      onApplyFilter(filters); // Pass filters to parent component
+      onApplyFilter(filters);
     }
     setIsFilterOpen(false);
   };
@@ -95,8 +95,6 @@ export function NavMain({ items = [], setIsFormOpen, onApplyFilter }) {
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>
-
-      {/* Add FilterPopup */}
       <FilterPopup
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
