@@ -34,45 +34,59 @@ export function ChartAreaInteractive({ data }) {
   // Helper function to calculate median
   const calculateMedian = (arr) => {
     if (!arr.length) return 0;
-    const sorted = [...arr].sort((a, b) => a - b);
+    // Convert all values to numbers and sort
+    const sorted = [...arr].map(Number).sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
-    return sorted.length % 2 !== 0
-      ? sorted[mid]
-      : (sorted[mid - 1] + sorted[mid]) / 2;
+    
+    // For even length, take average of two middle values
+    if (sorted.length % 2 === 0) {
+      return Math.floor((sorted[mid - 1] + sorted[mid]) / 2);
+    }
+    // For odd length, take middle value
+    return sorted[mid];
   };
 
   // Prepare chart data
-  const rawChartData = Object.entries(grouped).map(([division, values]) => ({
-    division,
-    count: values.count,
-    medianAge: calculateMedian(values.ages),
-    medianSalary: calculateMedian(values.salaries),
-  }));
+  const chartData = Object.entries(grouped).map(([division, values]) => {
+    const count = values.count;
+    const medianAge = calculateMedian(values.ages);
+    const medianSalary = calculateMedian(values.salaries);
 
-  // Find the highest median salary and age for normalization
-  const maxMedianSalary = Math.max(...rawChartData.map((d) => d.medianSalary));
-  const maxMedianAge = Math.max(...rawChartData.map((d) => d.medianAge));
-  const maxCount = Math.max(...rawChartData.map((d) => d.count));
+    console.log(`${division} stats:`, {
+      count,
+      ages: values.ages,
+      salaries: values.salaries,
+      medianAge,
+      medianSalary
+    }); // Debug log
 
-  // Normalize median salary and age relative to the highest values
-  const chartData = rawChartData.map((d) => ({
-    ...d,
-    normalizedMedianSalary: (d.medianSalary / maxMedianSalary) * maxCount,
-    normalizedMedianAge: (d.medianAge / maxMedianAge) * maxCount,
-  }));
+    return {
+      division,
+      count,
+      medianAge,
+      medianSalary,
+      normalizedMedianAge: (medianAge / Math.max(...Object.values(grouped).map(g => calculateMedian(g.ages)))) * count,
+      normalizedMedianSalary: (medianSalary / Math.max(...Object.values(grouped).map(g => calculateMedian(g.salaries)))) * count,
+    };
+  });
+
+  // Find the highest values for normalization (keep this part)
+  const maxMedianSalary = Math.max(...chartData.map((d) => d.medianSalary));
+  const maxMedianAge = Math.max(...chartData.map((d) => d.medianAge));
+  const maxCount = Math.max(...chartData.map((d) => d.count));
 
   const chartConfig = {
     count: {
       label: "Users",
-      color: "hsl(var(--chart-3))", // Green
+      color: "hsl(var(--chart-3))", 
     },
     normalizedMedianAge: {
       label: "Median Age",
-      color: "hsl(var(--chart-4))", // Blue
+      color: "hsl(var(--chart-4))", 
     },
     normalizedMedianSalary: {
       label: "Median Salary",
-      color: "hsl(var(--chart-5))", // Red
+      color: "hsl(var(--chart-5))", 
     },
   };
 
@@ -148,21 +162,32 @@ export function ChartAreaInteractive({ data }) {
             />
             <ChartTooltip
               cursor={false}
-              content={
-                <ChartTooltipContent
-                  labelFormatter={(value) => value}
-                  indicator="dot"
-                  formatter={(value, name, props) => {
-                    if (name === "normalizedMedianAge") {
-                      return [`Median Age: ${props.payload.medianAge}`];
-                    }
-                    if (name === "normalizedMedianSalary") {
-                      return [`Median Salary: ${props.payload.medianSalary}`];
-                    }
-                    return [value, name];
-                  }}
-                />
-              }
+              content={({ active, payload, label }) => {
+                if (!active || !payload || !payload.length) return null;
+                
+                const data = payload[0]?.payload;
+                return (
+                  <div className="rounded-lg border border-border bg-background p-2 shadow-sm">
+                    <div className="text-sm font-semibold text-foreground mb-1">{label}</div>
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-2" style={{ backgroundColor: chartConfig.count.color }} />
+                        <span className="text-sm text-muted-foreground">Total Users: {data.count}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-2" style={{ backgroundColor: chartConfig.normalizedMedianAge.color }} />
+                        <span className="text-sm text-muted-foreground">Median Age: {data.medianAge} years</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-2" style={{ backgroundColor: chartConfig.normalizedMedianSalary.color }} />
+                        <span className="text-sm text-muted-foreground">
+                          Median Salary: ৳{data.medianSalary.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }}
             />
             <Area
               dataKey="count"

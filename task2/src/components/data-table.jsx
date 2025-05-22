@@ -402,7 +402,7 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onD
               variant="outline"
               size="sm"
               onClick={() => setIsUploadModalOpen(true)}
-              className="bg-transparent text-[oklch(var(--foreground))] hover:bg-gray-300 hover:text-[oklch(var(--foreground))]"
+              className="bg-transparent text-[oklch(var(--foreground))] hover:bg-slate-800 hover:text-[oklch(var(--foreground))]"
             >
               <UploadIcon className="size-4 mr-1" />
               <span className="hidden lg:inline">Import</span>
@@ -411,7 +411,7 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onD
               variant="outline"
               size="sm"
               onClick={() => setIsFormOpen(true)}
-              className="bg-transparent text-[oklch(var(--foreground))] hover:bg-gray-300 hover:text-[oklch(var(--foreground))]"
+              className="bg-transparent text-[oklch(var(--foreground))] hover:bg-slate-800 hover:text-[oklch(var(--foreground))]"
             >
               <PlusIcon className="size-4 mr-1" />
               <span className="hidden lg:inline">Add Customer</span>
