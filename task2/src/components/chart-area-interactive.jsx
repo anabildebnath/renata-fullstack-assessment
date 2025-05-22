@@ -172,7 +172,7 @@ export function ChartAreaInteractive({ data }) {
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
                         <div className="h-2 w-2" style={{ backgroundColor: chartConfig.count.color }} />
-                        <span className="text-sm text-muted-foreground">Total Users: {data.count}</span>
+                        <span className="text-sm text-muted-foreground">Total Customers: {data.count}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="h-2 w-2" style={{ backgroundColor: chartConfig.normalizedMedianAge.color }} />

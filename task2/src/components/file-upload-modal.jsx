@@ -104,30 +104,37 @@ export function FileUploadModal({ isOpen, onClose, onUpload }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] bg-background text-foreground">
-        <DialogHeader>
-          <DialogTitle>Upload Customer Data</DialogTitle>
+      <DialogContent className="sm:max-w-[500px] bg-[#0a0a0a] border border-[#252525] p-6">
+        <DialogHeader className="mb-6">
+          <DialogTitle className="text-xl font-semibold text-white">Upload Customer Data</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <div className="grid gap-6">
           <div className="flex flex-col gap-4">
             <input
               type="file"
               accept=".xlsx,.xls"
               onChange={handleFileUpload}
-              className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+              className="block w-full text-sm text-white
+                file:mr-4 file:py-2.5 file:px-4 
+                file:rounded-md file:border-[1px] 
+                file:border-[#3f3e3e] file:text-sm 
+                file:font-medium file:bg-transparent 
+                file:text-white hover:file:bg-[#2a2a31]
+                file:cursor-pointer cursor-pointer"
             />
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-gray-400">
               Upload an Excel file (.xlsx, .xls) with columns: ID, Customer Name, Division, Gender, MaritalStatus, Age, Income
             </p>
           </div>
-          <div className="flex justify-end gap-4">
-            <Button variant="outline" onClick={onClose}>
+          <div className="flex justify-end gap-4 mt-6 pt-4 border-t border-[#252525]">
+            <Button variant="outline" onClick={onClose} 
+              className="bg-transparent border-[#3f3e3e] text-white hover:bg-[#2a2a31]">
               Cancel
             </Button>
             <Button
               onClick={handleSubmit}
               disabled={!file}
-              className={!file ? "opacity-50 cursor-not-allowed" : ""}
+              className={`bg-primary text-white hover:bg-primary/90 ${!file ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               Upload
             </Button>
