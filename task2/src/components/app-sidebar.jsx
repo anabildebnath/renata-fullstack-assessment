@@ -1,6 +1,7 @@
 "use client"
 
-import { FormContext } from "@/components/data-table"; // Import FormContext
+import { FormContext } from "@/components/data-table";
+import { AuthContext } from "@/context/AuthContext"; // Add this import
 import * as React from "react"
 import {
   ArrowUpCircleIcon,
@@ -36,11 +37,6 @@ import {
 } from "@/components/ui/sidebar"
 
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   navMain: [
     {
       title: "Dashboard",
@@ -153,6 +149,14 @@ const data = {
 }
 
 export function AppSidebar({ setIsFormOpen, onApplyFilter, ...props }) {
+  const { user: currentUser } = React.useContext(AuthContext); // Get current user from context
+
+  const userData = {
+    name: currentUser?.name || "Guest",
+    email: currentUser?.email || "guest@example.com",
+    avatar: currentUser?.avatar || "/avatars/default.jpg",
+  };
+
   return (
     <Sidebar
       collapsible="offcanvas"
@@ -182,7 +186,7 @@ export function AppSidebar({ setIsFormOpen, onApplyFilter, ...props }) {
         <NavMain
           items={data.navMain}
           setIsFormOpen={setIsFormOpen}
-          onApplyFilter={onApplyFilter} // Pass onApplyFilter to NavMain
+          onApplyFilter={onApplyFilter}
         />
         <NavDocuments items={data.documents} />
         <NavSecondary
@@ -191,7 +195,7 @@ export function AppSidebar({ setIsFormOpen, onApplyFilter, ...props }) {
         />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={userData} /> {/* Pass the actual user data */}
       </SidebarFooter>
     </Sidebar>
   );
