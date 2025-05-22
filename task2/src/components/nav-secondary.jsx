@@ -101,7 +101,7 @@ export function NavSecondary({
 
   return (
     <>
-      <SidebarGroup {...props}>
+      <SidebarGroup {...props} className="mt-auto"> {/* Add mt-auto here */}
         <SidebarGroupContent>
           <SidebarMenu className={className}>
             {filteredItems.map((item) => (
