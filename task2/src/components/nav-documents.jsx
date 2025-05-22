@@ -65,7 +65,7 @@ export function NavDocuments({
               <div className="w-full">
                 <Link
                   to={item.url}
-                  className="flex items-center gap-2 w-full p-2 hover:bg-gray-100 rounded-md"
+                  className="flex items-center gap-2 w-full p-2 hover:bg-[hsl(215,27.9%,16.9%)] rounded-md transition-colors"
                 >
                   {item.icon && <item.icon className="h-4 w-4" />}
                   <span>{item.name}</span>
