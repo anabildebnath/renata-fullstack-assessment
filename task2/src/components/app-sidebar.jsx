@@ -16,7 +16,6 @@ import {
   HelpCircleIcon,
   LayoutDashboardIcon,
   ListIcon,
-  SearchIcon,
   SettingsIcon,
   TrendingUpIcon,
   UsersIcon,
@@ -127,11 +126,6 @@ const data = {
       title: "Get Help",
       url: "#",
       icon: HelpCircleIcon,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: SearchIcon,
     },
   ],
   documents: [
