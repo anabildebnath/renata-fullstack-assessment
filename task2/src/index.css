@@ -604,3 +604,18 @@ button, .btn, .btn-primary {
 [role="separator"] {
   background-color: #333 !important;
 }
+
+/* Document section button styles */
+.documents-section button {
+  font-size: 0.875rem !important; /* Match other nav text size */
+  color: var(--sidebar-foreground) !important;
+}
+
+.documents-section button svg {
+  width: 16px !important; /* Match other nav icon size */
+  height: 16px !important;
+}
+
+.documents-section .group-data-[collapsible=icon]:hidden button.flex.items-center.w-full {
+  padding: 0.5rem 0.75rem !important; /* Match other nav padding */
+}
