@@ -339,7 +339,7 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onD
   // Move table-dependent JSX into a separate component
   const TableContent = () => (
     <Table>
-      <TableHeader className="sticky top-0 z-10 bg-muted">
+      <TableHeader className="sticky top-0 bg-muted">  {/* Remove z-10 class */}
         {table.getHeaderGroups().map((hg) => (
           <TableRow key={hg.id}>
             {hg.headers.map((header) => (

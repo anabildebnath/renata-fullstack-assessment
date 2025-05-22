@@ -276,7 +276,7 @@ button, .btn, .btn-primary {
 .filter-popup {
   width: 800px;
   min-height: 400px;
-  max-height: 600px;
+  max-height: 80vh; /* Changed from 600px to 80vh */
   padding: 1.5rem;
   background-color: #0a0a0a;
   color: #ffffff;
@@ -285,23 +285,73 @@ button, .btn, .btn-primary {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
   display: flex;
   flex-direction: column;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1000;
+  overflow-y: auto; /* Add scrolling */
 }
 
-/* Add backdrop styling for filter popup */
+/* Content grid container */
+.filter-popup .grid.gap-6 {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 1rem;
+  margin-bottom: 1rem;
+  max-height: calc(80vh - 150px); /* Account for header and footer */
+}
+
+/* Keep the footer buttons fixed at bottom */
+.filter-popup .flex.justify-end {
+  position: sticky;
+  bottom: 0;
+  background-color: #0a0a0a;
+  padding-top: 1rem;
+  border-top: 1px solid #252525;
+  margin-top: auto;
+}
+
+/* Filter popup backdrop */
 .filter-popup-backdrop {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999;
+  z-index: 9999;
+}
+
+[role="dialog"] {
+  position: relative;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Table header styles */
+.sticky.top-0 {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: var(--muted);
+}
+
+/* Filter popup */
+.filter-popup {
+  position: relative;
+  z-index: 51; /* Higher than backdrop */
+  isolation: isolate;
+}
+
+/* Ensure dialog is always on top */
+[role="dialog"] {
+  position: relative;
+  z-index: 100;
+}
+
+/* Table container */
+.overflow-hidden.rounded-\[0\.75rem\].border {
+  position: relative;
+  z-index: 1;
 }
 
 /* Make the content area scrollable */
