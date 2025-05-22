@@ -26,7 +26,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 export function NavDocuments({
   items = []
 }) {
-  const { isMobile } = useSidebar()
+  const { isMobile } = useSidebar();
   const [isExcelFilesOpen, setIsExcelFilesOpen] = React.useState(false);
   const [isDataLibraryOpen, setIsDataLibraryOpen] = useState(false);
   const navigate = useNavigate();
@@ -55,6 +55,12 @@ export function NavDocuments({
     setIsDataLibraryOpen(false);
   };
 
+  const handleDropdownAction = (action, itemName) => {
+    if (action === 'open' && itemName === "Data Files") {
+      navigate('/excel-files');
+    }
+  };
+
   return (
     <>
       <SidebarGroup className="group-data-[collapsible=icon]:hidden documents-section">
@@ -63,13 +69,13 @@ export function NavDocuments({
           {items.map((item) => (
             <SidebarMenuItem key={item.name}>
               <div className="w-full">
-                <Link
-                  to={item.url}
+                <button
+                  onClick={() => handleItemClick(item.name)}
                   className="flex items-center gap-2 w-full p-2 hover:bg-[hsl(215,27.9%,16.9%)] rounded-md transition-colors"
                 >
                   {item.icon && <item.icon className="h-4 w-4" />}
                   <span>{item.name}</span>
-                </Link>
+                </button>
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -82,7 +88,7 @@ export function NavDocuments({
                   className="w-24 rounded-lg"
                   side={isMobile ? "bottom" : "right"}
                   align={isMobile ? "end" : "start"}>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleDropdownAction('open', item.name)}>
                     <IconFolder />
                     <span>Open</span>
                   </DropdownMenuItem>
