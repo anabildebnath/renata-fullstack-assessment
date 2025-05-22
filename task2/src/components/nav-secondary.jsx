@@ -97,19 +97,25 @@ export function NavSecondary({
     setIsSettingsOpen(false);
   };
 
+  const handleClick = (itemTitle) => {
+    if (itemTitle === "Settings") {
+      handleSettingsClick();
+    } else if (itemTitle === "Get Help") {
+      window.open("https://www.linkedin.com/in/anabildebnath/", "_blank");
+    }
+  };
+
   const filteredItems = items.filter((item) => item.title !== "Search"); // Remove Search button
 
   return (
     <>
-      <SidebarGroup {...props} className="mt-auto"> {/* Add mt-auto here */}
+      <SidebarGroup {...props} className="mt-auto">
         <SidebarGroupContent>
           <SidebarMenu className={className}>
             {filteredItems.map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
-                  onClick={
-                    item.title === "Settings" ? handleSettingsClick : null
-                  }
+                  onClick={() => handleClick(item.title)}
                   className="nav-main-button"
                 >
                   {item.icon && <item.icon />}

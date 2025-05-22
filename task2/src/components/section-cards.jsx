@@ -59,13 +59,13 @@ export function SectionCards({ data = [] }) {
       title: "Total Customers", 
       desc: `${total}`,
       empty: "0",
-      trend: "neutral"
+      trend: total > 0 ? "up" : "neutral" // Add trend value
     },
     { 
       title: "New Customers Today", 
       desc: `${todayNew}`,
       empty: "0",
-      trend: "neutral"
+      trend: todayNew > 0 ? "up" : "down" // Add trend value
     },
     { 
       title: "Most Frequent Division", 
@@ -77,7 +77,7 @@ export function SectionCards({ data = [] }) {
       title: "Median (Age/Income)", 
       desc: data.length ? `${medianAge.toFixed(1)}/${medianIncome.toLocaleString()}` : "0/0",
       empty: "0/0",
-      trend: "neutral"
+      trend: medianIncome > 0 ? "up" : "neutral" // Add trend value
     },
   ];
 
@@ -93,14 +93,14 @@ export function SectionCards({ data = [] }) {
             <div className="absolute right-4 top-4">
               <Badge
                 variant="outline"
-                className="flex gap-1 rounded-[var(--radius)] text-xs bg-[oklch(var(--muted))] text-[oklch(var(--muted-foreground))]"
+                className="flex gap-1 rounded-lg text-xs"
               >
                 {c.trend === "down" ? (
-                  <TrendingDownIcon className="size-3 text-[oklch(var(--destructive))]" />
+                  <TrendingDownIcon className="h-4 w-4 text-red-500" />
                 ) : c.trend === "up" ? (
-                  <TrendingUpIcon className="size-3 text-[oklch(var(--chart-1))]" />
+                  <TrendingUpIcon className="h-4 w-4 text-green-500" />
                 ) : (
-                  <span>•</span> // Neutral indicator
+                  <span className="text-gray-400">•</span>
                 )}
               </Badge>
             </div>
