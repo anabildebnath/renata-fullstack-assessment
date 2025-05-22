@@ -133,7 +133,6 @@ export default function GaugeChart() {
   const pieChartData = useMemo(() => gaugeData, []);
 
   return (
-    
     <Card className="flex flex-col lg:flex-row">
       <CardHeader className="flex-shrink-0 lg:w-1/4 pb-0 lg:pb-6">
         <CardTitle className="text-xl mb-4 text-center lg:text-left">
