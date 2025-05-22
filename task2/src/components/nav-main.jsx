@@ -1,7 +1,6 @@
-import { IconCirclePlusFilled, IconMail, IconSearch } from "@tabler/icons-react";
+import { IconCirclePlusFilled } from "@tabler/icons-react";
 import { useNavigate, Link } from "react-router-dom";
-import { useState, useContext } from "react"; // Import useState and useContext
-import { FormContext } from "@/components/data-table"; // Import FormContext
+import { useState } from "react"; // Import useState
 import { FilterPopup } from "@/components/filter-popup"; // Import FilterPopup
 import {
   SidebarGroup,
@@ -59,22 +58,14 @@ export function NavMain({ items = [], setIsFormOpen, onApplyFilter }) {
       <SidebarGroup>
         <SidebarGroupContent className="flex flex-col gap-2">
           <SidebarMenu>
-            <SidebarMenuItem className="flex items-center gap-2">
+            <SidebarMenuItem>
               <SidebarMenuButton
-                tooltip="Quick Create"
                 onClick={handleQuickCreate}
-                className="min-w-8 bg-white text-black duration-200 ease-linear hover:bg-gray-100 hover:text-black active:bg-gray-200 active:text-black [&>span]:text-black" // Added [&>span]:text-black
+                className="min-w-8 bg-white text-black duration-200 ease-linear hover:bg-gray-100 hover:text-black active:bg-gray-200 active:text-black [&>span]:text-black"
               >
-                <IconCirclePlusFilled className="text-black" /> {/* Added text-black */}
+                <IconCirclePlusFilled className="text-black" />
                 <span>Quick Create</span>
               </SidebarMenuButton>
-              <button
-                size="icon"
-                className="h-9 w-9 shrink-0 group-data-[collapsible=icon]:opacity-0 border border-gray-300 rounded-md hover:bg-gray-100"
-              >
-                <IconMail />
-                <span className="sr-only">Inbox</span>
-              </button>
             </SidebarMenuItem>
           </SidebarMenu>
           <SidebarMenu>
