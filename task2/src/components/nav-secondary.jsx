@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +26,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { AuthContext } from "@/context/AuthContext";
 
 export function NavSecondary({
   items = [],
@@ -44,12 +46,24 @@ export function NavSecondary({
   });
   const [error, setError] = useState("");
 
+  const { user: currentUser } = useContext(AuthContext); // Get current user from context
+
+  // Add useEffect to initialize settings with current user data
+  React.useEffect(() => {
+    if (currentUser) {
+      setSettings(prev => ({
+        ...prev,
+        username: currentUser.name || "",
+        accountType: currentUser.accountType || "Sales Representative",
+      }));
+    }
+  }, [currentUser]);
+
   const handleSettingsClick = () => {
     setIsSettingsOpen(true);
   };
 
   const handleSettingsSave = () => {
-    // Get current user data
     const users = JSON.parse(localStorage.getItem("users")) || [];
     const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
@@ -58,7 +72,7 @@ export function NavSecondary({
       return;
     }
 
-    // Validate passwords if attempting to change password
+    // Password validation
     if (settings.newPassword || settings.confirmPassword) {
       if (settings.currentPassword !== currentUser.password) {
         setError("Current password is incorrect");
@@ -86,15 +100,31 @@ export function NavSecondary({
 
     // Save updated users
     localStorage.setItem("users", JSON.stringify(updatedUsers));
-    localStorage.setItem("currentUser", JSON.stringify({
+
+    // Update current user
+    const updatedCurrentUser = {
       ...currentUser,
       name: settings.username || currentUser.name,
       password: settings.newPassword || currentUser.password,
       accountType: settings.accountType,
-    }));
+    };
+    localStorage.setItem("currentUser", JSON.stringify(updatedCurrentUser));
 
+    // Reset form fields
+    setSettings({
+      username: settings.username,
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+      accountType: settings.accountType,
+    });
+
+    // Show success message and close modal
     toast.success("Settings updated successfully! Changes will take effect on next login.");
     setIsSettingsOpen(false);
+
+    // Force page refresh to reflect changes
+    window.location.reload();
   };
 
   const handleClick = (itemTitle) => {

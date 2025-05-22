@@ -339,10 +339,10 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onD
   // Move table-dependent JSX into a separate component
   const TableContent = () => (
     <Table>
-      <TableHeader className="sticky top-0 bg-muted">  {/* Remove z-10 class */}
-        {table.getHeaderGroups().map((hg) => (
-          <TableRow key={hg.id}>
-            {hg.headers.map((header) => (
+      <TableHeader>
+        {table.getHeaderGroups().map((headerGroup) => (
+          <TableRow key={headerGroup.id}>
+            {headerGroup.headers.map((header) => (
               <TableHead key={header.id} colSpan={header.colSpan}>
                 {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
               </TableHead>
@@ -353,10 +353,7 @@ export function DataTable({ data, onAddRecord, onEditRecord, onDeleteRecord, onD
       <TableBody>
         {table.getRowModel().rows.length ? (
           table.getRowModel().rows.map((row) => (
-            <DraggableRow
-              key={row.id}
-              row={row}
-            />
+            <DraggableRow key={row.id} row={row} />
           ))
         ) : (
           <TableRow>
