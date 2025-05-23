@@ -55,7 +55,7 @@ const data = {
     },
     {
       title: "Task1 Charts", // New button
-      url: "/task1",
+      url: "https://renata-task1-charts.netlify.app/", // Updated URL
       icon: TrendingUpIcon,
     },
     {

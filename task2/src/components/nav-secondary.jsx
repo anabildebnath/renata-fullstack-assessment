@@ -42,13 +42,12 @@ export function NavSecondary({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
-    accountType: "Sales Representative", // Updated default value
+    accountType: "Sales Representative",
   });
   const [error, setError] = useState("");
 
-  const { user: currentUser } = useContext(AuthContext); // Get current user from context
+  const { user: currentUser } = useContext(AuthContext);
 
-  // Add useEffect to initialize settings with current user data
   React.useEffect(() => {
     if (currentUser) {
       setSettings(prev => ({
@@ -72,7 +71,6 @@ export function NavSecondary({
       return;
     }
 
-    // Password validation
     if (settings.newPassword || settings.confirmPassword) {
       if (settings.currentPassword !== currentUser.password) {
         setError("Current password is incorrect");
@@ -85,7 +83,6 @@ export function NavSecondary({
       }
     }
 
-    // Update user data
     const updatedUsers = users.map(user => {
       if (user.email === currentUser.email) {
         return {
@@ -98,10 +95,8 @@ export function NavSecondary({
       return user;
     });
 
-    // Save updated users
     localStorage.setItem("users", JSON.stringify(updatedUsers));
 
-    // Update current user
     const updatedCurrentUser = {
       ...currentUser,
       name: settings.username || currentUser.name,
@@ -110,7 +105,6 @@ export function NavSecondary({
     };
     localStorage.setItem("currentUser", JSON.stringify(updatedCurrentUser));
 
-    // Reset form fields
     setSettings({
       username: settings.username,
       currentPassword: "",
@@ -119,11 +113,9 @@ export function NavSecondary({
       accountType: settings.accountType,
     });
 
-    // Show success message and close modal
     toast.success("Settings updated successfully! Changes will take effect on next login.");
     setIsSettingsOpen(false);
 
-    // Force page refresh to reflect changes
     window.location.reload();
   };
 
@@ -135,7 +127,7 @@ export function NavSecondary({
     }
   };
 
-  const filteredItems = items.filter((item) => item.title !== "Search"); // Remove Search button
+  const filteredItems = items.filter((item) => item.title !== "Search");
 
   return (
     <>

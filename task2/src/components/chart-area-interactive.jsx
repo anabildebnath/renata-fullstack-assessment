@@ -16,12 +16,10 @@ import {
 } from "@/components/ui/chart"
 
 export function ChartAreaInteractive({ data }) {
-  // Filter out records with invalid or undefined Division values
   const validData = data.filter((record) => record.Division && record.Division.trim() !== "");
 
-  // Group data by division and calculate metrics
   const grouped = validData.reduce((acc, curr) => {
-    const division = curr.Division.trim(); // Ensure no leading/trailing whitespace
+    const division = curr.Division.trim();
     if (!acc[division]) {
       acc[division] = { count: 0, ages: [], salaries: [] };
     }
@@ -31,34 +29,20 @@ export function ChartAreaInteractive({ data }) {
     return acc;
   }, {});
 
-  // Helper function to calculate median
   const calculateMedian = (arr) => {
     if (!arr.length) return 0;
-    // Convert all values to numbers and sort
     const sorted = [...arr].map(Number).sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
-    
-    // For even length, take average of two middle values
     if (sorted.length % 2 === 0) {
       return Math.floor((sorted[mid - 1] + sorted[mid]) / 2);
     }
-    // For odd length, take middle value
     return sorted[mid];
   };
 
-  // Prepare chart data
   const chartData = Object.entries(grouped).map(([division, values]) => {
     const count = values.count;
     const medianAge = calculateMedian(values.ages);
     const medianSalary = calculateMedian(values.salaries);
-
-    console.log(`${division} stats:`, {
-      count,
-      ages: values.ages,
-      salaries: values.salaries,
-      medianAge,
-      medianSalary
-    }); // Debug log
 
     return {
       division,
@@ -70,7 +54,6 @@ export function ChartAreaInteractive({ data }) {
     };
   });
 
-  // Find the highest values for normalization (keep this part)
   const maxMedianSalary = Math.max(...chartData.map((d) => d.medianSalary));
   const maxMedianAge = Math.max(...chartData.map((d) => d.medianAge));
   const maxCount = Math.max(...chartData.map((d) => d.count));

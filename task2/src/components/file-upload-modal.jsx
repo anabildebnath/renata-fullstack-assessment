@@ -10,11 +10,9 @@ export function FileUploadModal({ isOpen, onClose, onUpload }) {
   const validateAndFormatData = (rawData) => {
     console.log("Raw data:", rawData);
 
-    // Filter and validate rows without skipping any data rows
     const validRows = rawData.filter((row) => {
       console.log("Processing row:", row);
 
-      // Check if required fields exist and are valid
       return (
         row["ID"] &&
         row["Customer Name"] &&
@@ -28,7 +26,6 @@ export function FileUploadModal({ isOpen, onClose, onUpload }) {
 
     console.log("Valid rows before formatting:", validRows);
 
-    // Format the valid rows
     return validRows.map((row) => ({
       ID: String(row["ID"]),
       CustomerName: String(row["Customer Name"]),
@@ -60,12 +57,11 @@ export function FileUploadModal({ isOpen, onClose, onUpload }) {
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
 
-      // Convert Excel data to JSON with headers option set to true
       const rawData = utils.sheet_to_json(worksheet, {
         raw: false,
         defval: "",
         blankrows: false,
-        headers: true, // This ensures the first row is treated as headers
+        headers: true,
       });
 
       console.log("Raw Excel data:", rawData);
@@ -83,7 +79,6 @@ export function FileUploadModal({ isOpen, onClose, onUpload }) {
         );
       }
 
-      // Save file metadata to localStorage
       const uploadedFiles = JSON.parse(localStorage.getItem("uploadedFiles") || "[]");
       uploadedFiles.push({
         name: file.name,

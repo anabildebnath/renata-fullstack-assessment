@@ -32,12 +32,10 @@ export function NavDocuments({
   const navigate = useNavigate();
 
   const handleWordAssistantRedirect = () => {
-    // Redirect to Gemini
     window.location.href = "https://gemini.example.com";
   };
 
   const handleMorePopup = () => {
-    // Show a popup for "More"
     alert("More: Added later based on new requirements.");
   };
 
@@ -49,7 +47,7 @@ export function NavDocuments({
     } else if (itemName === "Reports") {
       navigate("/reports");
     } else if (itemName === "Word Assistant") {
-      window.open("https://gemini.google.com/", "_blank"); // Open Gemini in new tab
+      window.open("https://gemini.google.com/", "_blank");
     }
   };
 
@@ -125,17 +123,17 @@ export function NavDocuments({
       />
 
       <Dialog 
-        modal={false} // Allow clicking outside to close
+        modal={false}
         open={isDataLibraryOpen} 
         onOpenChange={handleDialogClose}
       >
         <div 
           className="dialog-backdrop"
-          onClick={handleDialogClose} // Close when clicking the backdrop
+          onClick={handleDialogClose}
         >
           <DialogContent 
             className="popup-form" 
-            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the content
+            onClick={(e) => e.stopPropagation()}
             style={{
               width: '800px',
               minHeight: '200px',

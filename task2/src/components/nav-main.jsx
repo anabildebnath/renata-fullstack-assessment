@@ -53,6 +53,10 @@ export function NavMain({ items = [], setIsFormOpen, onApplyFilter }) {
     }
   };
 
+  const handleExternalLink = (url) => {
+    window.open(url, "_blank");
+  };
+
   return (
     <>
       <SidebarGroup>
@@ -75,6 +79,14 @@ export function NavMain({ items = [], setIsFormOpen, onApplyFilter }) {
                   {item.title === "Filter" ? (
                     <button
                       onClick={() => handleItemClick(item)}
+                      className="flex items-center gap-2 w-full nav-main-button min-w-8 bg-transparent text-sidebar-foreground duration-200 ease-linear hover:bg-gray-900"
+                    >
+                      {item.icon && <item.icon />}
+                      <span>{item.title}</span>
+                    </button>
+                  ) : item.url.startsWith("http") ? (
+                    <button
+                      onClick={() => handleExternalLink(item.url)}
                       className="flex items-center gap-2 w-full nav-main-button min-w-8 bg-transparent text-sidebar-foreground duration-200 ease-linear hover:bg-gray-900"
                     >
                       {item.icon && <item.icon />}
