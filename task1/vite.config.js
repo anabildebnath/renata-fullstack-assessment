@@ -9,6 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default defineConfig({
+  base: './',
   plugins: [
     react(),
     tailwindcssVite(), // This the reason why tailwindcss styling wasn't getting applied
