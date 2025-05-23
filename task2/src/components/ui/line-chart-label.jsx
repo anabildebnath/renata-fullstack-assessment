@@ -1,67 +1,113 @@
 "use client";
 
-import React from "react";
-import { Line } from "react-chartjs-2";
+import { TrendingUp } from "lucide-react";
+import { CartesianGrid, LabelList, Line, LineChart, XAxis } from "recharts";
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-
-// Register ChartJS components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
 export function LineChartLabel({ data = [] }) {
-  // Process data for the chart
-  const divisionCounts = data.reduce((acc, item) => {
-    const division = item.Division || "Unknown";
-    acc[division] = (acc[division] || 0) + 1;
-    return acc;
-  }, {});
+  const processChartData = (data) => {
+    const divisionMap = data.reduce((acc, curr) => {
+      const division = curr.Division;
+      if (!acc[division]) {
+        acc[division] = { count: 0, income: 0 };
+      }
+      acc[division].count += 1;
+      acc[division].income += curr.Income;
+      return acc;
+    }, {});
 
-  const chartData = {
-    labels: Object.keys(divisionCounts),
-    datasets: [
-      {
-        label: "Customers by Division",
-        data: Object.values(divisionCounts),
-        borderColor: "rgb(75, 192, 192)",
-        backgroundColor: "rgba(75, 192, 192, 0.5)",
-        tension: 0.1,
-      },
-    ],
+    return Object.entries(divisionMap).map(([division, values]) => ({
+      division,
+      customers: values.count,
+      avgIncome: Math.round(values.income / values.count),
+    }));
   };
 
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "top",
-      },
-      title: {
-        display: true,
-        text: "Division Distribution",
-      },
+  const chartData = processChartData(data);
+
+  const chartConfig = {
+    customers: {
+      label: "Customers",
+      color: "hsl(var(--chart-1))",
+    },
+    avgIncome: {
+      label: "Average Income",
+      color: "hsl(var(--chart-2))",
     },
   };
 
   return (
-    <div className="w-full h-[300px] p-4 bg-white rounded-lg shadow">
-      <Line options={options} data={chartData} />
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Division Performance</CardTitle>
+        <CardDescription>Customer Count and Average Income</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ChartContainer config={chartConfig}>
+          <LineChart
+            data={chartData}
+            margin={{
+              top: 20,
+              left: 12,
+              right: 12,
+            }}
+          >
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="division"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={(value) => value.slice(0, 3)}
+            />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent indicator="line" />}
+            />
+            <Line
+              dataKey="customers"
+              type="natural"
+              stroke="hsl(var(--chart-1))"
+              strokeWidth={2}
+              dot={{
+                fill: "hsl(var(--chart-1))",
+              }}
+              activeDot={{
+                r: 6,
+              }}
+            >
+              <LabelList
+                position="top"
+                offset={12}
+                className="fill-foreground"
+                fontSize={12}
+              />
+            </Line>
+          </LineChart>
+        </ChartContainer>
+      </CardContent>
+      <CardFooter className="flex-col items-start gap-2 text-sm">
+        <div className="flex gap-2 font-medium leading-none">
+          Division-wise customer distribution{" "}
+          <TrendingUp className="h-4 w-4" />
+        </div>
+        <div className="leading-none text-muted-foreground">
+          Showing customer count across divisions
+        </div>
+      </CardFooter>
+    </Card>
   );
 }

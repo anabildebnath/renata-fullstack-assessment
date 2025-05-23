@@ -1,81 +1,96 @@
 "use client";
 
-import * as React from "react";
-import { Pie } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { TrendingUp } from "lucide-react";
+import { Pie, PieChart } from "recharts";
 
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-ChartJS.register(ArcElement, Tooltip, Legend);
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
 export function PieChartLabel({ data = [] }) {
-  // Validate the data prop
-  if (!Array.isArray(data) || data.length === 0) {
-    console.warn("Invalid or empty data provided to PieChartLabel:", data);
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Highest Salary by Division</CardTitle>
-          <CardDescription>No data available</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-center text-muted-foreground">
-            No valid data to display.
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
+  const processChartData = (data) => {
+    const divisionMap = data.reduce((acc, curr) => {
+      if (!acc[curr.Division]) {
+        acc[curr.Division] = {
+          division: curr.Division,
+          income: curr.Income,
+        };
+      } else if (curr.Income > acc[curr.Division].income) {
+        acc[curr.Division].income = curr.Income;
+      }
+      return acc;
+    }, {});
 
-  const chartData = {
-    labels: data.map((item) => item.name),
-    datasets: [
-      {
-        data: data.map((item) => item.value),
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.5)",
-          "rgba(54, 162, 235, 0.5)",
-          "rgba(255, 206, 86, 0.5)",
-          "rgba(75, 192, 192, 0.5)",
-          "rgba(153, 102, 255, 0.5)",
-        ],
-        borderWidth: 1,
-      },
-    ],
+    return Object.entries(divisionMap).map(([division, data], index) => ({
+      name: division,
+      value: data.income,
+      fill: `hsl(var(--chart-${index + 1}))`,
+    }));
   };
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top",
-      },
-      title: {
-        display: true,
-        text: "Division Distribution",
-      },
+  const chartData = processChartData(data);
+
+  const chartConfig = {
+    value: {
+      label: "Income",
     },
+    ...chartData.reduce(
+      (acc, curr, index) => ({
+        ...acc,
+        [curr.name]: {
+          label: curr.name,
+          color: `hsl(var(--chart-${index + 1}))`,
+        },
+      }),
+      {}
+    ),
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Highest Salary by Division</CardTitle>
-        <CardDescription>
-          Showing the highest salary and division details
-        </CardDescription>
+    <Card className="flex flex-col">
+      <CardHeader className="items-center pb-0">
+        <CardTitle>Highest Income by Division</CardTitle>
+        <CardDescription>Division Income Distribution</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="w-full h-[300px] p-4 bg-white rounded-lg shadow">
-          <Pie data={chartData} options={options} />
-        </div>
+      <CardContent className="flex-1 pb-0">
+        <ChartContainer
+          config={chartConfig}
+          className="mx-auto aspect-square max-h-[250px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
+        >
+          <PieChart>
+            <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+            <Pie
+              data={chartData}
+              dataKey="value"
+              nameKey="name"
+              label
+              cx="50%"
+              cy="50%"
+              outerRadius={80}
+            />
+          </PieChart>
+        </ChartContainer>
       </CardContent>
+      <CardFooter className="flex-col gap-2 text-sm">
+        <div className="flex items-center gap-2 font-medium leading-none">
+          Division Income Overview{" "}
+          <TrendingUp className="h-4 w-4" />
+        </div>
+        <div className="leading-none text-muted-foreground">
+          Showing highest income for each division
+        </div>
+      </CardFooter>
     </Card>
   );
 }

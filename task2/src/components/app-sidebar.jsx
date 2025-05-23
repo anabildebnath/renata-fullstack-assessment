@@ -172,7 +172,7 @@ export function AppSidebar({ setIsFormOpen, onApplyFilter, ...props }) {
             >
               <a href="#" className="flex items-center gap-2">
                 <img
-                  src="/assets/renata-logo2.png"
+                  src="../../public/logo.png"
                   alt="Renata Logo"
                   className="h-5 w-5"
                 />
